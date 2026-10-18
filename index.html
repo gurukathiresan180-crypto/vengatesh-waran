@@ -315,6 +315,85 @@
   #dashboardPage.mode-create .summary{ display:none; }
   #dashboardPage.mode-create .results-panel{ display:none; }
   /* READING title: shown only on the DASHBOARD page */
+  /* ===== TOTAL LOG page ===== */
+  .layout > *{ min-width:0; }   /* let wide tables scroll inside their card instead of stretching the page */
+  .log-panel{ display:none; }
+  #dashboardPage.mode-total-log .log-panel{ display:block; }
+  .log-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+  .log-title{ margin:0; font-size:24px; font-weight:700; letter-spacing:0.8px; color:var(--text); }
+  .log-sub{ color:var(--text-dim); font-size:13px; margin-top:4px; max-width:620px; }
+  .log-status{
+    display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-dim);
+    border:1px solid var(--border); border-radius:999px; padding:6px 12px; background:var(--panel); cursor:help;
+  }
+  .log-dot{ width:8px; height:8px; border-radius:50%; background:var(--amber); flex-shrink:0; }
+  .log-kpis{ grid-template-columns: repeat(3, 1fr); }
+  .log-toolbar{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
+  .log-toolbar input, .log-toolbar select{ width:auto; padding:8px 10px; font-size:13px; }
+  .log-toolbar .log-search{ flex:1 1 200px; min-width:160px; max-width:280px; }
+  .log-toolbar label.log-lbl{ margin:0; font-size:12px; color:var(--text-dim); }
+  .log-toolbar .log-spacer{ flex:1; }
+  .log-btn{
+    display:inline-flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--border);
+    color:var(--text-dim); font-size:12.5px; padding:8px 12px; border-radius:var(--radius); cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .log-btn svg{ width:14px; height:14px; }
+  .log-btn:hover{ border-color:var(--text-dim); color:var(--text); }
+  .log-btn.on{ border-color:var(--amber); color:var(--amber); background:rgba(224,147,46,0.1); }
+  .log-seg{ display:inline-flex; }
+  .log-seg .log-btn{ border-radius:0; }
+  .log-seg .log-btn:first-child{ border-radius:var(--radius) 0 0 var(--radius); }
+  .log-seg .log-btn:last-child{ border-radius:0 var(--radius) var(--radius) 0; border-left:none; }
+  .ov-table.log-table{ min-width:940px; border:1px solid var(--border-soft); }
+  .ov-table.log-table th, .ov-table.log-table td{ border:1px solid var(--border-soft); }
+  .ov-table.log-table th{ background:var(--panel-2); }
+  .ov-table.log-table th.sortable{ cursor:pointer; user-select:none; }
+  .ov-table.log-table th.sortable:hover{ color:var(--text); }
+  .ov-table.log-table .sort-ind{ display:inline-block; width:10px; color:var(--amber); }
+  .ov-table.log-table th, .ov-table.log-table td{ padding:8px 8px; }
+  .ov-table.log-table th{ white-space:normal; line-height:1.3; }
+  .ov-table.log-table td{ white-space:nowrap; vertical-align:middle; }
+  .ov-table.log-table td:nth-child(4), .ov-table.log-table td:nth-child(5){ white-space:normal; min-width:104px; }
+  .ov-table.log-table td.remarks{ white-space:normal; min-width:140px; }
+  .log-chip{
+    display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:2px 8px; margin:2px 4px 2px 0;
+    border-radius:10px; border:1px solid var(--border); color:var(--text-dim); white-space:nowrap;
+  }
+  .log-chip svg{ width:11px; height:11px; }
+  .log-chip.ok{ color:var(--green); border-color:rgba(111,169,122,0.5); background:rgba(111,169,122,0.1); }
+  .log-chip.warn{ color:var(--amber); border-color:rgba(224,147,46,0.5); background:rgba(224,147,46,0.1); }
+  .log-chip.bad{ color:#E39685; border-color:rgba(193,85,60,0.6); background:rgba(193,85,60,0.12); }
+  .log-chip.info{ color:#7DB1DE; border-color:rgba(91,155,213,0.5); background:rgba(91,155,213,0.1); }
+  .log-act{
+    background:transparent; border:1px solid var(--border); color:var(--text-dim); border-radius:var(--radius);
+    width:28px; height:28px; padding:0; margin-right:4px; cursor:pointer; vertical-align:middle;
+  }
+  .log-act svg{ width:13px; height:13px; }
+  .log-act:hover{ color:var(--text); border-color:var(--text-dim); }
+  .log-act.del:hover{ color:var(--red); border-color:var(--red); }
+  .log-pager{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-top:14px; font-size:12.5px; color:var(--text-dim); }
+  .log-pager select{ width:auto; padding:5px 8px; font-size:12px; }
+  .log-pager .log-btn:disabled{ opacity:0.4; cursor:default; }
+  .log-note{ margin-top:12px; font-size:11.5px; color:var(--text-faint); line-height:1.5; }
+  @media (max-width:980px){ .log-kpis{ grid-template-columns: 1fr; } }
+  @media (max-width:700px){
+    .log-toolbar .log-search, .log-toolbar input, .log-toolbar select{ flex:1 1 100%; max-width:none; width:100%; }
+    .log-toolbar .log-spacer{ display:none; }
+  }
+  @media print{
+    html, body{ background:#fff !important; color:#000 !important; }
+    .side-nav, .hamburger-btn, .sidenav-backdrop, .top .header-right, .log-toolbar, .log-pager, .log-status, .log-act, .log-note, .log-actions-col{ display:none !important; }
+    .main-content{ margin-left:0 !important; padding:0 !important; }
+    .shell{ max-width:none !important; padding:0 !important; }
+    .ov-card{ background:#fff !important; border:1px solid #999 !important; color:#000 !important; }
+    .log-title, .ov-kpi-value, .ov-kpi-label{ color:#000 !important; }
+    .ov-table.log-table{ min-width:0 !important; width:100%; }
+    .ov-table.log-table th, .ov-table.log-table td{ color:#000 !important; background:#fff !important; border:1px solid #888 !important; font-size:10px !important; }
+    .log-chip{ border:1px solid #888 !important; color:#000 !important; background:#fff !important; }
+    .ov-table-wrap{ overflow:visible !important; }
+  }
+
   /* ===== Dashboard overview (KPI cards, charts, latest readings) ===== */
   .overview-panel{ display:none; }
   #dashboardPage.mode-create .overview-panel{ display:block; }
@@ -791,6 +870,98 @@
 
   <div class="layout">
 
+    <div class="log-panel" id="totalLogPanel">
+      <div class="log-head">
+        <div>
+          <h2 class="log-title">TOTAL LOG</h2>
+          <div class="log-sub">Every saved meter reading with its initial reading, current reading and consumption. Nothing here is estimated — it is all read from the readings saved in this application.</div>
+        </div>
+        <div class="log-status" id="logStatus" title="">
+          <span class="log-dot"></span><span id="logStatusText">Checking storage…</span>
+        </div>
+      </div>
+
+      <div class="ov-kpis log-kpis">
+        <div class="ov-card ov-kpi">
+          <div class="ov-icon ov-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="12" x2="15.5" y2="8.5"></line><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle></svg></div>
+          <div class="ov-kpi-body">
+            <div class="ov-kpi-label">TOTAL METERS</div>
+            <div class="ov-kpi-value mono" id="logKpiMeters">—</div>
+            <div class="ov-kpi-sub" id="logKpiMetersSub"></div>
+          </div>
+        </div>
+        <div class="ov-card ov-kpi">
+          <div class="ov-icon ov-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
+          <div class="ov-kpi-body">
+            <div class="ov-kpi-label">TOTAL READING RECORDS</div>
+            <div class="ov-kpi-value mono" id="logKpiRecords">—</div>
+            <div class="ov-kpi-sub" id="logKpiRecordsSub"></div>
+          </div>
+        </div>
+        <div class="ov-card ov-kpi">
+          <div class="ov-icon ov-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+          <div class="ov-kpi-body">
+            <div class="ov-kpi-label">TOTAL ENERGY CONSUMPTION (kWh)</div>
+            <div class="ov-kpi-value mono" id="logKpiEnergy">—</div>
+            <div class="ov-kpi-sub" id="logKpiEnergySub"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ov-card">
+        <div class="log-toolbar">
+          <input type="text" class="log-search" id="logSearch" placeholder="Search meter, category or date…" aria-label="Search">
+          <label class="log-lbl" for="logFrom">From</label>
+          <input type="date" id="logFrom" aria-label="From date">
+          <label class="log-lbl" for="logTo">To</label>
+          <input type="date" id="logTo" aria-label="To date">
+          <select id="logCat" aria-label="Meter category"></select>
+          <button type="button" class="log-btn" id="logClear">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            Clear filter
+          </button>
+        </div>
+        <div class="log-toolbar">
+          <div class="log-seg" role="group" aria-label="View">
+            <button type="button" class="log-btn on" id="logModeRecords">All readings</button>
+            <button type="button" class="log-btn" id="logModeSummary">Meter summary</button>
+          </div>
+          <span class="log-spacer"></span>
+          <button type="button" class="log-btn" id="logExportCsv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export CSV
+          </button>
+          <button type="button" class="log-btn" id="logExportXlsx">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+            Export Excel
+          </button>
+          <button type="button" class="log-btn" id="logPrint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print
+          </button>
+        </div>
+
+        <div class="ov-table-wrap">
+          <table class="ov-table log-table">
+            <thead><tr id="logHeadRow"></tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+
+        <div class="log-pager">
+          <span id="logPagerInfo"></span>
+          <span style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <label for="logPageSize" style="margin:0;">Rows per page</label>
+            <select id="logPageSize"><option>10</option><option selected>25</option><option>50</option><option>100</option></select>
+            <button type="button" class="log-btn" id="logPrev">Previous</button>
+            <span id="logPageNo"></span>
+            <button type="button" class="log-btn" id="logNext">Next</button>
+          </span>
+        </div>
+        <div class="log-note" id="logNote"></div>
+      </div>
+    </div>
+
     <div class="overview-panel" id="overviewPanel">
       <div class="ov-error" id="ovError" style="display:none;"></div>
 
@@ -951,6 +1122,9 @@
   </div>
 
   <div id="adminSettingsPanel">
+    <div class="admin-warning">
+      <strong>Heads up:</strong> this is a front-end-only demo. "Admin-only" here means the UI hides these controls from non-admin accounts — since everything runs in your browser with no server, it isn't real security. Don't rely on this to protect sensitive data.
+    </div>
 
     <div class="admin-tabs" id="adminTabs">
       <button type="button" class="admin-tab active" data-admin-tab="panel">Panel Management</button>
@@ -1029,7 +1203,7 @@
         <div class="table-wrap" style="border:none;">
           <table>
             <thead>
-              <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr>
+              <tr><th>Name</th><th>Email ID</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr>
             </thead>
             <tbody id="userMgmtBody"></tbody>
           </table>
@@ -1037,6 +1211,7 @@
 
         <div class="admin-add-user-row">
           <input id="umNewName" placeholder="Full name">
+          <input id="umNewEmail" type="email" placeholder="Email ID">
           <input id="umNewUser" class="mono" placeholder="Username">
           <input id="umNewPass" class="mono" type="password" placeholder="Password (min 6 chars)">
           <select id="umNewRole">
@@ -1084,6 +1259,31 @@
     <div class="modal-actions">
       <button class="btn-ghost" id="resetSettingsCancel" type="button">Cancel</button>
       <button class="btn-primary" id="resetSettingsConfirm" type="button" style="width:auto; margin-top:0;">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOTAL LOG: EDIT / DELETE A READING (admin only) ================= -->
+<div class="modal-overlay" id="logEditModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-title">Edit reading</div>
+    <div class="modal-text" id="logEditText"></div>
+    <label for="logEditValue" style="margin-top:14px;">Reading</label>
+    <input id="logEditValue" class="mono" type="number" step="0.01">
+    <div class="err" id="logEditErr">Enter a number that is 0 or more.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="logEditCancel" type="button">Cancel</button>
+      <button class="btn-primary" id="logEditSave" type="button" style="width:auto; margin-top:0;">Save</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="logDeleteModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-title">Delete this reading?</div>
+    <div class="modal-text" id="logDeleteText"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="logDeleteCancel" type="button">Cancel</button>
+      <button class="btn-primary" id="logDeleteConfirm" type="button" style="width:auto; margin-top:0; background:var(--red); color:#fff;">Delete</button>
     </div>
   </div>
 </div>
@@ -1163,6 +1363,10 @@
       <label for="regName">Name</label>
       <input id="regName" type="text" placeholder="Your full name" autocomplete="name">
       <div class="err" id="regNameErr">Please enter your name</div>
+
+      <label for="regEmail" style="margin-top:14px;">Email ID</label>
+      <input id="regEmail" type="email" placeholder="name@example.com" autocomplete="email">
+      <div class="err" id="regEmailErr">Enter a valid email address</div>
 
       <label for="regUser" style="margin-top:14px;">Username</label>
       <input id="regUser" class="mono" type="text" placeholder="Choose a username" autocomplete="username">
@@ -1293,9 +1497,17 @@ function getDemoUsers(){
 function saveDemoUsers(users){
   localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users));
 }
-function saveDemoUser(user, pass, role, name){
+var EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function isValidEmail(e){ return EMAIL_PATTERN.test(String(e || '').trim()); }
+function emailInUse(email){
+  var target = String(email || '').trim().toLowerCase();
+  if(!target) return false;
   var users = getDemoUsers();
-  users[user] = { password: pass, role: (role === ROLE_ADMIN ? ROLE_ADMIN : ROLE_USER), active: true, name: (name || '').trim() };
+  return Object.keys(users).some(function(u){ return String(users[u].email || '').toLowerCase() === target; });
+}
+function saveDemoUser(user, pass, role, name, email){
+  var users = getDemoUsers();
+  users[user] = { password: pass, role: (role === ROLE_ADMIN ? ROLE_ADMIN : ROLE_USER), active: true, name: (name || '').trim(), email: (email || '').trim().toLowerCase() };
   saveDemoUsers(users);
 }
 function userExists(user){
@@ -1554,6 +1766,8 @@ function showLogin(){
   var registerForm = document.getElementById('registerForm');
   var regNameEl = document.getElementById('regName');
   var regNameErr = document.getElementById('regNameErr');
+  var regEmailEl = document.getElementById('regEmail');
+  var regEmailErr = document.getElementById('regEmailErr');
   var regUserEl = document.getElementById('regUser');
   var regPassEl = document.getElementById('regPass');
   var regPassConfirmEl = document.getElementById('regPassConfirm');
@@ -1566,7 +1780,7 @@ function showLogin(){
 
   openRegisterLink.addEventListener('click', function(){
     registerForm.reset();
-    [regNameErr, regUserErr, regPassErr, regConfirmErr].forEach(function(e){ e.style.display = 'none'; });
+    [regNameErr, regEmailErr, regUserErr, regPassErr, regConfirmErr].forEach(function(e){ e.style.display = 'none'; });
     registerAlert.style.display = 'none';
     registerModal.style.display = 'flex';
     regNameEl.focus();
@@ -1580,16 +1794,20 @@ function showLogin(){
 
   registerForm.addEventListener('submit', function(ev){
     ev.preventDefault();
-    [regNameErr, regUserErr, regPassErr, regConfirmErr].forEach(function(e){ e.style.display = 'none'; });
+    [regNameErr, regEmailErr, regUserErr, regPassErr, regConfirmErr].forEach(function(e){ e.style.display = 'none'; });
     registerAlert.style.display = 'none';
 
     var newName = regNameEl.value.trim().replace(/\s+/g, ' ');
+    var newEmail = regEmailEl.value.trim().toLowerCase();
     var newUser = regUserEl.value.trim();
     var newPass = regPassEl.value;
     var confirmPass = regPassConfirmEl.value;
     var valid = true;
 
     if(newName.length < 2){ regNameErr.style.display = 'block'; valid = false; }
+
+    if(!isValidEmail(newEmail)){ regEmailErr.textContent = 'Enter a valid email address'; regEmailErr.style.display = 'block'; valid = false; }
+    else if(emailInUse(newEmail)){ regEmailErr.textContent = 'That email is already registered'; regEmailErr.style.display = 'block'; valid = false; }
 
     if(!newUser){ regUserErr.textContent = 'Please choose a username'; regUserErr.style.display = 'block'; valid = false; }
     else if(userExists(newUser)){ regUserErr.textContent = 'That username is already taken'; regUserErr.style.display = 'block'; valid = false; }
@@ -1599,7 +1817,7 @@ function showLogin(){
 
     if(!valid) return;
 
-    saveDemoUser(newUser, newPass, ROLE_USER, newName);
+    saveDemoUser(newUser, newPass, ROLE_USER, newName, newEmail);
     registerModal.style.display = 'none';
     userEl.value = newUser;
     passEl.value = '';
@@ -2655,9 +2873,9 @@ function runDashboard(){
     // ---- User Management ----
     function allUsersList(){
       var users = getDemoUsers();
-      var list = [{ username: DEMO_USER, name: PROFILE_FULL_NAMES[DEMO_USER] || '', role: ROLE_ADMIN, active: true, builtin: true }];
+      var list = [{ username: DEMO_USER, name: PROFILE_FULL_NAMES[DEMO_USER] || '', email: '', role: ROLE_ADMIN, active: true, builtin: true }];
       Object.keys(users).forEach(function(u){
-        list.push({ username: u, name: users[u].name || '', role: users[u].role, active: users[u].active !== false, builtin: false });
+        list.push({ username: u, name: users[u].name || '', email: users[u].email || '', role: users[u].role, active: users[u].active !== false, builtin: false });
       });
       return list;
     }
@@ -2671,6 +2889,7 @@ function runDashboard(){
         var canManage = !u.builtin && u.username !== getCurrentUser();
         return '<tr>'
           + '<td>'+(u.name ? escapeHtml(u.name) : '<span style="color:var(--text-faint);">—</span>')+'</td>'
+          + '<td>'+(u.email ? escapeHtml(u.email) : '<span style="color:var(--text-faint);">—</span>')+'</td>'
           + '<td class="mono">'+escapeHtml(u.username)+(u.builtin ? ' <span class="role-tag role-admin" style="margin-left:6px;">built-in</span>' : '')+'</td>'
           + '<td><select class="um-role-select mono" data-user="'+escapeHtml(u.username)+'" '+(u.builtin?'disabled':'')+'>'+roleOptions+'</select></td>'
           + '<td><span class="status-tag'+(u.active?'':' inactive')+'">'+(u.active?'Active':'Inactive')+'</span></td>'
@@ -2709,16 +2928,23 @@ function runDashboard(){
     document.getElementById('umAddBtn').addEventListener('click', function(){
       if(!isAdmin()) return;
       var nEl = document.getElementById('umNewName');
+      var eEl = document.getElementById('umNewEmail');
       var uEl = document.getElementById('umNewUser');
       var pEl = document.getElementById('umNewPass');
       var rEl = document.getElementById('umNewRole');
       var msg = document.getElementById('umMsg');
       msg.style.display = 'none';
       var n = nEl.value.trim().replace(/\s+/g, ' ');
+      var em = eEl.value.trim().toLowerCase();
       var u = uEl.value.trim();
       var p = pEl.value;
       if(n.length < 2){
         msg.textContent = 'Enter the user\'s name.';
+        msg.style.display = 'block';
+        return;
+      }
+      if(!isValidEmail(em) || emailInUse(em)){
+        msg.textContent = !isValidEmail(em) ? 'Enter a valid email address.' : 'That email is already registered.';
         msg.style.display = 'block';
         return;
       }
@@ -2732,8 +2958,8 @@ function runDashboard(){
         msg.style.display = 'block';
         return;
       }
-      saveDemoUser(u, p, rEl.value === 'admin' ? ROLE_ADMIN : ROLE_USER, n);
-      nEl.value = ''; uEl.value = ''; pEl.value = ''; rEl.value = 'user';
+      saveDemoUser(u, p, rEl.value === 'admin' ? ROLE_ADMIN : ROLE_USER, n, em);
+      nEl.value = ''; eEl.value = ''; uEl.value = ''; pEl.value = ''; rEl.value = 'user';
       renderUserMgmtTable();
       msg.textContent = 'User "' + u + '" added.';
       msg.style.display = 'block';
@@ -3247,10 +3473,443 @@ function runDashboard(){
     ovResizeTimer = setTimeout(renderOverview, 150);
   });
 
+  /* ===== TOTAL LOG page ==========================================================
+     One row per saved reading (history is never merged or replaced).
+       Initial Reading = the same meter's previous reading (the start of that interval);
+                         for a meter's first reading it is the reading itself (baseline).
+       Current Reading = the reading saved on that row.
+       Consumption     = Current - Initial, only for kWh meters (MAIN LT, P3 SUB LT, UPS).
+     A reading that goes DOWN is never counted: it is flagged as a possible meter reset
+     or entry error. Hours (DG) and litres (DIESEL) are shown but never added to kWh.
+     "Meter summary" view: per meter, Initial = first reading in the chosen period,
+     Current = latest, Consumption = sum of the non-negative steps in between.
+     ============================================================================== */
+  var KWH_SECTIONS = { 'main-lt':true, 'p3-sub-lt':true, 'ups-reading':true };
+  var logState = { sort:{ key:'date', dir:'desc' }, page:1, size:25, mode:'records', search:'', from:'', to:'', cat:'', printAll:false };
+  var logRowsCache = [];
+  var LOG_COLS = [
+    { key:'sno', label:'S.No', sortable:false },
+    { key:'date', label:'Date', sortable:true },
+    { key:'time', label:'Time', sortable:true },
+    { key:'category', label:'Meter Category', sortable:true },
+    { key:'meter', label:'Meter Name', sortable:true },
+    { key:'initial', label:'Initial Reading', sortable:true, num:true },
+    { key:'current', label:'Current Reading', sortable:true, num:true },
+    { key:'consumption', label:'Consumption (kWh)', sortable:true, num:true },
+    { key:'remarks', label:'Remarks', sortable:false },
+    { key:'actions', label:'Actions', sortable:false, actions:true }
+  ];
+  var LOG_ICON = {
+    ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    bad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>',
+    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>'
+  };
+
+  function logUnitFor(roomId, key){
+    if(KWH_SECTIONS[roomId]) return 'kWh';
+    if(roomId === 'dg-reading'){
+      if(/RUNNING HOURS$/.test(key)) return 'hours';
+      if(/\(LITRES\/HOUR\)$/.test(key)) return 'litres/hour';
+      return 'litres';
+    }
+    return 'litres';
+  }
+  function logTimeOf(updatedAt){
+    var m = /\s(\d{2}:\d{2}:\d{2})/.exec(updatedAt || '');
+    return m ? m[1] : '';
+  }
+  function isoDayDiff(a, b){
+    var pa = a.split('-'), pb = b.split('-');
+    return Math.round((Date.UTC(+pb[0], +pb[1]-1, +pb[2]) - Date.UTC(+pa[0], +pa[1]-1, +pa[2])) / 86400000);
+  }
+
+  // Every saved reading, with the same meter's previous reading looked up from the FULL history.
+  function buildLogRecords(){
+    var out = [];
+    ROOMS.forEach(function(room){
+      var by = {};
+      (dataByRoom[room.id] || []).forEach(function(r){
+        if(typeof r.reading === 'number' && isFinite(r.reading) && r.date){ (by[r.equipment] = by[r.equipment] || []).push(r); }
+      });
+      Object.keys(by).forEach(function(key){
+        var recs = by[key].slice().sort(function(a,b){ return a.date.localeCompare(b.date) || a.id.localeCompare(b.id); });
+        recs.forEach(function(r, i){
+          var prev = i > 0 ? recs[i-1] : null;
+          out.push({
+            recId:r.id, roomId:room.id, category:room.name, key:key,
+            meter:fieldDisplayName(room.id, key), date:r.date, time:logTimeOf(r.updatedAt),
+            reading:r.reading, prev:prev ? prev.reading : null, prevDate:prev ? prev.date : null,
+            kwh:!!KWH_SECTIONS[room.id], unit:logUnitFor(room.id, key)
+          });
+        });
+      });
+    });
+    return out;
+  }
+
+  function logRecordRow(rec){
+    var row = {
+      mode:'record', recId:rec.recId, roomId:rec.roomId, date:rec.date, time:rec.time, category:rec.category,
+      meter:rec.meter, initial:rec.prev !== null ? rec.prev : rec.reading, current:rec.reading,
+      consumption:null, remarks:[], unit:rec.unit
+    };
+    if(rec.prev === null){ row.remarks.push({ t:'info', text:'First reading (baseline)' }); }
+    if(rec.kwh && rec.prev !== null){
+      var diff = round2(rec.reading - rec.prev);
+      if(diff < 0){
+        row.remarks.push({ t:'bad', text:'Reading dropped — check for meter reset or entry error' });
+      } else {
+        row.consumption = diff;
+        row.remarks.push(diff === 0 ? { t:'warn', text:'No consumption' } : { t:'ok', text:'OK' });
+      }
+      var gap = isoDayDiff(rec.prevDate, rec.date);
+      if(gap > 1){ row.remarks.push({ t:'warn', text:(gap - 1) + ' day' + (gap - 1 === 1 ? '' : 's') + ' without a reading' }); }
+    }
+    if(!rec.kwh){ row.remarks.push({ t:'', text:'Measured in ' + rec.unit + ' — not added to kWh' }); }
+    return row;
+  }
+
+  function logSummaryRows(records){
+    var groups = {};
+    records.forEach(function(r){ (groups[r.roomId + '|' + r.key] = groups[r.roomId + '|' + r.key] || []).push(r); });
+    return Object.keys(groups).map(function(g){
+      var recs = groups[g].slice().sort(function(a,b){ return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); });
+      var first = recs[0], last = recs[recs.length - 1];
+      var row = {
+        mode:'summary', date:last.date, time:last.time, category:last.category, meter:last.meter,
+        initial:first.reading, current:last.reading, consumption:null, remarks:[], unit:last.unit
+      };
+      if(last.kwh){
+        if(recs.length < 2){
+          row.remarks.push({ t:'info', text:'Needs two readings to calculate consumption' });
+        } else {
+          var sum = 0, drops = 0;
+          for(var i = 1; i < recs.length; i++){
+            var d = round2(recs[i].reading - recs[i-1].reading);
+            if(d < 0){ drops++; } else { sum += d; }
+          }
+          row.consumption = round2(sum);
+          row.remarks.push({ t:'ok', text:recs.length + ' readings' });
+          if(drops){ row.remarks.push({ t:'bad', text:drops + ' drop' + (drops === 1 ? '' : 's') + ' ignored — possible meter reset' }); }
+        }
+      } else {
+        row.remarks.push({ t:'', text:'Measured in ' + last.unit + ' — not added to kWh' });
+      }
+      return row;
+    });
+  }
+
+  function logFilteredRecords(all){
+    var q = logState.search.toLowerCase();
+    return all.filter(function(r){
+      if(logState.cat && r.roomId !== logState.cat) return false;
+      if(logState.from && r.date < logState.from) return false;
+      if(logState.to && r.date > logState.to) return false;
+      if(q && (r.meter + ' ' + r.category + ' ' + r.date).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function logCompare(a, b){
+    var key = logState.sort.key, dir = logState.sort.dir === 'asc' ? 1 : -1, c = 0;
+    if(key === 'date'){ c = (a.date + ' ' + a.time).localeCompare(b.date + ' ' + b.time); }
+    else if(key === 'time'){ c = a.time.localeCompare(b.time); }
+    else if(key === 'category' || key === 'meter'){ c = String(a[key]).localeCompare(String(b[key])); }
+    else {
+      var av = a[key], bv = b[key];
+      if(av === null && bv === null) return 0;
+      if(av === null) return 1;      // blanks always last
+      if(bv === null) return -1;
+      c = av - bv;
+    }
+    if(c === 0){ c = String(a.meter).localeCompare(String(b.meter)); if(!c) return 0; return c; }
+    return c * dir;
+  }
+
+  function logRemarksText(row){ return row.remarks.map(function(r){ return r.text; }).join('; '); }
+
+  function logChip(r){
+    return '<span class="log-chip ' + r.t + '">' + (r.t && LOG_ICON[r.t] ? LOG_ICON[r.t] : '') + escapeHtml(r.text) + '</span>';
+  }
+
+  function renderTotalLogHeader(){
+    document.getElementById('logHeadRow').innerHTML = LOG_COLS.map(function(c){
+      var cls = (c.sortable ? 'sortable ' : '') + (c.num ? 'num ' : '') + (c.actions ? 'log-actions-col' : '');
+      var ind = '';
+      if(c.sortable){
+        ind = '<span class="sort-ind">' + (logState.sort.key === c.key ? (logState.sort.dir === 'asc' ? '▲' : '▼') : '') + '</span>';
+      }
+      return '<th class="' + cls + '"' + (c.sortable ? ' data-sort="' + c.key + '" aria-sort="' + (logState.sort.key === c.key ? (logState.sort.dir === 'asc' ? 'ascending' : 'descending') : 'none') + '"' : '') + '>'
+        + escapeHtml(c.label) + ind + '</th>';
+    }).join('');
+  }
+
+  function renderTotalLog(){
+    if(!isTotalLog()) return;
+    var statusEl = document.getElementById('logStatus');
+    document.getElementById('logStatusText').textContent = 'Saved on this device only — no database connected';
+    statusEl.title = 'Readings are stored in this browser. No Supabase or other database is configured, so nothing is synced to the cloud and clearing browser data would remove them. Export CSV regularly as a backup.';
+
+    var cat = document.getElementById('logCat');
+    var wanted = cat.value || logState.cat;
+    cat.innerHTML = '<option value="">All meter categories</option>' + ROOMS.map(function(r){
+      return '<option value="' + r.id + '">' + escapeHtml(r.name) + '</option>';
+    }).join('');
+    cat.value = wanted || '';
+
+    var all = buildLogRecords();
+    var recs = logFilteredRecords(all);
+    var rows = logState.mode === 'summary' ? logSummaryRows(recs) : recs.map(logRecordRow);
+    rows.sort(logCompare);
+    rows.forEach(function(r, i){ r.sno = i + 1; });
+    logRowsCache = rows;
+
+    // summary cards (follow the filters)
+    var meterSet = {};
+    recs.forEach(function(r){ meterSet[r.roomId + '|' + r.key] = true; });
+    var configured = 0;
+    ROOMS.forEach(function(r){ configured += (FIELD_DEFS[r.id] || []).length * (r.id === 'dg-reading' ? 3 : 1); });
+    var energy = 0, anyKwh = false;
+    rows.forEach(function(r){
+      if(r.consumption !== null){ energy += r.consumption; anyKwh = true; }
+    });
+    var filtered = !!(logState.search || logState.from || logState.to || logState.cat);
+    document.getElementById('logKpiMeters').textContent = String(Object.keys(meterSet).length);
+    document.getElementById('logKpiMetersSub').textContent = 'with saved readings · ' + configured + ' meters configured';
+    document.getElementById('logKpiRecords').textContent = String(recs.length);
+    document.getElementById('logKpiRecordsSub').textContent = filtered ? 'matching the filters (' + all.length + ' in total)' : 'all saved readings';
+    document.getElementById('logKpiEnergy').textContent = anyKwh ? fmtNum(energy) : '—';
+    document.getElementById('logKpiEnergySub').textContent = anyKwh
+      ? 'sum of kWh meters only' + (filtered ? ' · filtered' : '')
+      : 'needs two readings on a kWh meter';
+
+    renderTotalLogHeader();
+    var total = rows.length;
+    var size = logState.printAll ? Math.max(total, 1) : logState.size;
+    var pages = Math.max(1, Math.ceil(total / size));
+    if(logState.page > pages){ logState.page = pages; }
+    var start = (logState.page - 1) * size;
+    var pageRows = rows.slice(start, start + size);
+    var admin = isAdmin() && logState.mode === 'records';
+
+    var body = document.getElementById('logBody');
+    if(!total){
+      body.innerHTML = '<tr><td colspan="10" class="ov-empty" style="white-space:normal;">' + (all.length
+        ? 'No readings match these filters. Use "Clear filter" to see everything.'
+        : 'No readings have been saved yet. Enter readings from the READINGS menu and they will appear here.') + '</td></tr>';
+    } else {
+      body.innerHTML = pageRows.map(function(r){
+        var actions = admin
+          ? '<button type="button" class="log-act" data-act="edit" data-rec="' + escapeHtml(r.recId) + '" data-room="' + r.roomId + '" title="Edit reading" aria-label="Edit reading">' + LOG_ICON.edit + '</button>'
+            + '<button type="button" class="log-act del" data-act="del" data-rec="' + escapeHtml(r.recId) + '" data-room="' + r.roomId + '" title="Delete reading" aria-label="Delete reading">' + LOG_ICON.del + '</button>'
+          : '<span style="color:var(--text-faint);" title="' + (logState.mode === 'summary' ? 'Switch to All readings to edit' : 'Only an admin can edit or delete readings') + '">—</span>';
+        return '<tr>'
+          + '<td class="mono">' + r.sno + '</td>'
+          + '<td class="mono">' + escapeHtml(fmtDate(r.date)) + '</td>'
+          + '<td class="mono">' + (r.time ? escapeHtml(r.time) : '<span style="color:var(--text-faint);">—</span>') + '</td>'
+          + '<td>' + escapeHtml(r.category) + '</td>'
+          + '<td class="mono">' + escapeHtml(r.meter) + '</td>'
+          + '<td class="num mono">' + escapeHtml(fmtNum(r.initial)) + '</td>'
+          + '<td class="num mono">' + escapeHtml(fmtNum(r.current)) + '</td>'
+          + '<td class="num mono">' + (r.consumption !== null ? escapeHtml(fmtNum(r.consumption)) : '<span style="color:var(--text-faint);">—</span>') + '</td>'
+          + '<td class="remarks">' + r.remarks.map(logChip).join('') + '</td>'
+          + '<td class="log-actions-col">' + actions + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    var shownFrom = total ? start + 1 : 0, shownTo = Math.min(start + size, total);
+    document.getElementById('logPagerInfo').textContent = 'Showing ' + shownFrom + '–' + shownTo + ' of ' + total + (logState.mode === 'summary' ? ' meters' : ' readings');
+    document.getElementById('logPageNo').textContent = 'Page ' + logState.page + ' of ' + pages;
+    document.getElementById('logPrev').disabled = logState.page <= 1;
+    document.getElementById('logNext').disabled = logState.page >= pages;
+    document.getElementById('logModeRecords').classList.toggle('on', logState.mode === 'records');
+    document.getElementById('logModeSummary').classList.toggle('on', logState.mode === 'summary');
+    document.getElementById('logNote').textContent = logState.mode === 'summary'
+      ? 'Meter summary: Initial = first reading in the chosen period, Current = latest, Consumption = sum of the increases between readings (drops are ignored and flagged).'
+      : 'Consumption = Current − Initial (the same meter\'s previous reading), for kWh meters only. A lower reading is flagged, never counted. The total adds only kWh meters, so it can include power that passes through more than one meter.';
+  }
+
+  // ---------- exports ----------
+  function logExportMatrix(){
+    var head = LOG_COLS.filter(function(c){ return !c.actions; }).map(function(c){ return c.label; });
+    var rows = logRowsCache.map(function(r){
+      return [r.sno, r.date, r.time, r.category, r.meter, r.initial, r.current, r.consumption === null ? '' : r.consumption, logRemarksText(r)];
+    });
+    return { head:head, rows:rows };
+  }
+  function downloadBlob(blob, name){
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 500);
+  }
+  function exportTotalLogCsv(){
+    var m = logExportMatrix();
+    var csv = [m.head].concat(m.rows).map(function(cols){
+      return cols.map(function(v){
+        var s = String(v == null ? '' : v);
+        if(/[",\n]/.test(s)){ s = '"' + s.replace(/"/g, '""') + '"'; }
+        return s;
+      }).join(',');
+    }).join('\r\n');
+    downloadBlob(new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8;' }), 'total-log-' + istDateStr() + '.csv');
+  }
+
+  // A real .xlsx file (a zip of XML parts) built here, so no external library is needed.
+  var CRC_TABLE = (function(){
+    var t = [], c, n, k;
+    for(n = 0; n < 256; n++){ c = n; for(k = 0; k < 8; k++){ c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); } t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(bytes){
+    var c = 0xFFFFFFFF;
+    for(var i = 0; i < bytes.length; i++){ c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8); }
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  function zipStore(files){
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+    function u16(n){ return [n & 255, (n >>> 8) & 255]; }
+    function u32(n){ return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]; }
+    files.forEach(function(f){
+      var name = enc.encode(f.name), data = enc.encode(f.data), crc = crc32(data);
+      var local = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+      parts.push(new Uint8Array(local), name, data);
+      central.push({ name:name, crc:crc, size:data.length, offset:offset });
+      offset += local.length + name.length + data.length;
+    });
+    var cdStart = offset, cdSize = 0;
+    central.forEach(function(c){
+      var h = [].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(c.crc), u32(c.size), u32(c.size), u16(c.name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.offset));
+      parts.push(new Uint8Array(h), c.name);
+      cdSize += h.length + c.name.length;
+    });
+    parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(central.length), u16(central.length), u32(cdSize), u32(cdStart), u16(0))));
+    return new Blob(parts, { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+  function xmlEsc(s){ return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); }
+  function colLetter(i){ var s = ''; i++; while(i > 0){ var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+  function exportTotalLogXlsx(){
+    var m = logExportMatrix();
+    var widths = [7, 12, 10, 24, 38, 16, 16, 18, 60];
+    var sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+      + '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+      + '<cols>' + widths.map(function(w, i){ return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols><sheetData>';
+    [m.head].concat(m.rows).forEach(function(row, r){
+      sheet += '<row r="' + (r + 1) + '">';
+      row.forEach(function(v, c){
+        var ref = colLetter(c) + (r + 1), style = r === 0 ? ' s="1"' : '';
+        if(typeof v === 'number' && isFinite(v) && r > 0){ sheet += '<c r="' + ref + '"' + style + '><v>' + v + '</v></c>'; }
+        else if(v === '' || v === null || v === undefined){ sheet += '<c r="' + ref + '"' + style + '/>'; }
+        else { sheet += '<c r="' + ref + '" t="inlineStr"' + style + '><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>'; }
+      });
+      sheet += '</row>';
+    });
+    sheet += '</sheetData></worksheet>';
+    var files = [
+      { name:'[Content_Types].xml', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
+      { name:'_rels/.rels', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+      { name:'xl/workbook.xml', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Total Log" sheetId="1" r:id="rId1"/></sheets></workbook>' },
+      { name:'xl/_rels/workbook.xml.rels', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+      { name:'xl/styles.xml', data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>' },
+      { name:'xl/worksheets/sheet1.xml', data:sheet }
+    ];
+    downloadBlob(zipStore(files), 'total-log-' + istDateStr() + '.xlsx');
+  }
+
+  function printTotalLog(){
+    logState.printAll = true;
+    renderTotalLog();
+    var done = function(){
+      window.removeEventListener('afterprint', done);
+      logState.printAll = false;
+      renderTotalLog();
+    };
+    window.addEventListener('afterprint', done);
+    setTimeout(function(){ window.print(); }, 50);
+  }
+
+  // ---------- events ----------
+  function logRefresh(resetPage){ if(resetPage){ logState.page = 1; } renderTotalLog(); }
+  document.getElementById('logSearch').addEventListener('input', function(){ logState.search = this.value.trim(); logRefresh(true); });
+  document.getElementById('logFrom').addEventListener('change', function(){ logState.from = this.value; logRefresh(true); });
+  document.getElementById('logTo').addEventListener('change', function(){ logState.to = this.value; logRefresh(true); });
+  document.getElementById('logCat').addEventListener('change', function(){ logState.cat = this.value; logRefresh(true); });
+  document.getElementById('logClear').addEventListener('click', function(){
+    logState.search = ''; logState.from = ''; logState.to = ''; logState.cat = '';
+    document.getElementById('logSearch').value = ''; document.getElementById('logFrom').value = ''; document.getElementById('logTo').value = ''; document.getElementById('logCat').value = '';
+    logRefresh(true);
+  });
+  document.getElementById('logModeRecords').addEventListener('click', function(){ logState.mode = 'records'; logRefresh(true); });
+  document.getElementById('logModeSummary').addEventListener('click', function(){ logState.mode = 'summary'; logRefresh(true); });
+  document.getElementById('logPageSize').addEventListener('change', function(){ logState.size = parseInt(this.value, 10) || 25; logRefresh(true); });
+  document.getElementById('logPrev').addEventListener('click', function(){ if(logState.page > 1){ logState.page--; renderTotalLog(); } });
+  document.getElementById('logNext').addEventListener('click', function(){ logState.page++; renderTotalLog(); });
+  document.getElementById('logHeadRow').addEventListener('click', function(ev){
+    var th = ev.target.closest('th[data-sort]');
+    if(!th) return;
+    var key = th.getAttribute('data-sort');
+    if(logState.sort.key === key){ logState.sort.dir = logState.sort.dir === 'asc' ? 'desc' : 'asc'; }
+    else { logState.sort = { key:key, dir:(key === 'date' || key === 'time' ? 'desc' : 'asc') }; }
+    logRefresh(true);
+  });
+  document.getElementById('logExportCsv').addEventListener('click', exportTotalLogCsv);
+  document.getElementById('logExportXlsx').addEventListener('click', exportTotalLogXlsx);
+  document.getElementById('logPrint').addEventListener('click', printTotalLog);
+
+  // admin-only edit / delete of a single saved reading
+  var logActionTarget = null;
+  function findStoredRecord(roomId, recId){
+    return (dataByRoom[roomId] || []).filter(function(r){ return r.id === recId; })[0] || null;
+  }
+  document.getElementById('logBody').addEventListener('click', function(ev){
+    var btn = ev.target.closest('button[data-act]');
+    if(!btn || !isAdmin()) return;
+    var rec = findStoredRecord(btn.getAttribute('data-room'), btn.getAttribute('data-rec'));
+    if(!rec) return;
+    logActionTarget = { roomId:btn.getAttribute('data-room'), rec:rec };
+    var label = fieldDisplayName(logActionTarget.roomId, rec.equipment) + ' on ' + fmtDateFull(rec.date) + ' (reading ' + fmtNum(rec.reading) + ')';
+    if(btn.getAttribute('data-act') === 'edit'){
+      document.getElementById('logEditText').textContent = label;
+      document.getElementById('logEditValue').value = rec.reading;
+      document.getElementById('logEditErr').style.display = 'none';
+      document.getElementById('logEditModal').style.display = 'flex';
+      document.getElementById('logEditValue').focus();
+    } else {
+      document.getElementById('logDeleteText').textContent = label + '. This removes the saved reading and cannot be undone.';
+      document.getElementById('logDeleteModal').style.display = 'flex';
+    }
+  });
+  document.getElementById('logEditCancel').addEventListener('click', function(){ document.getElementById('logEditModal').style.display = 'none'; });
+  document.getElementById('logEditSave').addEventListener('click', function(){
+    if(!isAdmin() || !logActionTarget) return;
+    var v = document.getElementById('logEditValue').value.trim();
+    var n = parseFloat(v);
+    if(v === '' || isNaN(n) || n < 0){ document.getElementById('logEditErr').style.display = 'block'; return; }
+    logActionTarget.rec.reading = n;
+    logActionTarget.rec.updatedAt = istDateTimeStr();
+    saveRoom(logActionTarget.roomId);
+    document.getElementById('logEditModal').style.display = 'none';
+    logActionTarget = null;
+    render();
+  });
+  document.getElementById('logDeleteCancel').addEventListener('click', function(){ document.getElementById('logDeleteModal').style.display = 'none'; });
+  document.getElementById('logDeleteConfirm').addEventListener('click', function(){
+    if(!isAdmin() || !logActionTarget) return;
+    dataByRoom[logActionTarget.roomId] = (dataByRoom[logActionTarget.roomId] || []).filter(function(r){ return r.id !== logActionTarget.rec.id; });
+    saveRoom(logActionTarget.roomId);
+    document.getElementById('logDeleteModal').style.display = 'none';
+    logActionTarget = null;
+    render();
+  });
+
   function render(){
     if(currentView === 'admin-settings' && (!isAdmin() || !adminGateUnlocked())){ currentView = 'create-add'; }
     renderTabs();
     renderOverview();
+    renderTotalLog();
   }
 
   function renderFilterSelect(){
