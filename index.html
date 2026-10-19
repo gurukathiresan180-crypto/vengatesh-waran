@@ -1120,6 +1120,7 @@
     </div>
 
   </div>
+
     <div class="admin-tabs" id="adminTabs">
       <button type="button" class="admin-tab active" data-admin-tab="panel">Panel Management</button>
       <button type="button" class="admin-tab" data-admin-tab="users">User Management</button>
@@ -1330,12 +1331,16 @@
 <div class="modal-overlay" id="forgotModal" style="display:none;">
   <div class="modal-card">
     <div class="modal-title">Reset password</div>
-    <div class="modal-text" id="forgotIntro">Enter your username and we'll tell you how to reset it.</div>
+    <div class="modal-text" id="forgotIntro">Enter your username and the email ID registered with your account.</div>
 
     <form id="forgotForm" novalidate style="margin-top:16px;">
       <label for="forgotUser">Username</label>
       <input id="forgotUser" class="mono" type="text" placeholder="rkvengat" autocomplete="username">
       <div class="err" id="forgotErr">Please enter your username</div>
+
+      <label for="forgotEmail" style="margin-top:14px;">Email ID</label>
+      <input id="forgotEmail" type="email" placeholder="you@example.com" autocomplete="email">
+      <div class="err" id="forgotEmailErr">Enter a valid email address</div>
 
       <div class="modal-text" id="forgotResult" style="display:none; margin-top:14px;"></div>
 
@@ -1726,6 +1731,8 @@ function showLogin(){
   var forgotForm = document.getElementById('forgotForm');
   var forgotUserEl = document.getElementById('forgotUser');
   var forgotErr = document.getElementById('forgotErr');
+  var forgotEmailEl = document.getElementById('forgotEmail');
+  var forgotEmailErr = document.getElementById('forgotEmailErr');
   var forgotResult = document.getElementById('forgotResult');
   var forgotIntro = document.getElementById('forgotIntro');
   var forgotCancel = document.getElementById('forgotCancel');
@@ -1733,6 +1740,7 @@ function showLogin(){
   forgotLink.addEventListener('click', function(){
     forgotForm.reset();
     forgotErr.style.display = 'none';
+    forgotEmailErr.style.display = 'none';
     forgotResult.style.display = 'none';
     forgotIntro.style.display = 'block';
     forgotModal.style.display = 'flex';
@@ -1742,14 +1750,26 @@ function showLogin(){
   forgotForm.addEventListener('submit', function(ev){
     ev.preventDefault();
     forgotErr.style.display = 'none';
+    forgotEmailErr.style.display = 'none';
     var user = forgotUserEl.value.trim();
-    if(!user){ forgotErr.style.display = 'block'; return; }
+    var email = forgotEmailEl.value.trim().toLowerCase();
+    var ok = true;
+    if(!user){ forgotErr.style.display = 'block'; ok = false; }
+    if(!isValidEmail(email)){ forgotEmailErr.style.display = 'block'; ok = false; }
+    if(!ok) return;
+
     forgotIntro.style.display = 'none';
     forgotResult.style.display = 'block';
-    if(userExists(user)){
-      forgotResult.textContent = 'This demo has no email service connected, so no reset link can be sent. Ask whoever administers this dashboard to reset "' + user + '" for you, or sign in with the demo credentials shown below the form.';
+    var users = getDemoUsers();
+    var rec = user === DEMO_USER ? {} : users[user];
+    if(!userExists(user) || !rec){
+      forgotResult.textContent = 'No account matches that username and email ID in this browser.';
+    } else if(!rec.email){
+      forgotResult.textContent = 'This account has no email ID on file, so it can\'t be verified here. Ask whoever administers this dashboard to reset the password.';
+    } else if(String(rec.email).toLowerCase() !== email){
+      forgotResult.textContent = 'No account matches that username and email ID in this browser.';
     } else {
-      forgotResult.textContent = 'No account was found for "' + user + '" in this browser.';
+      forgotResult.textContent = 'These details match an account, but this demo has no email service connected, so no reset email can be sent. Ask whoever administers this dashboard to reset the password for "' + user + '".';
     }
   });
 
