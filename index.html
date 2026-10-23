@@ -284,6 +284,7 @@
   .qe-date-row{ display:flex; align-items:center; gap:12px; margin-bottom:20px; }
   .qe-date-row label{ margin:0; flex:0 0 auto; font-size:13px; color:var(--text-dim); }
   .qe-date-input{ max-width:200px; }
+  .qe-date-row + .err{ margin:-8px 0 16px; }
   .quick-entry-grid{
     display:grid; grid-template-columns: repeat(2, 1fr);
     gap: 14px 28px;
@@ -1121,6 +1122,11 @@
 
   </div>
 
+  <div id="adminSettingsPanel">
+    <div class="admin-warning">
+      <strong>Heads up:</strong> this is a front-end-only demo. "Admin-only" here means the UI hides these controls from non-admin accounts — since everything runs in your browser with no server, it isn't real security. Don't rely on this to protect sensitive data.
+    </div>
+
     <div class="admin-tabs" id="adminTabs">
       <button type="button" class="admin-tab active" data-admin-tab="panel">Panel Management</button>
       <button type="button" class="admin-tab" data-admin-tab="users">User Management</button>
@@ -1404,6 +1410,9 @@
    ========================================================================== */
 // All reading dates and "updated at"/login timestamps use Asia/Kolkata
 // (IST), regardless of the browser's own timezone.
+// Reading dates may be today or earlier only (Asia/Kolkata); never in the future.
+var FUTURE_DATE_MSG = "Future dates are not allowed. Please select today's date or a previous date.";
+function isFutureDate(iso){ return !!iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && iso > istDateStr(); }
 function istDateStr(d){
   d = d || new Date();
   var parts = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Kolkata', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(d);
@@ -2104,6 +2113,67 @@ function runDashboard(){
   setInterval(updateClock, 30000);
 
   function uid(){ return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+  /* ---- Date rules: today or earlier only ---------------------------------------
+     Layer 1 (UI): every date box gets max = today (IST), so the calendar greys out
+     future days, and a typed future date is rejected with an error and reset.
+     Layer 2 (save logic): the save handlers re-check the chosen date and refuse to
+     store anything dated in the future, even if the box's max attribute was removed. */
+  var DATE_FIELD_IDS = ['p3QuickDate','mainLtQuickDate','upsQuickDate','dieselQuickDate','dgQuickDate','logFrom','logTo'];
+  function refreshDateMax(el){ el.max = istDateStr(); }
+  function dateErrEl(el){
+    var id = el.id + 'Err', e = document.getElementById(id);
+    if(!e){
+      e = document.createElement('div');
+      e.id = id; e.className = 'err'; e.setAttribute('role', 'alert'); e.textContent = FUTURE_DATE_MSG;
+      (el.closest('.qe-date-row') || el.parentElement).insertAdjacentElement('afterend', e);
+    }
+    return e;
+  }
+  function showDateError(el){ dateErrEl(el).style.display = 'block'; }
+  function hideDateError(el){ var e = document.getElementById(el.id + 'Err'); if(e){ e.style.display = 'none'; } }
+  // After a future date is rejected the box is reset, which fires one more change
+  // event with a valid value; keep the message on screen until the user picks a date.
+  function markFutureRejected(el){ el._futureAt = Date.now(); showDateError(el); }
+  function hideDateErrorUnlessJustRejected(el){ if(!el._futureAt || Date.now() - el._futureAt > 600){ hideDateError(el); } }
+  // Returns true when the box holds an allowed date (or is empty); shows the error otherwise.
+  function validateEntryDate(el){
+    refreshDateMax(el);
+    if(isFutureDate(el.value)){ showDateError(el); el.focus(); return false; }
+    hideDateError(el);
+    return true;
+  }
+  // Value for a filter box: a future date is rejected and cleared.
+  function filterDateValue(el){
+    refreshDateMax(el);
+    if(isFutureDate(el.value)){ markFutureRejected(el); el.value = ''; return ''; }
+    hideDateErrorUnlessJustRejected(el);
+    return el.value;
+  }
+  function initDateGuards(){
+    DATE_FIELD_IDS.forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      refreshDateMax(el);
+      ['focus','click','mousedown'].forEach(function(ev){ el.addEventListener(ev, function(){ refreshDateMax(el); }); });
+      ['input','change'].forEach(function(ev){
+        el.addEventListener(ev, function(){
+          refreshDateMax(el);
+          if(isFutureDate(el.value)){
+            markFutureRejected(el);
+            el.value = /^log/.test(id) ? '' : istDateStr();   // entry boxes fall back to today, filters are cleared
+          } else { hideDateErrorUnlessJustRejected(el); }
+        });
+      });
+    });
+    // keep the limit correct if the page stays open past midnight
+    setInterval(function(){ DATE_FIELD_IDS.forEach(function(id){ var el = document.getElementById(id); if(el){ refreshDateMax(el); } }); }, 60000);
+  }
+  // Last check before anything is written to storage.
+  function saveReadings(roomId, date){
+    if(isFutureDate(date)){ throw new Error(FUTURE_DATE_MSG); }
+    saveRoom(roomId);
+  }
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, function(c){
       return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
@@ -2213,6 +2283,7 @@ function runDashboard(){
 
     document.getElementById(saveBtnElId).addEventListener('click', function(){
       var inputs = grid.querySelectorAll('input');
+      if(!validateEntryDate(dateEl)) return;
       var chosenDate = dateEl.value || istDateStr();
       var list = dataByRoom[roomId] || [];
       var savedCount = 0, updatedCount = 0, createdCount = 0;
@@ -2247,7 +2318,7 @@ function runDashboard(){
 
       dataByRoom[roomId] = list;
       if(savedCount > 0){
-        saveRoom(roomId);
+        saveReadings(roomId, chosenDate);
         var msg = document.getElementById(msgElId);
         var bits = [];
         if(createdCount) bits.push(createdCount + ' new');
@@ -2325,6 +2396,7 @@ function runDashboard(){
     sheetBuilders[roomId] = build;
 
     document.getElementById('dieselQuickSaveBtn').addEventListener('click', function(){
+      if(!validateEntryDate(dateEl)) return;
       var chosenDate = dateEl.value || istDateStr();
       var list = dataByRoom[roomId] || [];
       var savedCount = 0, updatedCount = 0, createdCount = 0;
@@ -2367,7 +2439,7 @@ function runDashboard(){
 
       dataByRoom[roomId] = list;
       if(savedCount > 0){
-        saveRoom(roomId);
+        saveReadings(roomId, chosenDate);
         var msg = document.getElementById('dieselQuickMsg');
         var bits = [];
         if(createdCount) bits.push(createdCount + ' new');
@@ -2449,6 +2521,7 @@ function runDashboard(){
     sheetBuilders[roomId] = build;
 
     document.getElementById('dgQuickSaveBtn').addEventListener('click', function(){
+      if(!validateEntryDate(dateEl)) return;
       var chosenDate = dateEl.value || istDateStr();
       var list = dataByRoom[roomId] || [];
       var savedCount = 0, updatedCount = 0, createdCount = 0;
@@ -2496,7 +2569,7 @@ function runDashboard(){
 
       dataByRoom[roomId] = list;
       if(savedCount > 0){
-        saveRoom(roomId);
+        saveReadings(roomId, chosenDate);
         var msg = document.getElementById('dgQuickMsg');
         var bits = [];
         if(createdCount) bits.push(createdCount + ' new');
@@ -3848,8 +3921,8 @@ function runDashboard(){
   // ---------- events ----------
   function logRefresh(resetPage){ if(resetPage){ logState.page = 1; } renderTotalLog(); }
   document.getElementById('logSearch').addEventListener('input', function(){ logState.search = this.value.trim(); logRefresh(true); });
-  document.getElementById('logFrom').addEventListener('change', function(){ logState.from = this.value; logRefresh(true); });
-  document.getElementById('logTo').addEventListener('change', function(){ logState.to = this.value; logRefresh(true); });
+  document.getElementById('logFrom').addEventListener('change', function(){ logState.from = filterDateValue(this); logRefresh(true); });
+  document.getElementById('logTo').addEventListener('change', function(){ logState.to = filterDateValue(this); logRefresh(true); });
   document.getElementById('logCat').addEventListener('change', function(){ logState.cat = this.value; logRefresh(true); });
   document.getElementById('logClear').addEventListener('click', function(){
     logState.search = ''; logState.from = ''; logState.to = ''; logState.cat = '';
@@ -4195,6 +4268,7 @@ function runDashboard(){
     render();
   };
   for(var i=0;i<ROOMS.length;i++){ loadRoom(ROOMS[i].id); }
+  initDateGuards();
   rebuildAllSheets();
   render();
 }
