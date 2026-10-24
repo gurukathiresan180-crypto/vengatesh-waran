@@ -1288,6 +1288,19 @@
   </div>
 </div>
 
+<!-- ================= DELETE USER CONFIRMATION (admin only) ================= -->
+<div class="modal-overlay" id="deleteUserModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-title">Delete this user?</div>
+    <div class="modal-text" id="deleteUserText"></div>
+    <div class="modal-text" style="margin-top:10px; color:var(--text-faint);">Only the account is removed. Saved readings and login history are kept. This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="deleteUserCancel" type="button">Cancel</button>
+      <button class="btn-primary" id="deleteUserConfirm" type="button" style="width:auto; margin-top:0; background:var(--red); color:#fff;">Delete user</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= LOGOUT CONFIRMATION ================= -->
 <div class="modal-overlay" id="logoutModal" style="display:none;">
   <div class="modal-card">
@@ -1836,19 +1849,7 @@ function showLogin(){
 
     if(!newPass || newPass.length < 6){ regPassErr.style.display = 'block'; valid = false; }
     else if(newPass !== confirmPass){ regConfirmErr.style.display = 'block'; valid = false; }
-
-    if(!valid) return;
-
-    saveDemoUser(newUser, newPass, ROLE_USER, newName, newEmail);
-    registerModal.style.display = 'none';
-    userEl.value = newUser;
-    passEl.value = '';
-    alertBox.style.display = 'none';
-    userErr.style.display = 'none';
-    passErr.style.display = 'none';
-    passEl.focus();
-  });
-
+if(!valid) return; registerAlert.style.display = 'block'; registerAlert.textContent = 'Submitting your account...'; fetch('https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newName, userID: newUser, email: newEmail, password: newPass })} .then(async function(response) { var data = await response.json(); if (!response.ok || !data.success) { throw new Error(data.error || 'Registration failed'); } registerAlert.textContent = 'Account submitted successfully. Waiting for admin approval.'; userEl.value = newUser; passEl.value = ''; alertBox.style.display = 'none'; userErr.style.display = 'none'; passErr.style.display = 'none'; setTimeout(function() { registerModal.style.display = 'none'; registerAlert.style.display = 'none'; }, 2000); }) .catch(function(error) { registerAlert.textContent = 'Registration failed: ' + error.message; }); });
   // Discourage returning to the dashboard via the browser Back button
   // after logout. This is a single-page app with no real routes, so this
   // simply re-checks the auth flag whenever a history state is visited.
@@ -3004,12 +3005,36 @@ function runDashboard(){
       }
       var delBtn = ev.target.closest('.um-delete-btn');
       if(delBtn){
-        var users2 = getDemoUsers();
-        var u2 = delBtn.getAttribute('data-user');
-        delete users2[u2];
-        saveDemoUsers(users2);
-        renderUserMgmtTable();
+        var target = delBtn.getAttribute('data-user');
+        // The built-in admin and the account you are signed in with can never be deleted.
+        if(target === DEMO_USER || target === getCurrentUser()) return;
+        var rec = getDemoUsers()[target];
+        if(!rec) return;
+        pendingDeleteUser = target;
+        document.getElementById('deleteUserText').textContent =
+          (rec.name ? rec.name + ' · ' : '') + '"' + target + '"' + (rec.email ? ' · ' + rec.email : '') + ' will no longer be able to sign in.';
+        document.getElementById('deleteUserModal').style.display = 'flex';
       }
+    });
+    var pendingDeleteUser = null;
+    document.getElementById('deleteUserCancel').addEventListener('click', function(){
+      pendingDeleteUser = null;
+      document.getElementById('deleteUserModal').style.display = 'none';
+    });
+    document.getElementById('deleteUserConfirm').addEventListener('click', function(){
+      var target = pendingDeleteUser;
+      pendingDeleteUser = null;
+      document.getElementById('deleteUserModal').style.display = 'none';
+      // Re-check everything at the moment of deleting, not just when the button was clicked.
+      if(!target || !isAdmin() || target === DEMO_USER || target === getCurrentUser()) return;
+      var users = getDemoUsers();
+      if(!Object.prototype.hasOwnProperty.call(users, target)) return;
+      delete users[target];
+      saveDemoUsers(users);
+      renderUserMgmtTable();
+      var msg = document.getElementById('umMsg');
+      msg.textContent = 'User "' + target + '" deleted.';
+      msg.style.display = 'block';
     });
     document.getElementById('umAddBtn').addEventListener('click', function(){
       if(!isAdmin()) return;
