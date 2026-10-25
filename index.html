@@ -1849,7 +1849,15 @@ function showLogin(){
 
     if(!newPass || newPass.length < 6){ regPassErr.style.display = 'block'; valid = false; }
     else if(newPass !== confirmPass){ regConfirmErr.style.display = 'block'; valid = false; }
-if(!valid) return; registerAlert.style.display = 'block'; registerAlert.textContent = 'Submitting your account...'; fetch('https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newName, userID: newUser, email: newEmail, password: newPass })} .then(async function(response) { var data = await response.json(); if (!response.ok || !data.success) { throw new Error(data.error || 'Registration failed'); } registerAlert.textContent = 'Account submitted successfully. Waiting for admin approval.'; userEl.value = newUser; passEl.value = ''; alertBox.style.display = 'none'; userErr.style.display = 'none'; passErr.style.display = 'none'; setTimeout(function() { registerModal.style.display = 'none'; registerAlert.style.display = 'none'; }, 2000); }) .catch(function(error) { registerAlert.textContent = 'Registration failed: ' + error.message; }); });
+if(!valid) return; registerAlert.style.display = 'block'; registerAlert.textContent = 'Submitting your account...'; fetch('https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify({
+        name: newName,
+        userID: newUser,
+        email: newEmail,
+        password: newPass
+      })
+    }).then(async function(response) {
+ var data = await response.json(); if (!response.ok || !data.success) { throw new Error(data.error || 'Registration failed'); } registerAlert.textContent = 'Account submitted successfully. Waiting for admin approval.'; userEl.value = newUser; passEl.value = ''; alertBox.style.display = 'none'; userErr.style.display = 'none'; passErr.style.display = 'none'; setTimeout(function() { registerModal.style.display = 'none'; registerAlert.style.display = 'none'; }, 2000); }) .catch(function(error) { registerAlert.textContent = 'Registration failed: ' + error.message; }); });
   // Discourage returning to the dashboard via the browser Back button
   // after logout. This is a single-page app with no real routes, so this
   // simply re-checks the auth flag whenever a history state is visited.
