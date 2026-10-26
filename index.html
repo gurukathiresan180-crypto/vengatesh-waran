@@ -1704,25 +1704,47 @@ function showLogin(){
     loginBtn.disabled = true;
     loginBtn.textContent = 'Signing in...';
 
-    // Simulated network delay so the disabled/processing state is visible.
-    // Swap this whole block for an awaited fetch() call for a real backend.
-    setTimeout(function(){
-      if(checkCredentials(user, pass)){
-        var role = getUserRole(user);
-        setLoggedIn(user, role);
-        recordLogin(user, role);
+  
+    try {
+      const response = await fetch(
+        'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            identifier: user,
+            password: pass
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const role = data.user.role;
+        const userID = data.user.userID || user;
+
+        setLoggedIn(userID, role);
+        recordLogin(userID, role);
         history.pushState({ authed: true }, '', '#dashboard');
         form.reset();
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
         showDashboard();
       } else {
-        alertBox.textContent = 'Invalid username or password.';
+        alertBox.textContent =
+          data.error || 'Invalid username or password.';
         alertBox.style.display = 'block';
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
       }
-    }, 450);
+    } catch (error) {
+      alertBox.textContent =
+        'Unable to connect to server. Please try again.';
+      alertBox.style.display = 'block';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Login';
+    }
+
   });
 
   // Logout button + confirmation modal
