@@ -1687,7 +1687,7 @@ function showLogin(){
     pwdToggle.textContent = showing ? 'Show' : 'Hide';
   });
 
-  form.addEventListener('submit', function(ev){
+form.addEventListener('submit', async function(ev){
     ev.preventDefault();
 
     userErr.style.display = 'none';
