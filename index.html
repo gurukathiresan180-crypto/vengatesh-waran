@@ -1807,29 +1807,85 @@ function showLogin(){
     loginBtn.disabled = true;
     loginBtn.textContent = 'Signing in...';
 
-    // Simulated network delay so the disabled/processing state is visible.
-    // Swap this whole block for an awaited fetch() call for a real backend.
-    setTimeout(function(){
-      if(checkCredentials(user, pass)){
-        var role = getUserRole(user);
-        setLoggedIn(user, role);
-        recordLogin(user, role);
-        history.pushState({ authed: true }, '', '#dashboard');
+       try {
+      const response = await fetch(
+        "https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            identifier: user,
+            password: pass
+          })
+        }
+      );      
+         
+        const data = await response.json();
+
+      if (response.ok && data.success) {
+        const role = data.user.role;
+        const userID = data.user.userID || user;
+
+        localStorage.setItem("emd_api_token", data.token);
+
+        setLoggedIn(userID, role);
+        recordLogin(userID, role);
+
+        history.pushState({ authed: true }, "", "#dashboard");
         form.reset();
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
+        showDashboard();
+
+      } else {
+        alertBox.className = "login-alert";
+        alertBox.textContent =
+          data.error || "Invalid username or password.";
+        alertBox.style.display = "block";
+      }
+
+    } catch (err) {
+      console.error("Login error:", err);
+
+      alertBox.className = "login-alert";
+      alertBox.textContent =
+        "Unable to connect to the server. Please try again.";
+      alertBox.style.display = "block";
+
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+    }
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const role = data.user.role;
+        const userID = data.user.userID || user;
+
+        localStorage.setItem("emd_api_token", data.token);
+        setLoggedIn(userID, role);
+        recordLogin(userID, role);
+
+        history.pushState({ authed: true }, "", "#dashboard");
+        form.reset();
         showDashboard();
       } else {
-        var reason = loginBlockReason(user, pass);
-        alertBox.className = 'login-alert' + (reason === 'pending' ? ' notice' : '');
-        alertBox.textContent = reason === 'pending' ? 'Your account is waiting for administrator approval.'
-          : reason === 'rejected' ? 'Your account registration has been rejected. Please contact the administrator.'
-          : 'Invalid username or password.';
-        alertBox.style.display = 'block';
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login';
+        alertBox.className = "login-alert";
+        alertBox.textContent =
+          data.error || "Invalid username or password.";
+        alertBox.style.display = "block";
       }
-    }, 450);
+    } catch (err) {
+      console.error("Login error:", err);
+      alertBox.className = "login-alert";
+      alertBox.textContent =
+        "Unable to connect to the server. Please try again.";
+      alertBox.style.display = "block";
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+    }
   });
 
   // Logout button + confirmation modal
