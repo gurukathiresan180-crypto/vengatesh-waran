@@ -1725,6 +1725,8 @@ form.addEventListener('submit', async function(ev){
       if (response.ok && data.success) {
         const role = data.user.role;
         const userID = data.user.userID || user;
+        
+        localStorage.setItem('emd_api_token', data.token);
 
         setLoggedIn(userID, role);
         recordLogin(userID, role);
