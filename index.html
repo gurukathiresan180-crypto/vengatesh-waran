@@ -1931,7 +1931,7 @@ function showLogin(){
     forgotUserEl.focus();
   });
   forgotCancel.addEventListener('click', function(){ forgotModal.style.display = 'none'; });
-  forgotForm.addEventListener('submit', function(ev){
+  form.addEventListener('submit', async function(ev){
     ev.preventDefault();
     forgotErr.style.display = 'none';
     forgotEmailErr.style.display = 'none';
