@@ -1787,40 +1787,8 @@ function showLogin(){
     var showing = passEl.type === 'text';
     passEl.type = showing ? 'password' : 'text';
     pwdToggle.textContent = showing ? 'Show' : 'Hide';
-  });
 
- form.addEventListener('submit', async function(ev){
-    ev.preventDefault();
-
-    userErr.style.display = 'none';
-    passErr.style.display = 'none';
-    alertBox.style.display = 'none';
-    alertBox.className = 'login-alert';
-
-    var user = userEl.value.trim();
-    var pass = passEl.value;
-    var valid = true;
-    if(!user){ userErr.style.display = 'block'; valid = false; }
-    if(!pass){ passErr.style.display = 'block'; valid = false; }
-    if(!valid) return;
-
-    loginBtn.disabled = true;
-    loginBtn.textContent = 'Signing in...';
-
-       try {
-      const response = await fetch(
-        "https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            identifier: user,
-            password: pass
-          })
-        }
-      );      
+  
          
         const data = await response.json();
 
@@ -1852,36 +1820,6 @@ function showLogin(){
         "Unable to connect to the server. Please try again.";
       alertBox.style.display = "block";
 
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Login";
-    }
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        const role = data.user.role;
-        const userID = data.user.userID || user;
-
-        localStorage.setItem("emd_api_token", data.token);
-        setLoggedIn(userID, role);
-        recordLogin(userID, role);
-
-        history.pushState({ authed: true }, "", "#dashboard");
-        form.reset();
-        showDashboard();
-      } else {
-        alertBox.className = "login-alert";
-        alertBox.textContent =
-          data.error || "Invalid username or password.";
-        alertBox.style.display = "block";
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alertBox.className = "login-alert";
-      alertBox.textContent =
-        "Unable to connect to the server. Please try again.";
-      alertBox.style.display = "block";
     } finally {
       loginBtn.disabled = false;
       loginBtn.textContent = "Login";
@@ -1929,7 +1867,7 @@ function showLogin(){
     forgotIntro.style.display = 'block';
     forgotModal.style.display = 'flex';
     forgotUserEl.focus();
-  });
+  }); 
   forgotCancel.addEventListener('click', function(){ forgotModal.style.display = 'none'; });
   form.addEventListener('submit', async function(ev){
     ev.preventDefault();
