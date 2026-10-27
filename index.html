@@ -2149,11 +2149,40 @@ function adminGateSalt(){
       localStorage.setItem(ADMIN_GATE_KEY, JSON.stringify({ id: id, salt: salt, hash: hash }));
     });
   }
-  function verifyCurrent(id, pw){
-    var gate = getAdminGate();
-    if(!gate) return Promise.resolve(false);
-    return adminGateHash(gate.salt, pw).then(function(hash){ return id === gate.id && hash === gate.hash; });
-  }
+  
+function verifyCurrent(id, pw) {
+  return fetch(
+    "https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin-settings/login",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        adminId: id,
+        password: pw
+      })
+    }
+  )
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(result) {
+    if (!result.success || !result.token) {
+      return false;
+    }
+
+    // Keep the Admin Settings session separate
+    // from the regular dashboard login session.
+    localStorage.setItem("emd_admin_settings_token", result.token);
+    return true;
+  })
+  .catch(function(error) {
+    console.error("Admin Settings login failed:", error);
+    return false;
+  });
+}
+
 
   form.addEventListener('submit', function(ev){
     ev.preventDefault();
