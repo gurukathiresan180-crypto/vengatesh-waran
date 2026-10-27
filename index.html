@@ -1783,49 +1783,77 @@ function showLogin(){
   var loginBtn = document.getElementById('loginBtn');
   var pwdToggle = document.getElementById('pwdToggle');
 
-  pwdToggle.addEventListener('click', function(){
+    pwdToggle.addEventListener('click', function(){
     var showing = passEl.type === 'text';
     passEl.type = showing ? 'password' : 'text';
     pwdToggle.textContent = showing ? 'Show' : 'Hide';
-
+  });
   
-         
-        const data = await response.json();
+  form.addEventListener('submit', async function(ev){
+    ev.preventDefault();
+
+    userErr.style.display = 'none';
+    passErr.style.display = 'none';
+    alertBox.style.display = 'none';
+
+    var user = userEl.value.trim();
+    var pass = passEl.value;
+
+    if (!user || !pass) {
+      if (!user) userErr.style.display = 'block';
+      if (!pass) passErr.style.display = 'block';
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in...';
+
+    try {
+      const response = await fetch(
+        "https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            identifier: user,
+            password: pass
+          })
+        }
+      );
+
+      const data = await response.json();
 
       if (response.ok && data.success) {
         const role = data.user.role;
         const userID = data.user.userID || user;
 
         localStorage.setItem("emd_api_token", data.token);
-
         setLoggedIn(userID, role);
         recordLogin(userID, role);
 
         history.pushState({ authed: true }, "", "#dashboard");
         form.reset();
         showDashboard();
-
       } else {
         alertBox.className = "login-alert";
         alertBox.textContent =
           data.error || "Invalid username or password.";
         alertBox.style.display = "block";
       }
-
     } catch (err) {
       console.error("Login error:", err);
-
       alertBox.className = "login-alert";
       alertBox.textContent =
         "Unable to connect to the server. Please try again.";
       alertBox.style.display = "block";
-
     } finally {
       loginBtn.disabled = false;
       loginBtn.textContent = "Login";
     }
   });
-
+  
   // Logout button + confirmation modal
   var logoutBtn = document.getElementById('logoutBtn');
   var logoutModal = document.getElementById('logoutModal');
@@ -1869,7 +1897,7 @@ function showLogin(){
     forgotUserEl.focus();
   }); 
   forgotCancel.addEventListener('click', function(){ forgotModal.style.display = 'none'; });
-  form.addEventListener('submit', async function(ev){
+  forgotForm.addEventListener('submit', function(ev){
     ev.preventDefault();
     forgotErr.style.display = 'none';
     forgotEmailErr.style.display = 'none';
@@ -1922,10 +1950,11 @@ function showLogin(){
     regNameEl.focus();
   });
   registerCancel.addEventListener('click', function(){ registerModal.style.display = 'none'; });
-  regPwdToggle.addEventListener('click', function(){
-    var showing = regPassEl.type === 'text';
-    regPassEl.type = showing ? 'password' : 'text';
-    regPwdToggle.textContent = showing ? 'Show' : 'Hide';
+  reg
+  pwdToggle.addEventListener('click', function(){
+    var showing = passEl.type === 'text';
+    passEl.type = showing ? 'password' : 'text';
+    pwdToggle.textContent = showing ? 'Show' : 'Hide';
   });
 
   registerForm.addEventListener('submit', function(ev){
