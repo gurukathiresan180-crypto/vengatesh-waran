@@ -1950,11 +1950,10 @@ function showLogin(){
     regNameEl.focus();
   });
   registerCancel.addEventListener('click', function(){ registerModal.style.display = 'none'; });
-  reg
-  pwdToggle.addEventListener('click', function(){
-    var showing = passEl.type === 'text';
-    passEl.type = showing ? 'password' : 'text';
-    pwdToggle.textContent = showing ? 'Show' : 'Hide';
+    regPwdToggle.addEventListener('click', function(){
+    var showing = regPassEl.type === 'text';
+    regPassEl.type = showing ? 'password' : 'text';
+    regPwdToggle.textContent = showing ? 'Show' : 'Hide';
   });
 
   registerForm.addEventListener('submit', function(ev){
