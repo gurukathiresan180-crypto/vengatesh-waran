@@ -1956,7 +1956,7 @@ function showLogin(){
     regPwdToggle.textContent = showing ? 'Show' : 'Hide';
   });
 
-  registerForm.addEventListener('submit', function(ev){
+registerForm.addEventListener('submit', async function(ev){
     ev.preventDefault();
     [regNameErr, regEmailErr, regUserErr, regPassErr, regConfirmErr].forEach(function(e){ e.style.display = 'none'; });
     registerAlert.style.display = 'none';
@@ -1970,29 +1970,74 @@ function showLogin(){
 
     if(newName.length < 2){ regNameErr.style.display = 'block'; valid = false; }
 
-    if(!isValidEmail(newEmail)){ regEmailErr.textContent = 'Enter a valid email address'; regEmailErr.style.display = 'block'; valid = false; }
-    else if(emailInUse(newEmail)){ regEmailErr.textContent = 'That email is already registered'; regEmailErr.style.display = 'block'; valid = false; }
+if(!isValidEmail(newEmail)){
+  regEmailErr.textContent = 'Enter a valid email address';
+  regEmailErr.style.display = 'block';
+  valid = false;
+}
 
-    if(!newUser){ regUserErr.textContent = 'Please choose a username'; regUserErr.style.display = 'block'; valid = false; }
-    else if(userExists(newUser)){ regUserErr.textContent = 'That username is already taken'; regUserErr.style.display = 'block'; valid = false; }
+if(!newUser){
+  regUserErr.textContent = 'Please choose a username';
+  regUserErr.style.display = 'block';
+  valid = false;
+}
 
     if(!newPass || newPass.length < 6){ regPassErr.style.display = 'block'; valid = false; }
     else if(newPass !== confirmPass){ regConfirmErr.style.display = 'block'; valid = false; }
 
     if(!valid) return;
 
-    // New self-registered accounts cannot sign in until an administrator approves them.
-    saveDemoUser(newUser, newPass, ROLE_USER, newName, newEmail, 'pending');
-    registerModal.style.display = 'none';
-    userEl.value = newUser;
-    passEl.value = '';
-    userErr.style.display = 'none';
-    passErr.style.display = 'none';
-    alertBox.className = 'login-alert notice';
-    alertBox.textContent = 'Account created. It is waiting for administrator approval — you can sign in once it has been approved.';
-    alertBox.style.display = 'block';
-    passEl.focus();
-  });
+   
+    // Submit new account to Cloudflare D1 database
+    try {
+      const response = await fetch(
+        "https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: newName,
+            userID: newUser,
+            email: newEmail,
+            password: newPass
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        registerAlert.className = 'login-alert error';
+        registerAlert.textContent = data.error || 'Registration failed. Please try again.';
+        registerAlert.style.display = 'block';
+        return;
+      }
+
+registerModal.style.display = 'none';
+
+userEl.value = newUser;
+passEl.value = '';
+
+userErr.style.display = 'none';
+passErr.style.display = 'none';
+
+alertBox.className = 'login-alert notice';
+alertBox.textContent =
+  'Account created successfully. Waiting for administrator approval.';
+alertBox.style.display = 'block';
+
+passEl.focus();;
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      registerAlert.className = 'login-alert error';
+      registerAlert.textContent =
+        'Unable to connect to server. Please try again.';
+      registerAlert.style.display = 'block';
+    }
+
 
   // Discourage returning to the dashboard via the browser Back button
   // after logout. This is a single-page app with no real routes, so this
