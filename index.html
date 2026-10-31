@@ -3208,90 +3208,225 @@ function runDashboard(){
           + '</tr>';
       }).join('');
     }
-    document.getElementById('userMgmtBody').addEventListener('change', function(ev){
-      var sel = ev.target.closest('.um-role-select');
-      if(!sel || !isAdmin()) return;
-      var users = getDemoUsers();
-      var u = sel.getAttribute('data-user');
-      if(users[u]){ users[u].role = sel.value === 'admin' ? ROLE_ADMIN : ROLE_USER; saveDemoUsers(users); renderUserMgmtTable(); renderTabs(); }
-    });
-    // ---- User Approval ----
-    function fmtRegistered(stamp){
-      var m = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/.exec(stamp || '');
-      return m ? fmtDate(m[1]) + ', ' + m[2] : '—';
+
+// ---- User Approval ----
+
+function fmtRegistered(stamp){
+  var m = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/.exec(stamp || '');
+  return m ? fmtDate(m[1]) + ', ' + m[2] : '—';
+}
+
+function showApprovalMsg(text, bad){
+  var el = document.getElementById('approvalMsg');
+  el.textContent = text;
+  el.style.color = bad ? '#E39685' : 'var(--green)';
+  el.style.display = 'block';
+}
+
+var d1PendingCount = 0;
+
+function pendingCount(){
+  return d1PendingCount;
+}
+
+async function renderApprovalList(){
+  var body = document.getElementById('approvalBody');
+  var badge = document.getElementById('approvalTabCount');
+
+  body.innerHTML =
+    '<tr><td colspan="6" class="approval-empty">Loading pending requests...</td></tr>';
+
+  try {
+    var token = localStorage.getItem('emd_api_token');
+
+    if (!token) {
+      throw new Error('Admin login session not found. Please login again.');
     }
-    function showApprovalMsg(text, bad){
-      var el = document.getElementById('approvalMsg');
-      el.textContent = text;
-      el.style.color = bad ? '#E39685' : 'var(--green)';
-      el.style.display = 'block';
-    }
-    function pendingCount(){ return getPendingUsers().length; }
-    function renderApprovalList(){
-      var list = getPendingUsers();
-      document.getElementById('approvalTotal').textContent = String(list.length);
-      var badge = document.getElementById('approvalTabCount');
-      badge.textContent = String(list.length);
-      badge.style.display = list.length ? 'inline-block' : 'none';
-      var body = document.getElementById('approvalBody');
-      if(!list.length){
-        body.innerHTML = '<tr><td colspan="6" class="approval-empty" style="display:table-cell;">No pending requests. New registrations will appear here.</td></tr>';
-        return;
+
+    var response = await fetch(
+      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/pending-users',
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
       }
-      body.innerHTML = list.map(function(x){
-        var u = escapeHtml(x.username);
-        return '<tr>'
-          + '<td data-label="Name">'+(x.rec.name ? escapeHtml(x.rec.name) : '—')+'</td>'
-          + '<td data-label="Username" class="mono">'+u+'</td>'
-          + '<td data-label="Email ID">'+(x.rec.email ? escapeHtml(x.rec.email) : '—')+'</td>'
-          + '<td data-label="Registered" class="mono">'+escapeHtml(fmtRegistered(x.rec.registeredAt))+'</td>'
-          + '<td data-label="Status"><span class="status-tag pending">Pending Approval</span></td>'
-          + '<td class="approval-actions-cell"><div class="approval-actions">'
-          +   '<button type="button" class="btn-approve" data-act="approve" data-user="'+u+'">Approve</button>'
-          +   '<button type="button" class="btn-reject" data-act="reject" data-user="'+u+'">Reject</button>'
-          + '</div></td>'
-          + '</tr>';
-      }).join('');
+    );
+
+    var data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Unable to load pending users.');
     }
-    function afterApprovalChange(){
-      renderApprovalList();
+
+    var list = data.users || [];
+    d1PendingCount = list.length;
+
+    document.getElementById('approvalTotal').textContent =
+      String(list.length);
+
+    badge.textContent = String(list.length);
+    badge.style.display = list.length ? 'inline-block' : 'none';
+
+    if (!list.length) {
+      body.innerHTML =
+        '<tr><td colspan="6" class="approval-empty" style="display:table-cell;">No pending requests. New registrations will appear here.</td></tr>';
+      renderTabs();
+      return;
+    }
+
+    body.innerHTML = list.map(function(x){
+      var u = escapeHtml(x.user_id || '');
+      var name = x.name ? escapeHtml(x.name) : '—';
+      var email = x.email ? escapeHtml(x.email) : '—';
+
+      return '<tr>'
+        + '<td data-label="Name">' + name + '</td>'
+        + '<td data-label="Username" class="mono">' + u + '</td>'
+        + '<td data-label="Email ID">' + email + '</td>'
+        + '<td data-label="Registered" class="mono">—</td>'
+        + '<td data-label="Status"><span class="status-tag pending">Pending Approval</span></td>'
+        + '<td class="approval-actions-cell"><div class="approval-actions">'
+        + '<button type="button" class="btn-approve" data-act="approve" data-user="' + u + '">Approve</button>'
+        + '<button type="button" class="btn-reject" data-act="reject" data-user="' + u + '">Reject</button>'
+        + '</div></td>'
+        + '</tr>';
+    }).join('');
+
+    renderTabs();
+
+  } catch (error) {
+    console.error('Pending users error:', error);
+
+    body.innerHTML =
+      '<tr><td colspan="6" class="approval-empty">' +
+      escapeHtml(error.message) +
+      '</td></tr>';
+
+    d1PendingCount = 0;
+    document.getElementById('approvalTotal').textContent = '0';
+    badge.style.display = 'none';
+  }
+}
+
+function afterApprovalChange(){
+  renderApprovalList();
+  renderUserMgmtTable();
+  renderTabs();
+}
+
+ 
+var pendingRejectUser = null;
+
+document.getElementById('approvalBody').addEventListener('click', async function(ev){
+  var btn = ev.target.closest('button[data-act]');
+  if (!btn || !isAdmin()) return;
+
+  var user = btn.getAttribute('data-user');
+  var action = btn.getAttribute('data-act');
+
+  if (action === 'approve') {
+    if (!confirm('Approve user "' + user + '"?')) return;
+
+    btn.disabled = true;
+
+    try {
+      var token = localStorage.getItem('emd_api_token');
+
+      var response = await fetch(
+        'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/user-approval',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            userID: user,
+            status: 'approved'
+          })
+        }
+      );
+
+      var data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Approval failed');
+      }
+
+      showApprovalMsg('User "' + user + '" approved successfully.');
+      await renderApprovalList();
       renderUserMgmtTable();
-      renderTabs();          // refreshes the pending count shown on the Admin Settings menu item
+      renderTabs();
+
+    } catch (error) {
+      alert(error.message);
+      btn.disabled = false;
     }
-    var pendingRejectUser = null;
-    document.getElementById('approvalBody').addEventListener('click', function(ev){
-      var btn = ev.target.closest('button[data-act]');
-      if(!btn || !isAdmin()) return;
-      var user = btn.getAttribute('data-user');
-      var rec = getDemoUsers()[user];
-      if(!rec || rec.status !== 'pending') { renderApprovalList(); return; }
-      if(btn.getAttribute('data-act') === 'approve'){
-        setUserStatus(user, 'approved');
-        afterApprovalChange();
-        showApprovalMsg('User "' + user + '" approved. They can now sign in.');
-      } else {
-        pendingRejectUser = user;
-        document.getElementById('rejectUserText').textContent =
-          (rec.name ? rec.name + ' · ' : '') + '"' + user + '"' + (rec.email ? ' · ' + rec.email : '') + ' will not be able to sign in.';
-        document.getElementById('rejectUserModal').style.display = 'flex';
-      }
-    });
+
+  } else if (action === 'reject') {
+    pendingRejectUser = user;
+
+    document.getElementById('rejectUserText').textContent =
+      '"' + user + '" will not be able to sign in.';
+
+    document.getElementById('rejectUserModal').style.display = 'flex';
+  }
+});
+
     document.getElementById('rejectUserCancel').addEventListener('click', function(){
       pendingRejectUser = null;
       document.getElementById('rejectUserModal').style.display = 'none';
     });
-    document.getElementById('rejectUserConfirm').addEventListener('click', function(){
-      var user = pendingRejectUser;
-      pendingRejectUser = null;
-      document.getElementById('rejectUserModal').style.display = 'none';
-      // Re-check at the moment of rejecting: admin only, and still pending.
-      if(!user || !isAdmin()) return;
-      var rec = getDemoUsers()[user];
-      if(!rec || rec.status !== 'pending'){ renderApprovalList(); return; }
-      setUserStatus(user, 'rejected');
-      afterApprovalChange();
-      showApprovalMsg('User "' + user + '" rejected. They cannot sign in.', false);
-    });
+
+document.getElementById('rejectUserConfirm').addEventListener('click', async function(){
+  var user = pendingRejectUser;
+
+  if (!user || !isAdmin()) return;
+
+  var confirmBtn = document.getElementById('rejectUserConfirm');
+  confirmBtn.disabled = true;
+
+  try {
+    var token = localStorage.getItem('emd_api_token');
+
+    var response = await fetch(
+      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/user-approval',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          userID: user,
+          status: 'rejected'
+        })
+      }
+    );
+
+    var data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Rejection failed');
+    }
+
+    pendingRejectUser = null;
+    document.getElementById('rejectUserModal').style.display = 'none';
+
+    showApprovalMsg('User "' + user + '" rejected. They cannot sign in.', false);
+
+    await renderApprovalList();
+    renderUserMgmtTable();
+    renderTabs();
+
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    confirmBtn.disabled = false;
+  }
+});
+
 
     document.getElementById('userMgmtBody').addEventListener('click', function(ev){
       if(!isAdmin()) return;
