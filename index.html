@@ -2439,10 +2439,11 @@ function runDashboard(){
     ],
     // DG fields are shared by DG-1, DG-2 and DG-3: renaming or removing one
     // applies to all three units.
-    'dg-reading': mkDefs([
-      'RUNNING HOURS','OPENING DIESEL QUANTITY','DIESEL ADDED','CLOSING DIESEL QUANTITY',
-      'DIESEL CONSUMED','DIESEL CONSUMPTION (LITRES/HOUR)'
-    ])
+  'dg-reading': mkDefs([
+  'UNITS',
+  'RUNNING HOURS',
+  'DIESEL ADDED'
+])
   };
   var activeConfig = null;       // the panel config currently applied to the page
   var sheetBuilders = {};        // roomId -> function that (re)draws that sheet's boxes
