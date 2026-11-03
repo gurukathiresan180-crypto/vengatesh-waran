@@ -423,7 +423,7 @@
   .ov-kpi-value .ov-unit{ font-size:13px; font-weight:500; color:var(--text-dim); margin-left:6px; }
   .ov-kpi-sub{ font-size:11.5px; color:var(--text-faint); margin-top:4px; }
   .ov-row{ display:grid; gap:16px; margin-bottom:16px; }
-  .ov-row-charts{ grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); }
+  .ov-row-charts{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ov-row-bottom{ grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); }
   .ov-card-head{
     display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
@@ -1055,25 +1055,6 @@
           <div id="ovSections"></div>
         </div>
       </div>
-
-      <div class="ov-row ov-row-bottom">
-        <div class="ov-card">
-          <div class="ov-card-head"><span>LATEST METER READINGS</span></div>
-          <div class="ov-table-wrap">
-            <table class="ov-table">
-              <thead>
-                <tr>
-                  <th>SECTION / EQUIPMENT</th>
-                  <th class="num">PREVIOUS READING</th>
-                  <th class="num">CURRENT READING</th>
-                  <th class="num">CONSUMPTION</th>
-                  <th>LAST UPDATED</th>
-                </tr>
-              </thead>
-              <tbody id="ovLatestBody"></tbody>
-            </table>
-          </div>
-        </div>
         <div class="ov-card">
           <div class="ov-card-head"><span>QUICK ACTIONS</span></div>
           <div class="ov-actions">
