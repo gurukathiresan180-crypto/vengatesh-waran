@@ -859,7 +859,16 @@
     .approval-actions button{ flex:1; }
   }
   .um-role-select{ width:auto; min-width:100px; }
-  /* Hide dashboard header only in Admin Settings */
+/* Reduce gap above Admin Settings tabs */
+#dashboardPage.view-admin-settings .main-content > .shell > .top{
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#dashboardPage.view-admin-settings #adminSettingsPanel{
+  margin-top: 0 !important;
+  padding-top: 8px !important;
+}
 </style>
 </head>
 <body>
