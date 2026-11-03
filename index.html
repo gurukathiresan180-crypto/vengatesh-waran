@@ -673,14 +673,15 @@
   #dashboardPage.view-admin-settings .layout{ display:none; }
   #dashboardPage.view-admin-settings #adminSettingsPanel{ display:block; }
 
-  #dashboardPage.view-admin-settings #adminSettingsPanel{
-  width:100%;
-  max-width:1320px;
-  margin:0 auto;
-  padding:24px 32px;
-  box-sizing:border-box;
+#dashboardPage.view-admin-settings #adminSettingsPanel{
+  display:block !important;
+  width:calc(100% - 40px) !important;
+  max-width:1100px !important;
+  margin:20px auto !important;
+  padding:24px !important;
+  box-sizing:border-box !important;
+  outline:4px solid red !important;
 }
-
 #dashboardPage.view-admin-settings .admin-tabs{
   width:100%;
   margin:0 auto 24px;
