@@ -1035,27 +1035,43 @@
         </div>
       </div>
 
-<div class="ov-row ov-row-charts">
-  <div class="ov-card">
-    <div class="ov-card-head">
-      <span>ENERGY CONSUMPTION TREND</span>
-      <select id="ovRangeSel" aria-label="Date range">
-        <option value="7">Last 7 Days</option>
-        <option value="30">Last 30 Days</option>
-        <option value="month">This Month</option>
-      </select>
+      <div class="ov-row ov-row-charts">
+        <div class="ov-card">
+          <div class="ov-card-head">
+            <span>ENERGY CONSUMPTION TREND</span>
+            <select id="ovRangeSel" aria-label="Date range">
+              <option value="7">Last 7 Days</option>
+              <option value="30">Last 30 Days</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
+          <div class="ov-chart" id="ovTrend"></div>
+        </div>
+        <div class="ov-card">
+          <div class="ov-card-head">
+            <span>SECTION-WISE CONSUMPTION</span>
+            <span class="ov-range-label" id="ovSectionRange"></span>
+          </div>
+          <div id="ovSections"></div>
+        </div>
+      </div>
+        <div class="ov-card">
+          <div class="ov-card-head"><span>QUICK ACTIONS</span></div>
+          <div class="ov-actions">
+            <button type="button" class="ov-action-btn" id="ovAddBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              ADD READING
+            </button>
+            <button type="button" class="ov-action-btn" id="ovReportsBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              VIEW REPORTS
+            </button>
+          </div>
+          <div class="ov-action-note">ADD READING opens the MAIN LT READING sheet; use the READINGS menu for the other sheets.</div>
+        </div>
+      </div>
     </div>
-    <div class="ov-chart" id="ovTrend"></div>
-  </div>
 
-  <div class="ov-card">
-    <div class="ov-card-head">
-      <span>SECTION-WISE CONSUMPTION</span>
-      <span class="ov-range-label" id="ovSectionRange"></span>
-    </div>
-    <div id="ovSections"></div>
-  </div>
-</div>
     <div class="results-panel">
       <div class="quick-entry-panel" id="p3QuickEntryPanel">
         <div class="quick-entry-title" id="p3QuickTitle">P3 SUB LT READING</div><div class="admin-preview-id" id="p3QuickPanelIdBadge"></div>
