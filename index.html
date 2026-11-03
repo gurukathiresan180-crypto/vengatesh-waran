@@ -4068,9 +4068,12 @@ if (toggleBtn) {
 
   function renderOverviewLatest(items){
     var body = document.getElementById('ovLatestBody');
+    if(!body) return;
+    
     var latest = items.filter(function(i){ return i.isLatest; }).sort(function(a,b){
       return (b.updatedAt || (b.date + ' 00:00:00')).localeCompare(a.updatedAt || (a.date + ' 00:00:00'));
     }).slice(0, 10);
+    
     if(!latest.length){
       body.innerHTML = '<tr><td colspan="5" class="ov-empty" style="white-space:normal;">No meter readings recorded yet. Use ADD READING to log the first one.</td></tr>';
       return;
