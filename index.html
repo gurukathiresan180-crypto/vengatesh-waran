@@ -3257,7 +3257,7 @@ function runDashboard(){
       });
       return list;
     }
-    async function renderUserMgmtTable() {
+   var token = localStorage.getItem('emd_admin_settings_token');
   var body = document.getElementById('userMgmtBody');
 
   body.innerHTML =
