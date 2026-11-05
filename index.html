@@ -4083,6 +4083,7 @@ var ovRange = 'week';
 }
   function renderOverviewTrend(items, dates){
     var box = document.getElementById('ovTrend');
+if (!box) return;
     var daily = {};
     items.forEach(function(i){ if(i.cons !== null){ daily[i.date] = (daily[i.date] || 0) + i.cons; } });
     var withData = dates.filter(function(d){ return daily[d] !== undefined; });
