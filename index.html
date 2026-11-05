@@ -3802,6 +3802,39 @@ if (toggleBtn) {
     });
     return out;
   }
+function ovMeterItems(){
+  var out = [];
+
+  ROOMS.forEach(function(room){
+    if (
+      room.id !== 'main-lt' &&
+      room.id !== 'p3-sub-lt' &&
+      room.id !== 'ups-reading'
+    ) return;
+
+    var list = dataByRoom[room.id] || [];
+
+    list.forEach(function(r){
+      var consumption = consumptionInRoom(room.id, r);
+
+      if(consumption === null || consumption < 0) return;
+
+      out.push({
+        id: r.id,
+        roomId: room.id,
+        section: room.name,
+        equipment: r.equipment,
+        date: r.date,
+        reading: r.reading,
+        consumption: consumption,
+        note: r.note,
+        updatedAt: r.updatedAt || ''
+      });
+    });
+  });
+
+  return out;
+}
   function saveRoom(roomId){
     var room = ROOMS.filter(function(rm){ return rm.id === roomId; })[0];
     if(!room) return;
