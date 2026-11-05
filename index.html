@@ -4267,7 +4267,11 @@ function drawPanelGraph(){
 
   loadPanels();
 }
-  
+function ovRangeLabel(){
+  if(ovRange === 'week') return 'Last 7 Days';
+  if(ovRange === 'month') return 'Last 30 Days';
+  return 'Last 7 Days';
+}  
 function renderOverview(){
   if(currentView !== 'create-add') return;
 
