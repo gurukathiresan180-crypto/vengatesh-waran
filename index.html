@@ -1145,6 +1145,8 @@
   </div>
 
   <div id="ovPanelConsumptionChart"></div>
+  <div id="ovSections" style="display:none;"></div>
+<span id="ovSectionRange" style="display:none;"></span>
 </div>
 
 </div>
@@ -3962,98 +3964,6 @@ if (toggleBtn) {
          feed the DG hours / diesel KPI cards only, never the kWh totals.
      =========================================================================== */
 
-var OV_PANEL_COUNTS = {
-  'main-lt': 14,
-  'p3-sub-lt': 24,
-  'ups-reading': 4
-};
-
-function renderPanelOptions() {
-  var room = document.getElementById('ovRoomSelect').value;
-  var panelSelect = document.getElementById('ovPanelSelect');
-
-  var section = OV_SECTIONS.find(function(s) {
-    return s.id === room;
-  });
-
-  var panels = (dataByRoom[room] || [])
-    .map(function(r) { return r.equipment; })
-    .filter(function(name, index, arr) {
-      return arr.indexOf(name) === index;
-    })
-    .sort();
-
-  panelSelect.innerHTML = '<option value="">Select Panel</option>';
-
-  panels.forEach(function(name) {
-    var option = document.createElement('option');
-    option.value = name;
-    option.textContent = fieldDisplayName(room, name);
-    panelSelect.appendChild(option);
-  });
-
-  renderSelectedPanelGraph();
-}
-
-function renderSelectedPanelGraph() {
-  var room = document.getElementById('ovRoomSelect').value;
-  var panel = document.getElementById('ovPanelSelect').value;
-  var box = document.getElementById('ovPanelConsumptionChart');
-
-  if (!panel) {
-    box.innerHTML = '<div class="ov-empty">Please select a panel.</div>';
-    return;
-  }
-
-  var items = ovMeterItems().filter(function(i) {
-    return i.sectionId === room &&
-      i.equipment === fieldDisplayName(room, panel) &&
-      i.cons !== null;
-  });
-
-  var dates = ovRangeDates();
-  var daily = {};
-
-  dates.forEach(function(d) {
-    daily[d] = 0;
-  });
-
-  items.forEach(function(i) {
-    if (daily[i.date] !== undefined) {
-      daily[i.date] += i.cons;
-    }
-  });
-
-  var values = dates.map(function(d) {
-    return { date: d, value: round2(daily[d]) };
-  });
-
-  var max = Math.max.apply(null, values.map(function(v) {
-    return v.value;
-  }));
-
-  if (!max) {
-    box.innerHTML = '<div class="ov-empty">No consumption data available for this panel in this period.</div>';
-    return;
-  }
-
-  box.innerHTML = values.map(function(v) {
-    var width = (v.value / max * 100).toFixed(1);
-
-    return '<div class="ov-bar-row">' +
-      '<div class="ov-bar-name">' + escapeHtml(v.date.slice(5)) + '</div>' +
-      '<div class="ov-bar-track"><div class="ov-bar-fill" style="width:' + width + '%"></div></div>' +
-      '<div class="ov-bar-val"><b class="mono">' +
-      escapeHtml(fmtNum(v.value)) + ' kWh</b></div>' +
-      '</div>';
-  }).join('');
-}
-
-document.getElementById('ovRoomSelect').addEventListener('change', renderPanelOptions);
-document.getElementById('ovPanelSelect').addEventListener('change', renderSelectedPanelGraph);
-
-renderPanelOptions();
-
   function ovSetKpi(id, valueHtml, sub){
     document.getElementById(id).innerHTML = valueHtml;
     document.getElementById(id + 'Sub').textContent = sub;
@@ -4156,6 +4066,11 @@ renderPanelOptions();
     svg += '</svg>';
     box.innerHTML = svg;
   }
+  var OV_SECTIONS = [
+  { id:'main-lt', short:'MAIN LT' },
+  { id:'p3-sub-lt', short:'P3 SUB LT' },
+  { id:'ups-reading', short:'UPS' }
+];
 
   function renderOverviewSections(items, dates){
     var box = document.getElementById('ovSections');
