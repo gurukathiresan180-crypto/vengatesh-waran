@@ -4057,7 +4057,8 @@ function ovMeterItems(){
     var m = v / pow;
     return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * pow;
   }
-function ovRangeDates(){
+var ovRange = 'week';
+  function ovRangeDates(){
   var today = new Date();
   var dates = [];
   var start = new Date(today);
