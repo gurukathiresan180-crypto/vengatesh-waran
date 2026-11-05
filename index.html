@@ -4267,6 +4267,9 @@ function drawPanelGraph(){
 
   loadPanels();
 }
+  function round2(value){
+  return Math.round((Number(value) || 0) * 100) / 100;
+}
 function ovRangeLabel(){
   if(ovRange === 'week') return 'Last 7 Days';
   if(ovRange === 'month') return 'Last 30 Days';
