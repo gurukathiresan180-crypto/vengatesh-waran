@@ -3819,17 +3819,18 @@ function ovMeterItems(){
 
       if(consumption === null || consumption < 0) return;
 
-      out.push({
-        id: r.id,
-        roomId: room.id,
-        section: room.name,
-        equipment: r.equipment,
-        date: r.date,
-        reading: r.reading,
-        cons: consumption,
-        note: r.note,
-        updatedAt: r.updatedAt || ''
-      });
+  out.push({
+  id: r.id,
+  roomId: room.id,
+  sectionId: room.id,
+  section: room.name,
+  equipment: fieldDisplayName(room.id, r.equipment),
+  date: r.date,
+  reading: r.reading,
+  cons: consumption,
+  note: r.note,
+  updatedAt: r.updatedAt || ''
+});
     });
   });
 
