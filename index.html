@@ -4243,17 +4243,27 @@ function renderOverview(){
 }
 
 
-  document.getElementById('ovRangeSel').addEventListener('change', function(){
+  var ovRangeEl = document.getElementById('ovRangeSel');
+if (ovRangeEl) {
+  ovRangeEl.addEventListener('change', function(){
     ovRange = this.value;
     renderOverview();
   });
-  document.getElementById('ovAddBtn').addEventListener('click', function(){ handleNavAction('main-lt', 'room'); });
-  document.getElementById('ovReportsBtn').addEventListener('click', function(){ handleNavAction('total-log', 'view'); });
-  var ovResizeTimer = null;
-  window.addEventListener('resize', function(){
-    clearTimeout(ovResizeTimer);
-    ovResizeTimer = setTimeout(renderOverview, 150);
+}
+
+var ovAddEl = document.getElementById('ovAddBtn');
+if (ovAddEl) {
+  ovAddEl.addEventListener('click', function(){
+    handleNavAction('main-lt', 'room');
   });
+}
+
+var ovReportsEl = document.getElementById('ovReportsBtn');
+if (ovReportsEl) {
+  ovReportsEl.addEventListener('click', function(){
+    handleNavAction('total-log', 'view');
+  });
+}
 
   /* ===== TOTAL LOG page ==========================================================
      One row per saved reading (history is never merged or replaced).
