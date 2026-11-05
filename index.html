@@ -3826,7 +3826,7 @@ function ovMeterItems(){
         equipment: r.equipment,
         date: r.date,
         reading: r.reading,
-        consumption: consumption,
+        cons: consumption,
         note: r.note,
         updatedAt: r.updatedAt || ''
       });
@@ -4057,7 +4057,29 @@ function ovMeterItems(){
     var m = v / pow;
     return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * pow;
   }
+function ovRangeDates(){
+  var today = new Date();
+  var dates = [];
+  var start = new Date(today);
 
+  if(ovRange === 'week'){
+    start.setDate(today.getDate() - 6);
+  } else if(ovRange === 'month'){
+    start.setDate(today.getDate() - 29);
+  } else {
+    start.setDate(today.getDate() - 6);
+  }
+
+  for(var d = new Date(start); d <= today; d.setDate(d.getDate() + 1)){
+    dates.push(
+      d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0')
+    );
+  }
+
+  return dates;
+}
   function renderOverviewTrend(items, dates){
     var box = document.getElementById('ovTrend');
     var daily = {};
