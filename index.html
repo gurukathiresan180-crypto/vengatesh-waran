@@ -3775,15 +3775,58 @@ if (toggleBtn) {
 
   // Data persistence: plain localStorage, since this file is opened
   // directly in the browser rather than through a hosted backend.
-  function loadRoom(roomId){
-    var room = ROOMS.filter(function(r){ return r.id === roomId; })[0];
-    try{
-      var raw = localStorage.getItem(room.key);
-      dataByRoom[roomId] = raw ? JSON.parse(raw) : [];
-    }catch(e){
+  async function loadRoom(roomId){
+  var room = ROOMS.filter(function(r){
+    return r.id === roomId;
+  })[0];
+
+  if(!room) return;
+
+  try {
+    var token = localStorage.getItem('emd_api_token');
+
+    if(!token) {
       dataByRoom[roomId] = [];
+      return;
     }
+
+    var response = await fetch(
+      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        cache: 'no-store'
+      }
+    );
+
+    var result = await response.json();
+
+    if(!response.ok || !result.success) {
+      throw new Error(result.error || 'Unable to load readings');
+    }
+
+    dataByRoom[roomId] = (result.readings || [])
+      .filter(function(r){
+        return r.roomId === roomId;
+      })
+      .map(function(r){
+        return {
+          id: String(r.id),
+          equipment: r.equipment,
+          date: r.date,
+          reading: Number(r.reading),
+          note: r.note || '',
+          updatedAt: r.updatedAt || ''
+        };
+      });
+
+  } catch(e) {
+    console.error('Meter readings load error:', e);
+    throw e;
   }
+}
   function saveCurrentRoom(){
     try{
       localStorage.setItem(currentRoom().key, JSON.stringify(readings()));
