@@ -3296,123 +3296,7 @@ function runDashboard(){
       });
       return list;
     }
-    async function renderUserMgmtTable() {
-  var body = document.getElementById('userMgmtBody');
-
-  body.innerHTML =
-    '<tr><td colspan="7">Loading users...</td></tr>';
-
-  try {
-    var token = localStorage.getItem('emd_api_token');
-
-    if (!token) {
-      throw new Error('Please login again.');
-    }
-
-    var response = await fetch(
-      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/users',
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      }
-    );
-
-    var data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Unable to load users');
-    }
-
-    var list = (data.users || []).map(function(u) {
-      return {
-        username: u.userID || u.user_id || '',
-        name: u.name || '',
-        email: u.email || '',
-        role: u.role || 'user',
-        status: u.approval_status || 'approved',
-        active: u.active !== 0 &&
-                u.active !== false &&
-                u.active !== '0',
-        builtin: u.role === 'admin'
-      };
-    });
-
-    body.innerHTML = list.map(function(u) {
-      var roleOptions = ['user', 'admin'].map(function(r) {
-        return '<option value="' + r + '"' +
-          (r === u.role ? ' selected' : '') + '>' +
-          (r === 'admin' ? 'Admin' : 'User') +
-          '</option>';
-      }).join('');
-
-      var canManage =
-        !u.builtin && u.username !== getCurrentUser();
-
-      return '<tr>'
-        + '<td>' + (u.name ? escapeHtml(u.name) :
-          '<span style="color:var(--text-faint);">—</span>') + '</td>'
-        + '<td>' + (u.email ? escapeHtml(u.email) :
-          '<span style="color:var(--text-faint);">—</span>') + '</td>'
-        + '<td class="mono">' + escapeHtml(u.username) +
-          (u.builtin ? ' <span class="role-tag role-admin" style="margin-left:6px;">built-in</span>' : '') + '</td>'
-        + '<td><select class="um-role-select mono" data-user="' +
-          escapeHtml(u.username) + '" ' +
-          ((u.builtin || u.status !== 'approved') ? 'disabled' : '') +
-          '>' + roleOptions + '</select></td>'
-        + '<td><span class="status-tag ' + u.status + '">' +
-          (u.status === 'pending' ? 'Pending Approval' :
-          (u.status === 'rejected' ? 'Rejected' : 'Approved')) +
-          '</span></td>'
-        + '<td>' + (u.status === 'approved' ?
-          '<span class="status-tag' + (u.active ? '' : ' inactive') + '">' +
-          (u.active ? 'Active' : 'Inactive') + '</span>' :
-          '<span style="color:var(--text-faint);">—</span>') + '</td>'
-        + '<td style="text-align:right; white-space:nowrap;">'
-        + (canManage && u.status === 'approved' ?
-          '<button type="button" class="btn-ghost um-toggle-btn" data-user="' +
-          escapeHtml(u.username) + '" style="margin-right:6px;">' +
-          (u.active ? 'Deactivate' : 'Activate') + '</button>' : '')
-        + (canManage && u.status === 'rejected' ?
-          '<button type="button" class="btn-ghost um-reapprove-btn" data-user="' +
-          escapeHtml(u.username) + '" style="margin-right:6px;">Approve</button>' : '')
-        + (canManage ?
-          '<button type="button" class="btn-ghost um-delete-btn" data-user="' +
-          escapeHtml(u.username) +
-          '" style="color:var(--red); border-color:var(--red);">Delete</button>' : '')
-        + '</td>'
-        + '</tr>';
-    }).join('');
-
-  } catch (err) {
-    console.error('User Management error:', err);
-    body.innerHTML =
-      '<tr><td colspan="7">Error: ' +
-      escapeHtml(err.message) + '</td></tr>';
-  }
-}
-// ---- User Approval ----
-
-function fmtRegistered(stamp){
-  var m = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/.exec(stamp || '');
-  return m ? fmtDate(m[1]) + ', ' + m[2] : '—';
-}
-
-function showApprovalMsg(text, bad){
-  var el = document.getElementById('approvalMsg');
-  el.textContent = text;
-  el.style.color = bad ? '#E39685' : 'var(--green)';
-  el.style.display = 'block';
-}
-
-var d1PendingCount = 0;
-
-function pendingCount(){
-  return d1PendingCount;
-}
-
-async function renderApprovalList(){
+   async function renderApprovalList() {
   var body = document.getElementById('approvalBody');
   var badge = document.getElementById('approvalTabCount');
 
@@ -3420,29 +3304,17 @@ async function renderApprovalList(){
     '<tr><td colspan="6" class="approval-empty">Loading pending requests...</td></tr>';
 
   try {
-    var token = localStorage.getItem('emd_api_token');
+    var result = await supabaseClient
+      .from('profiles')
+      .select('id, user_id, name, email, approval_status, created_at')
+      .eq('approval_status', 'pending')
+      .order('created_at', { ascending: true });
 
-    if (!token) {
-      throw new Error('Admin login session not found. Please login again.');
+    if (result.error) {
+      throw result.error;
     }
 
-    var response = await fetch(
-      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/pending-users',
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      }
-    );
-
-    var data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Unable to load pending users.');
-    }
-
-    var list = data.users || [];
+    var list = result.data || [];
     d1PendingCount = list.length;
 
     document.getElementById('approvalTotal').textContent =
@@ -3458,16 +3330,19 @@ async function renderApprovalList(){
       return;
     }
 
-    body.innerHTML = list.map(function(x){
+    body.innerHTML = list.map(function(x) {
       var u = escapeHtml(x.user_id || '');
       var name = x.name ? escapeHtml(x.name) : '—';
       var email = x.email ? escapeHtml(x.email) : '—';
+      var registered = x.created_at
+        ? new Date(x.created_at).toLocaleString()
+        : '—';
 
       return '<tr>'
         + '<td data-label="Name">' + name + '</td>'
         + '<td data-label="Username" class="mono">' + u + '</td>'
         + '<td data-label="Email ID">' + email + '</td>'
-        + '<td data-label="Registered" class="mono">—</td>'
+        + '<td data-label="Registered" class="mono">' + escapeHtml(registered) + '</td>'
         + '<td data-label="Status"><span class="status-tag pending">Pending Approval</span></td>'
         + '<td class="approval-actions-cell"><div class="approval-actions">'
         + '<button type="button" class="btn-approve" data-act="approve" data-user="' + u + '">Approve</button>'
@@ -3491,6 +3366,43 @@ async function renderApprovalList(){
     badge.style.display = 'none';
   }
 }
+// ---- User Approval ----
+
+function fmtRegistered(stamp){
+  var m = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/.exec(stamp || '');
+  return m ? fmtDate(m[1]) + ', ' + m[2] : '—';
+}
+
+function showApprovalMsg(text, bad){
+  var el = document.getElementById('approvalMsg');
+  el.textContent = text;
+  el.style.color = bad ? '#E39685' : 'var(--green)';
+  el.style.display = 'block';
+}
+
+var d1PendingCount = 0;
+
+function pendingCount(){
+  return d1PendingCount;
+}
+
+async function updateSupabaseApproval(user, status) {
+  var result = await supabaseClient
+    .from('profiles')
+    .update({ approval_status: status })
+    .eq('user_id', user)
+    .select('user_id');
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (!result.data || result.data.length === 0) {
+    throw new Error('User update failed. Check Admin permission.');
+  }
+
+  return true;
+}
 
 function afterApprovalChange(){
   renderApprovalList();
@@ -3498,10 +3410,9 @@ function afterApprovalChange(){
   renderTabs();
 }
 
- 
 var pendingRejectUser = null;
 
-document.getElementById('approvalBody').addEventListener('click', async function(ev){
+document.getElementById('approvalBody').addEventListener('click', async function(ev) {
   var btn = ev.target.closest('button[data-act]');
   if (!btn || !isAdmin()) return;
 
@@ -3514,35 +3425,16 @@ document.getElementById('approvalBody').addEventListener('click', async function
     btn.disabled = true;
 
     try {
-      var token = localStorage.getItem('emd_api_token');
-
-      var response = await fetch(
-        'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/user-approval',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
-          body: JSON.stringify({
-            userID: user,
-            status: 'approved'
-          })
-        }
-      );
-
-      var data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Approval failed');
-      }
+      await updateSupabaseApproval(user, 'approved');
 
       showApprovalMsg('User "' + user + '" approved successfully.');
+
       await renderApprovalList();
-      renderUserMgmtTable();
+      await renderUserMgmtTable();
       renderTabs();
 
     } catch (error) {
+      console.error('Approve error:', error);
       alert(error.message);
       btn.disabled = false;
     }
@@ -3556,8 +3448,7 @@ document.getElementById('approvalBody').addEventListener('click', async function
     document.getElementById('rejectUserModal').style.display = 'flex';
   }
 });
-
-    document.getElementById('rejectUserCancel').addEventListener('click', function(){
+  document.getElementById('rejectUserCancel').addEventListener('click', function(){
       pendingRejectUser = null;
       document.getElementById('rejectUserModal').style.display = 'none';
     });
@@ -3571,45 +3462,28 @@ document.getElementById('rejectUserConfirm').addEventListener('click', async fun
   confirmBtn.disabled = true;
 
   try {
-    var token = localStorage.getItem('emd_api_token');
-
-    var response = await fetch(
-      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/user-approval',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
-        body: JSON.stringify({
-          userID: user,
-          status: 'rejected'
-        })
-      }
-    );
-
-    var data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Rejection failed');
-    }
+    await updateSupabaseApproval(user, 'rejected');
 
     pendingRejectUser = null;
     document.getElementById('rejectUserModal').style.display = 'none';
 
-    showApprovalMsg('User "' + user + '" rejected. They cannot sign in.', false);
+    showApprovalMsg(
+      'User "' + user + '" rejected. They cannot sign in.',
+      false
+    );
 
     await renderApprovalList();
-    renderUserMgmtTable();
+    await renderUserMgmtTable();
     renderTabs();
 
   } catch (error) {
+    console.error('Reject error:', error);
     alert(error.message);
+
   } finally {
     confirmBtn.disabled = false;
   }
 });
-
 
     document.getElementById('userMgmtBody').addEventListener('click', function(ev){
       if(!isAdmin()) return;
@@ -3620,50 +3494,50 @@ document.getElementById('rejectUserConfirm').addEventListener('click', async fun
         if(rrec && rrec.status === 'rejected'){ setUserStatus(ru, 'approved'); afterApprovalChange(); }
         return;
       }
-     var toggleBtn = ev.target.closest('.um-toggle-btn');
+    
+var toggleBtn = ev.target.closest('.um-toggle-btn');
 
 if (toggleBtn) {
   var u = toggleBtn.getAttribute('data-user');
   var makeActive = toggleBtn.textContent.trim() === 'Activate';
-  var token = localStorage.getItem('emd_api_token');
 
   toggleBtn.disabled = true;
   toggleBtn.textContent = 'Please wait...';
 
-  fetch(
-    'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/admin/user-status',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        userID: u,
-        active: makeActive
-      })
+  try {
+    var result = await supabaseClient
+      .from('profiles')
+      .update({ active: makeActive })
+      .eq('user_id', u)
+      .select('user_id');
+
+    if (result.error) {
+      throw result.error;
     }
-  )
-  .then(function(response) {
-    return response.json().then(function(data) {
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Status update failed');
-      }
-      return data;
-    });
-  })
-  .then(function(data) {
-    alert(data.message);
-    renderUserMgmtTable();
-  })
-  .catch(function(error) {
+
+    if (!result.data || result.data.length === 0) {
+      throw new Error('Status update failed. Check Admin permission.');
+    }
+
+    alert(
+      'User "' + u + '" ' +
+      (makeActive ? 'activated' : 'deactivated') +
+      ' successfully.'
+    );
+
+    await renderUserMgmtTable();
+
+  } catch (error) {
+    console.error('User status update error:', error);
     alert(error.message);
-    renderUserMgmtTable();
-  });
+    await renderUserMgmtTable();
+  }
 
   return;
 }
-      var delBtn = ev.target.closest('.um-delete-btn');
+
+var delBtn = ev.target.closest('.um-delete-btn');
+
       if(delBtn){
         var target = delBtn.getAttribute('data-user');
         // The built-in admin and the account you are signed in with can never be deleted.
