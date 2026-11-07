@@ -3295,8 +3295,9 @@ function runDashboard(){
         list.push({ username: u, name: users[u].name || '', email: users[u].email || '', role: users[u].role, active: users[u].active !== false, builtin: false, status: users[u].status || 'approved' });
       });
       return list;
-      
-async function renderUserMgmtTable() {
+    }
+
+    async function renderUserMgmtTable() {
   var body = document.getElementById('userMgmtBody');
 
   if (!body) {
