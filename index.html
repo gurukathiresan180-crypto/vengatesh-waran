@@ -3971,6 +3971,18 @@ async function migrateLocalStorageToD1() {
   }
 }
   window.migrateLocalStorageToD1 = migrateLocalStorageToD1;
+  window.checkLocalReadingCounts = function() {
+  return ROOMS.map(function(room) {
+    var raw = localStorage.getItem(room.key);
+    var list = raw ? JSON.parse(raw) : [];
+
+    return {
+      room: room.name,
+      count: Array.isArray(list) ? list.length : 0
+    };
+  });
+};
+
 
   // READINGS and REPORTS start expanded so their sub-items are visible.
   var expandedItems = {};
