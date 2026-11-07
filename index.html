@@ -3906,6 +3906,70 @@ function ovMeterItems(){
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+  // Migrate old localStorage readings to Cloudflare D1
+async function migrateLocalStorageToD1() {
+  var token = localStorage.getItem('emd_api_token');
+
+  if (!token) {
+    alert('Please login first.');
+    return;
+  }
+
+  var totalUploaded = 0;
+
+  try {
+    for (var i = 0; i < ROOMS.length; i++) {
+      var room = ROOMS[i];
+
+      var raw = localStorage.getItem(room.key);
+      var localReadings = raw ? JSON.parse(raw) : [];
+
+      if (!Array.isArray(localReadings) || !localReadings.length) {
+        continue;
+      }
+
+      var response = await fetch(
+        'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            roomId: room.id,
+            readings: localReadings
+          })
+        }
+      );
+
+      var result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          room.name + ': ' +
+          (result.error || 'Upload failed')
+        );
+      }
+
+      totalUploaded += result.saved || 0;
+    }
+
+    alert(
+      'Migration completed successfully!\n' +
+      'Uploaded readings: ' + totalUploaded +
+      '\nYour local backup is preserved.'
+    );
+
+  } catch (e) {
+    console.error('Migration error:', e);
+
+    alert(
+      'Migration stopped: ' + e.message +
+      '\n\nYour local readings are still preserved. You can safely retry.'
+    );
+  }
+}
 
   // READINGS and REPORTS start expanded so their sub-items are visible.
   var expandedItems = {};
