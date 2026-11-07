@@ -2201,21 +2201,34 @@ function adminGateSalt(){
   return Array.prototype.map.call(a, function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
 }
 
+
 (function adminGateSetup(){
   var modal = document.getElementById('adminGateModal');
   var form = document.getElementById('agForm');
+
   var els = {
-    title: document.getElementById('agTitle'), text: document.getElementById('agText'),
-    idWrap: document.getElementById('agIdWrap'), passWrap: document.getElementById('agPassWrap'),
-    newIdWrap: document.getElementById('agNewIdWrap'), confirmWrap: document.getElementById('agConfirmWrap'),
-    id: document.getElementById('agId'), pass: document.getElementById('agPass'),
-    newId: document.getElementById('agNewId'), confirm: document.getElementById('agConfirm'),
-    idLabel: document.getElementById('agIdLabel'), passLabel: document.getElementById('agPassLabel'),
+    title: document.getElementById('agTitle'),
+    text: document.getElementById('agText'),
+    idWrap: document.getElementById('agIdWrap'),
+    passWrap: document.getElementById('agPassWrap'),
+    newIdWrap: document.getElementById('agNewIdWrap'),
+    confirmWrap: document.getElementById('agConfirmWrap'),
+    id: document.getElementById('agId'),
+    pass: document.getElementById('agPass'),
+    newId: document.getElementById('agNewId'),
+    confirm: document.getElementById('agConfirm'),
+    idLabel: document.getElementById('agIdLabel'),
+    passLabel: document.getElementById('agPassLabel'),
     confirmLabel: document.getElementById('agConfirmLabel'),
-    alert: document.getElementById('agAlert'), submit: document.getElementById('agSubmit'),
-    cancel: document.getElementById('agCancel'), sw: document.getElementById('agSwitch')
+    alert: document.getElementById('agAlert'),
+    submit: document.getElementById('agSubmit'),
+    cancel: document.getElementById('agCancel'),
+    sw: document.getElementById('agSwitch')
   };
-  var mode = 'login', onSuccess = null, failed = 0, lockedUntil = 0;
+
+  var onSuccess = null;
+  var failed = 0;
+  var lockedUntil = 0;
 
   function showAlert(msg, ok){
     els.alert.textContent = msg;
@@ -2224,64 +2237,148 @@ function adminGateSalt(){
     els.alert.style.color = ok ? 'var(--green)' : '';
     els.alert.style.background = ok ? 'rgba(111,169,122,0.12)' : '';
   }
-  function setMode(m){
-    mode = m;
-    els.alert.style.display = 'none';
+
+  function close(){
+    modal.style.display = 'none';
     form.reset();
-    els.newIdWrap.style.display = 'none';
-    els.confirmWrap.style.display = 'none';
-    els.idLabel.textContent = 'Admin ID';
-    els.passLabel.textContent = 'Password';
-    if(m === 'setup'){
-      els.title.textContent = 'Create admin settings login';
-      els.text.textContent = 'Choose an admin ID and password. You will be asked for them every time you open Admin Settings.';
-      els.idLabel.textContent = 'Create admin ID';
-      els.passLabel.textContent = 'Create password';
-      els.confirmLabel.textContent = 'Confirm password';
-      els.confirmWrap.style.display = 'block';
-      els.submit.textContent = 'Create and open';
-      els.sw.style.display = 'none';
-    } else if(m === 'change'){
-      els.title.textContent = 'Change admin settings login';
-      els.text.textContent = 'Enter the current admin ID and password, then choose new ones.';
-      els.idLabel.textContent = 'Current admin ID';
-      els.passLabel.textContent = 'Current password';
-      els.confirmLabel.textContent = 'New password';
-      els.newIdWrap.style.display = 'block';
-      els.confirmWrap.style.display = 'block';
-      els.submit.textContent = 'Save changes';
-      els.sw.textContent = 'Back'; els.sw.style.display = 'inline';
-    } else {
-      els.title.textContent = 'Admin Settings access';
-      els.text.textContent = 'Enter the admin ID and password to open Admin Settings.';
-      els.submit.textContent = 'Unlock';
-      els.sw.textContent = 'Change ID / password'; els.sw.style.display = 'inline';
-    }
+    onSuccess = null;
   }
-  function close(){ modal.style.display = 'none'; form.reset(); onSuccess = null; }
+
   function unlockAndContinue(){
     sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1');
+
     var cb = onSuccess;
     close();
-    if(typeof cb === 'function'){ cb(); }
+
+    if(typeof cb === 'function'){
+      cb();
+    }
+  }
+
+  function setLoginMode(){
+    els.alert.style.display = 'none';
+    form.reset();
+
+    els.title.textContent = 'Admin Settings access';
+    els.text.textContent =
+      'Enter your Admin Settings ID and password.';
+
+    els.idLabel.textContent = 'Admin ID';
+    els.passLabel.textContent = 'Password';
+
+    els.newIdWrap.style.display = 'none';
+    els.confirmWrap.style.display = 'none';
+    els.submit.textContent = 'Unlock';
+    els.sw.style.display = 'none';
   }
 
   window.openAdminGate = function(cb){
     onSuccess = cb || null;
-    setMode(getAdminGate() ? 'login' : 'setup');
+    setLoginMode();
     modal.style.display = 'flex';
     els.id.focus();
   };
 
   els.cancel.addEventListener('click', close);
-  els.sw.addEventListener('click', function(){ setMode(mode === 'login' ? 'change' : 'login'); });
 
-  function saveGate(id, pw){
-    var salt = adminGateSalt();
-    return adminGateHash(salt, pw).then(function(hash){
-      localStorage.setItem(ADMIN_GATE_KEY, JSON.stringify({ id: id, salt: salt, hash: hash }));
-    });
-  }
+  // Supabase Admin Settings authentication
+  form.addEventListener('submit', async function(ev){
+    ev.preventDefault();
+
+    els.alert.style.display = 'none';
+
+    var id = els.id.value.trim();
+    var pw = els.pass.value;
+
+    if(Date.now() < lockedUntil){
+      showAlert(
+        'Too many wrong attempts. Try again in ' +
+        Math.ceil((lockedUntil - Date.now()) / 1000) +
+        ' seconds.'
+      );
+      return;
+    }
+
+    if(!id || !pw){
+      showAlert('Enter the admin ID and password.');
+      return;
+    }
+
+    if(id !== 'Guru_Admin180' && id !== 'Abilash_Admin'){
+      showAlert('Invalid Admin Settings ID.');
+      return;
+    }
+
+    els.submit.disabled = true;
+    els.submit.textContent = 'Verifying...';
+
+    try {
+      // Find the email mapped to this Admin ID
+      var emailResult = await supabaseClient.rpc(
+        'get_login_email',
+        { p_user_id: id }
+      );
+
+      if(emailResult.error || !emailResult.data){
+        throw new Error('Admin ID mapping failed.');
+      }
+
+      // Authenticate with Supabase
+      var loginResult = await supabaseClient.auth.signInWithPassword({
+        email: emailResult.data,
+        password: pw
+      });
+
+      if(loginResult.error){
+        throw loginResult.error;
+      }
+
+      // Verify Admin Settings permission
+      var accessResult = await supabaseClient.rpc(
+        'can_access_admin_settings',
+        { p_admin_id: id }
+      );
+
+      if(accessResult.error || accessResult.data !== true){
+        await supabaseClient.auth.signOut();
+        throw new Error('This account does not have Admin Settings permission.');
+      }
+
+      failed = 0;
+
+      // Separate Admin Settings unlock marker
+      sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1');
+
+      // Remove the old Worker token
+      localStorage.removeItem('emd_admin_settings_token');
+
+      unlockAndContinue();
+
+    } catch(error) {
+      console.error('Admin Settings login error:', error);
+
+      failed++;
+
+      if(failed >= 5){
+        failed = 0;
+        lockedUntil = Date.now() + 30000;
+        showAlert('Too many wrong attempts. Locked for 30 seconds.');
+      } else {
+        showAlert(
+          error && error.message
+            ? error.message
+            : 'Incorrect Admin ID or password.'
+        );
+      }
+
+    } finally {
+      els.submit.disabled = false;
+      els.submit.textContent = 'Unlock';
+    }
+  });
+
+})();
+
   
 function verifyCurrent(id, pw) {
   return fetch(
