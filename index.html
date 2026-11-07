@@ -3485,7 +3485,7 @@ document.getElementById('rejectUserConfirm').addEventListener('click', async fun
   }
 });
 
-    document.getElementById('userMgmtBody').addEventListener('click', function(ev){
+    document.getElementById('userMgmtBody').addEventListener('click', async function(ev){
       if(!isAdmin()) return;
       var reBtn = ev.target.closest('.um-reapprove-btn');
       if(reBtn){
