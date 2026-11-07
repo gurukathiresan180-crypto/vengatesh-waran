@@ -3295,6 +3295,97 @@ function runDashboard(){
         list.push({ username: u, name: users[u].name || '', email: users[u].email || '', role: users[u].role, active: users[u].active !== false, builtin: false, status: users[u].status || 'approved' });
       });
       return list;
+      
+async function renderUserMgmtTable() {
+  var body = document.getElementById('userMgmtBody');
+
+  if (!body) {
+    console.error('userMgmtBody element not found');
+    return;
+  }
+
+  body.innerHTML =
+    '<tr><td colspan="7">Loading users...</td></tr>';
+
+  try {
+    var result = await supabaseClient
+      .from('profiles')
+      .select('id, email, user_id, name, role, approval_status, active, admin_settings_access')
+      .order('created_at', { ascending: true });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    var list = result.data || [];
+
+    if (list.length === 0) {
+      body.innerHTML =
+        '<tr><td colspan="7">No user accounts found.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = list.map(function(u) {
+      var username = u.user_id || '';
+      var role = u.role || 'user';
+      var status = u.approval_status || 'pending';
+      var active = u.active === true;
+
+      // Protect both Admin Settings accounts.
+      var protectedAccount =
+        role === 'admin' || u.admin_settings_access === true;
+
+      var roleOptions = ['user', 'admin'].map(function(r) {
+        return '<option value="' + r + '"' +
+          (r === role ? ' selected' : '') + '>' +
+          (r === 'admin' ? 'Admin' : 'User') +
+          '</option>';
+      }).join('');
+
+      var canManage =
+        !protectedAccount &&
+        username !== getCurrentUser();
+
+      return '<tr>'
+        + '<td>' + escapeHtml(u.name || '—') + '</td>'
+        + '<td>' + escapeHtml(u.email || '—') + '</td>'
+        + '<td class="mono">' + escapeHtml(username) + '</td>'
+        + '<td><select class="um-role-select mono" data-user="' +
+          escapeHtml(username) + '" ' +
+          (canManage && status === 'approved' ? '' : 'disabled') +
+          '>' + roleOptions + '</select></td>'
+        + '<td><span class="status-tag ' + escapeHtml(status) + '">' +
+          escapeHtml(status === 'pending' ? 'Pending Approval' :
+            status === 'rejected' ? 'Rejected' : 'Approved') +
+          '</span></td>'
+        + '<td>' + (status === 'approved' ?
+          '<span class="status-tag' + (active ? '' : ' inactive') + '">' +
+          (active ? 'Active' : 'Inactive') + '</span>' : '—') +
+          '</td>'
+        + '<td style="text-align:right;white-space:nowrap;">'
+        + (canManage && status === 'approved' ?
+          '<button type="button" class="btn-ghost um-toggle-btn" data-user="' +
+          escapeHtml(username) + '">' +
+          (active ? 'Deactivate' : 'Activate') + '</button>' : '')
+        + (canManage && status === 'rejected' ?
+          '<button type="button" class="btn-ghost um-reapprove-btn" data-user="' +
+          escapeHtml(username) + '">Approve</button>' : '')
+        + (canManage ?
+          '<button type="button" class="btn-ghost um-delete-btn" data-user="' +
+          escapeHtml(username) + '" style="color:var(--red);">Delete</button>' : '')
+        + '</td>'
+        + '</tr>';
+    }).join('');
+
+  } catch (error) {
+    console.error('User Management error:', error);
+
+    body.innerHTML =
+      '<tr><td colspan="7">Error: ' +
+      escapeHtml(error.message) + '</td></tr>';
+  }
+}
+
     }
    async function renderApprovalList() {
   var body = document.getElementById('approvalBody');
