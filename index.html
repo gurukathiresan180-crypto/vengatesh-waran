@@ -2612,20 +2612,34 @@ function runDashboard(){
         inp.value = '';
       });
 
-      dataByRoom[roomId] = list;
-      if(savedCount > 0){
-        saveReadings(roomId, chosenDate);
-        var msg = document.getElementById(msgElId);
-        var bits = [];
-        if(createdCount) bits.push(createdCount + ' new');
-        if(updatedCount) bits.push(updatedCount + ' updated');
-        msg.textContent = 'Saved ' + savedCount + ' reading' + (savedCount===1?'':'s') + ' (' + bits.join(', ') + ') for ' + fmtDate(chosenDate) + '.';
-        msg.style.display = 'block';
-        if(currentView === roomId){ render(); }
-      }
-    });
-  }
+    dataByRoom[roomId] = list;
 
+if(savedCount > 0){
+  var msg = document.getElementById(msgElId);
+  msg.textContent = 'Saving readings to cloud...';
+  msg.style.display = 'block';
+
+  saveReadings(roomId, chosenDate)
+    .then(function(){
+      var bits = [];
+      if(createdCount) bits.push(createdCount + ' new');
+      if(updatedCount) bits.push(updatedCount + ' updated');
+
+      msg.textContent =
+        'Saved ' + savedCount +
+        ' reading' + (savedCount === 1 ? '' : 's') +
+        ' (' + bits.join(', ') + ') for ' +
+        fmtDate(chosenDate) + '. Cloud sync successful.';
+
+      if(currentView === roomId){ render(); }
+    })
+    .catch(function(e){
+      msg.textContent =
+        'Local backup saved, but cloud sync failed: ' + e.message;
+      msg.style.display = 'block';
+      console.error('Cloud sync error:', e);
+    });
+}
   setupQuickEntrySection('p3-sub-lt', 'qe', 'p3QuickEntryGrid', 'p3QuickSaveBtn', 'p3QuickMsg', 'p3QuickDate');
 
   setupQuickEntrySection('main-lt', 'qeml', 'mainLtQuickEntryGrid', 'mainLtQuickSaveBtn', 'mainLtQuickMsg', 'mainLtQuickDate');
@@ -3784,7 +3798,47 @@ function loadRoom(roomId){
     dataByRoom[roomId] = [];
   }
 }
-  function saveCurrentRoom(){
+      async function loadAllRoomsFromD1(){
+  var token = localStorage.getItem('emd_api_token');
+
+  if(!token){
+    throw new Error('Login token not found. Please login again.');
+  }
+
+  var response = await fetch(
+    'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      cache: 'no-store'
+    }
+  );
+
+  var result = await response.json();
+
+  if(!response.ok || !result.success){
+    throw new Error(result.error || 'Could not load cloud readings');
+  }
+
+  var cloudReadings = result.readings || [];
+
+  ROOMS.forEach(function(room){
+    dataByRoom[room.id] = cloudReadings.filter(function(r){
+      return r.roomId === room.id;
+    });
+
+    localStorage.setItem(
+      room.key,
+      JSON.stringify(dataByRoom[room.id])
+    );
+  });
+
+  return cloudReadings.length;
+}
+
+function saveCurrentRoom(){
     try{
       localStorage.setItem(currentRoom().key, JSON.stringify(readings()));
     }catch(e){}
@@ -3853,11 +3907,47 @@ function ovMeterItems(){
 
   return out;
 }
-  function saveRoom(roomId){
-    var room = ROOMS.filter(function(rm){ return rm.id === roomId; })[0];
-    if(!room) return;
-    try{ localStorage.setItem(room.key, JSON.stringify(dataByRoom[roomId] || [])); }catch(e){}
+async function saveRoom(roomId){
+  var room = ROOMS.filter(function(rm){
+    return rm.id === roomId;
+  })[0];
+
+  if(!room) throw new Error('Room not found');
+
+  var list = dataByRoom[roomId] || [];
+
+  // Keep local backup first.
+  localStorage.setItem(room.key, JSON.stringify(list));
+
+  var token = localStorage.getItem('emd_api_token');
+
+  if(!token){
+    throw new Error('Please login again. Login token not found.');
   }
+
+  var response = await fetch(
+    'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        roomId: roomId,
+        readings: list
+      })
+    }
+  );
+
+  var result = await response.json();
+
+  if(!response.ok || !result.success){
+    throw new Error(result.error || 'Cloud save failed');
+  }
+
+  return result;
+}
   var NAV_ICON = '<svg class="rt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
     + '<circle cx="12" cy="12" r="9"></circle>'
     + '<line x1="12" y1="12" x2="15.5" y2="8.5"></line>'
@@ -5124,17 +5214,29 @@ if (ovReportsEl) {
     if(!btn) return;
     handleNavAction(btn.getAttribute('data-id'), btn.getAttribute('data-type'));
   });
+      
+   window.__refreshDashboardForUser = async function(){
+  try{
+    var total = await loadAllRoomsFromD1();
 
-  window.__refreshDashboardForUser = function(){
-    for(var i=0;i<ROOMS.length;i++){ loadRoom(ROOMS[i].id); }
     currentView = 'create-add';
+    rebuildAllSheets();
     render();
-  };
-  for(var i=0;i<ROOMS.length;i++){ loadRoom(ROOMS[i].id); }
-  initDateGuards();
-  rebuildAllSheets();
-  render();
+
+    console.log('Cloud readings loaded successfully:', total);
+  }catch(e){
+    console.error('Cloud refresh error:', e);
+
+    alert(
+      'Could not load cloud readings: ' + e.message
+    );
+  }
+};
+
+for(var i=0;i<ROOMS.length;i++){
+  loadRoom(ROOMS[i].id);
 }
-</script>
-</body>
-</html>
+
+initDateGuards();
+rebuildAllSheets();
+render();
