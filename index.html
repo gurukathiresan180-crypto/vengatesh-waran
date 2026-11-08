@@ -3773,15 +3773,83 @@ var delBtn = ev.target.closest('.um-delete-btn');
 
   // Data persistence: plain localStorage, since this file is opened
   // directly in the browser rather than through a hosted backend.
-function loadRoom(roomId){
-  var room = ROOMS.filter(function(r){ return r.id === roomId; })[0];
-  try{
-    var raw = localStorage.getItem(room.key);
-    dataByRoom[roomId] = raw ? JSON.parse(raw) : [];
-  }catch(e){
-    dataByRoom[roomId] = [];
+
+// Shared cloud readings loader
+var meterCloudReadingsPromise = null;
+
+function fetchMeterReadingsFromCloud() {
+  var token = localStorage.getItem('emd_api_token');
+
+  if (!token) {
+    return Promise.reject(
+      new Error('Login token is missing. Please login again.')
+    );
   }
+
+  if (!meterCloudReadingsPromise) {
+    meterCloudReadingsPromise = fetch(
+      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        cache: 'no-store'
+      }
+    )
+    .then(async function(response) {
+      var result = await response.json();
+
+      if (!response.ok || !result.success ||
+          !Array.isArray(result.readings)) {
+        throw new Error(
+          result.error || 'Unable to load cloud readings'
+        );
+      }
+
+      return result.readings;
+    })
+    .catch(function(error) {
+      meterCloudReadingsPromise = null;
+      throw error;
+    });
+  }
+
+  return meterCloudReadingsPromise;
 }
+
+function loadRoom(roomId) {
+  var room = ROOMS.filter(function(r) {
+    return r.id === roomId;
+  })[0];
+
+  if (!room) return Promise.resolve([]);
+
+  dataByRoom[roomId] = [];
+
+  return fetchMeterReadingsFromCloud()
+    .then(function(allReadings) {
+      dataByRoom[roomId] = allReadings.filter(function(r) {
+        return r.roomId === roomId;
+      });
+
+      console.log(
+        'Cloud readings loaded:',
+        roomId,
+        dataByRoom[roomId].length
+      );
+
+      render();
+
+      return dataByRoom[roomId];
+    })
+    .catch(function(error) {
+      console.error('Cloud reading load error:', roomId, error);
+      dataByRoom[roomId] = [];
+      return [];
+    });
+}
+
   function saveCurrentRoom(){
     try{
       localStorage.setItem(currentRoom().key, JSON.stringify(readings()));
@@ -4598,9 +4666,8 @@ if (ovReportsEl) {
   function renderTotalLog(){
     if(!isTotalLog()) return;
     var statusEl = document.getElementById('logStatus');
-    document.getElementById('logStatusText').textContent = 'Saved on this device only — no database connected';
-    statusEl.title = 'Readings are stored in this browser. No Supabase or other database is configured, so nothing is synced to the cloud and clearing browser data would remove them. Export CSV regularly as a backup.';
-
+   document.getElementById('logStatusText').textContent = 'Connected to cloud database';
+   statusEl.title = 'Meter readings are loaded and saved through the Cloudflare Worker and Supabase database.';
     var cat = document.getElementById('logCat');
     var wanted = cat.value || logState.cat;
     cat.innerHTML = '<option value="">All meter categories</option>' + ROOMS.map(function(r){
