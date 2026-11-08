@@ -3919,11 +3919,71 @@ function ovMeterItems(){
 
   return out;
 }
-  function saveRoom(roomId){
-    var room = ROOMS.filter(function(rm){ return rm.id === roomId; })[0];
-    if(!room) return;
-    try{ localStorage.setItem(room.key, JSON.stringify(dataByRoom[roomId] || [])); }catch(e){}
+ 
+function saveRoom(roomId){
+  var room = ROOMS.filter(function(rm){
+    return rm.id === roomId;
+  })[0];
+
+  if(!room) return Promise.resolve(false);
+
+  var roomReadings = dataByRoom[roomId] || [];
+
+  // Keep local backup
+  try{
+    localStorage.setItem(
+      room.key,
+      JSON.stringify(roomReadings)
+    );
+  }catch(e){
+    console.error('Local backup error:', e);
   }
+
+  var token = localStorage.getItem('emd_api_token');
+
+  if(!token){
+    console.error('Cloud save failed: Login token missing');
+    return Promise.resolve(false);
+  }
+
+  // Save readings to Cloudflare Worker / Supabase
+  return fetch(
+    'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        roomId: roomId,
+        readings: roomReadings
+      })
+    }
+  )
+  .then(async function(response){
+    var result = await response.json();
+
+    if(!response.ok || !result.success){
+      throw new Error(
+        result.error || 'Cloud save failed'
+      );
+    }
+
+    console.log(
+      'Cloud save successful:',
+      roomId,
+      result.saved
+    );
+
+    return true;
+  })
+  .catch(function(error){
+    console.error('Cloud save error:', roomId, error);
+    return false;
+  });
+}
+
   var NAV_ICON = '<svg class="rt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
     + '<circle cx="12" cy="12" r="9"></circle>'
     + '<line x1="12" y1="12" x2="15.5" y2="8.5"></line>'
