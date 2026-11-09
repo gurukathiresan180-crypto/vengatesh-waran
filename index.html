@@ -1634,12 +1634,15 @@ async function clearLoggedIn(){
     console.error("Supabase logout error:", error);
   }
 
- [
-  AUTH_FLAG_KEY,
-  CURRENT_USER_KEY,
-  CURRENT_ROLE_KEY,
-  'emd_admin_settings_access'
-].forEach(function(k){
+  [
+    AUTH_FLAG_KEY,
+    CURRENT_USER_KEY,
+    CURRENT_ROLE_KEY,
+    'emd_admin_settings_access'
+  ].forEach(function(k){
+    sessionStorage.removeItem(k);
+    localStorage.removeItem(k);
+  });
 
   localStorage.removeItem("emd_api_token");
 }
@@ -1647,10 +1650,14 @@ async function clearLoggedIn(){
 function getCurrentUser(){
   return sessionStorage.getItem(CURRENT_USER_KEY) || '';
 }
+
 function getCurrentRole(){
   return sessionStorage.getItem(CURRENT_ROLE_KEY) || ROLE_USER;
 }
-function isAdmin(){ return getCurrentRole() === ROLE_ADMIN; }
+
+function isAdmin(){
+  return getCurrentRole() === ROLE_ADMIN;
+}
 
 // Sidebar profile card: shows the logged-in user's initials, name and
 // username. Accounts only store a username, so the built-in admin gets
