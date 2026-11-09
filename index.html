@@ -4197,6 +4197,7 @@ async function migrateLocalStorageToD1() {
       { id:'create-add', type:'view', name:'DASHBOARD', icon:ICON_ADD, meta:'Log a new reading' },
       { id:orderedRoomIds()[0], key:'main-lt', type:'room', name:'READINGS', icon:NAV_ICON, meta:'5 sections' },
       { id:'total-log', type:'view', name:'REPORTS', icon:ICON_LIST, meta: allReadingsFlat().length + ' total entries' }
+      ];
     if (
   isAdmin() ||
   sessionStorage.getItem('emd_admin_settings_access') === '1'
