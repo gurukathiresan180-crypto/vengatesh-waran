@@ -5290,14 +5290,19 @@ if (ovReportsEl) {
       if(id === 'download' || id === 'export-csv'){ exportCSV(); }
       return;
     }
-    if(id === 'admin-settings'){
-      if(!isAdmin()) return;
-      if(!adminGateUnlocked()){
-        // Extra ID + password required before Admin Settings opens.
-        openAdminGate(function(){ handleNavAction(id, type); });
-        return;
-      }
-    } else {
+   if(id === 'admin-settings'){
+  var hasAdminSettingsAccess =
+    isAdmin() ||
+    sessionStorage.getItem('emd_admin_settings_access') === '1';
+
+  if(!hasAdminSettingsAccess) return;
+
+  if(!adminGateUnlocked()){
+    // Extra ID + password required before Admin Settings opens.
+    openAdminGate(function(){ handleNavAction(id, type); });
+    return;
+  }
+} else {
       lockAdminGate();
     }
     if(id === currentView) return;
