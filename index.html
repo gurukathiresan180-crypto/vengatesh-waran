@@ -5290,7 +5290,11 @@ if (ovReportsEl) {
       if(id === 'download' || id === 'export-csv'){ exportCSV(); }
       return;
     }
-   if(id === 'admin-settings'){
+  if(id === 'admin-settings'){
+  console.log('ADMIN SETTINGS CLICK DETECTED');
+  console.log('Admin:', isAdmin());
+  console.log('Access:', sessionStorage.getItem('emd_admin_settings_access'));
+  console.log('Unlocked:', adminGateUnlocked());
   var hasAdminSettingsAccess =
     isAdmin() ||
     sessionStorage.getItem('emd_admin_settings_access') === '1';
