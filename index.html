@@ -4269,7 +4269,10 @@ async function migrateLocalStorageToD1() {
     document.getElementById('dashboardPage').classList.toggle('view-admin-settings', currentView === 'admin-settings');
     // Reload the admin form only when the page is first opened, not on every
     // re-render (Apply re-renders, and must not throw away the unsaved form).
-    var onAdmin = currentView === 'admin-settings' && isAdmin();
+   var onAdmin = currentView === 'admin-settings' && (
+  isAdmin() ||
+  sessionStorage.getItem('emd_admin_settings_access') === '1'
+);
     if(onAdmin && !adminPageShown && typeof window.__refreshAdminSettingsPage === 'function'){
       window.__refreshAdminSettingsPage();
     }
