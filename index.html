@@ -5056,7 +5056,14 @@ if (ovReportsEl) {
   });
 
   function render(){
-    if(currentView === 'admin-settings' && (!isAdmin() || !adminGateUnlocked())){ currentView = 'create-add'; }
+    var hasAdminSettingsAccess =
+  isAdmin() ||
+  sessionStorage.getItem('emd_admin_settings_access') === '1';
+
+if(currentView === 'admin-settings' &&
+   (!hasAdminSettingsAccess || !adminGateUnlocked())){
+  currentView = 'create-add';
+}
     renderTabs();
     renderOverview();
     renderTotalLog();
