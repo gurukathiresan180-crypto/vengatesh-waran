@@ -1634,10 +1634,12 @@ async function clearLoggedIn(){
     console.error("Supabase logout error:", error);
   }
 
-  [AUTH_FLAG_KEY, CURRENT_USER_KEY, CURRENT_ROLE_KEY].forEach(function(k){
-    sessionStorage.removeItem(k);
-    localStorage.removeItem(k);
-  });
+ [
+  AUTH_FLAG_KEY,
+  CURRENT_USER_KEY,
+  CURRENT_ROLE_KEY,
+  'emd_admin_settings_access'
+].forEach(function(k){
 
   localStorage.removeItem("emd_api_token");
 }
@@ -1947,9 +1949,14 @@ function showLogin(){
 const role = data.user.role;
 const userID = data.user.username || user;
 
-        setLoggedIn(userID, role);
-        recordLogin(userID, role);
+// Store Admin Settings access separately
+sessionStorage.setItem(
+  'emd_admin_settings_access',
+  data.user.admin_settings_access === true ? '1' : '0'
+);
 
+setLoggedIn(userID, role);
+recordLogin(userID, role);
         history.pushState({ authed: true }, "", "#dashboard");
         form.reset();
         showDashboard();
@@ -4183,11 +4190,22 @@ async function migrateLocalStorageToD1() {
       { id:'create-add', type:'view', name:'DASHBOARD', icon:ICON_ADD, meta:'Log a new reading' },
       { id:orderedRoomIds()[0], key:'main-lt', type:'room', name:'READINGS', icon:NAV_ICON, meta:'5 sections' },
       { id:'total-log', type:'view', name:'REPORTS', icon:ICON_LIST, meta: allReadingsFlat().length + ' total entries' }
-    ];
-    if(isAdmin()){
-      var pend = getPendingUsers().length;
-      items.push({ id:'admin-settings', type:'view', name:'ADMIN SETTINGS', icon:ICON_GEAR, meta: pend ? (pend + ' pending approval' + (pend === 1 ? '' : 's')) : 'Panels, users, login history' });
-    }
+    if (
+  isAdmin() ||
+  sessionStorage.getItem('emd_admin_settings_access') === '1'
+) {
+  var pend = getPendingUsers().length;
+
+  items.push({
+    id: 'admin-settings',
+    type: 'view',
+    name: 'ADMIN SETTINGS',
+    icon: ICON_GEAR,
+    meta: pend
+      ? (pend + ' pending approval' + (pend === 1 ? '' : 's'))
+      : 'Panels, users, login history'
+  });
+}
 
     wrap.innerHTML = items.map(function(it){
       var key = it.key || it.id;
