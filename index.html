@@ -5309,11 +5309,15 @@ if (ovReportsEl) {
 } else {
       lockAdminGate();
     }
+    console.log('NAV ID:', id);
+    console.log('CURRENT VIEW BEFORE CHANGE:', currentView);
     if(id === currentView) return;
     currentView = id;
     activeFilter = '';
     if(type === 'room' && !dataByRoom[id]) loadRoom(id);
     render();
+    console.log('CURRENT VIEW AFTER RENDER:', currentView);
+console.log('DASHBOARD CLASS AFTER RENDER:', document.getElementById('dashboardPage').className);
   }
 
   document.getElementById('roomTabs').addEventListener('click', function(ev){
