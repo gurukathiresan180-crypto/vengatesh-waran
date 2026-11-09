@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script>
-  /* Runs before body paints, so the correct page (login vs dashboard)
+  /* Runs before body paints, so the correct page (login vs dashboard)function login
      shows immediately with no flash of the wrong one. */
   (function(){
     // Login lasts only for this browser tab: closing the tab logs out.
@@ -900,9 +900,12 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+
 </style>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<script>
 const SUPABASE_URL = 'https://gvepnamqspkunfnxedvm.supabase.co';
 
 const SUPABASE_ANON_KEY = 'sb_publishable_GD0fE_pPIbdfd-7hdtCA-w_1MFwF4zx';
@@ -911,9 +914,15 @@ const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
+
+// Supabase connection test
+console.log('Supabase Client:', supabaseClient);
+console.log('Supabase Auth:', supabaseClient.auth);
 </script>
+
 </head>
 <body>
+
 
 <!-- ================= LOGIN PAGE (split-screen) ================= -->
 <div id="loginPage" class="login-wrap">
