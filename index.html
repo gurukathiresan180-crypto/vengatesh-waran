@@ -4694,18 +4694,19 @@ if (ovReportsEl) {
   var KWH_SECTIONS = { 'main-lt':true, 'p3-sub-lt':true, 'ups-reading':true };
   var logState = { sort:{ key:'date', dir:'desc' }, page:1, size:25, mode:'records', search:'', from:'', to:'', cat:'', printAll:false };
   var logRowsCache = [];
-  var LOG_COLS = [
-    { key:'sno', label:'S.No', sortable:false },
-    { key:'date', label:'Date', sortable:true },
-    { key:'time', label:'Time', sortable:true },
-    { key:'category', label:'Meter Category', sortable:true },
-    { key:'meter', label:'Meter Name', sortable:true },
-    { key:'initial', label:'Initial Reading', sortable:true, num:true },
-    { key:'current', label:'Current Reading', sortable:true, num:true },
-    { key:'consumption', label:'Consumption (kWh)', sortable:true, num:true },
-    { key:'remarks', label:'Remarks', sortable:false },
-    { key:'actions', label:'Actions', sortable:false, actions:true }
-  ];
+
+var LOG_COLS = [
+  { key:'sno', label:'S.No', sortable:false },
+  { key:'date', label:'Date', sortable:true },
+  { key:'time', label:'Time', sortable:true },
+  { key:'category', label:'Meter Category', sortable:true },
+  { key:'meter', label:'Meter Name', sortable:true },
+  { key:'shiftA', label:'Shift A', sortable:true, num:true },
+  { key:'shiftB', label:'Shift B', sortable:true, num:true },
+  { key:'shiftC', label:'Shift C', sortable:true, num:true },
+  { key:'actions', label:'Actions', sortable:false, actions:true }
+];
+
   var LOG_ICON = {
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
     warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
@@ -4734,81 +4735,125 @@ if (ovReportsEl) {
   }
 
   // Every saved reading, with the same meter's previous reading looked up from the FULL history.
-  function buildLogRecords(){
-    var out = [];
-    ROOMS.forEach(function(room){
-      var by = {};
-      (dataByRoom[room.id] || []).forEach(function(r){
-        if(typeof r.reading === 'number' && isFinite(r.reading) && r.date){ (by[r.equipment] = by[r.equipment] || []).push(r); }
+  
+function buildLogRecords(){
+  var out = [];
+  ROOMS.forEach(function(room){
+    var by = {};
+
+    (dataByRoom[room.id] || []).forEach(function(r){
+      if(typeof r.reading !== 'number' || !isFinite(r.reading) || !r.date) return;
+
+      var key = r.equipment + '|' + r.date;
+      (by[key] = by[key] || []).push(r);
+    });
+
+    Object.keys(by).forEach(function(groupKey){
+      var recs = by[groupKey];
+      var first = recs[0];
+
+      var shiftA = null;
+      var shiftB = null;
+      var shiftC = null;
+      var legacy = null;
+
+      recs.forEach(function(r){
+        if(r.shift === 'A') shiftA = r;
+        else if(r.shift === 'B') shiftB = r;
+        else if(r.shift === 'C') shiftC = r;
+        else legacy = r;
       });
-      Object.keys(by).forEach(function(key){
-        var recs = by[key].slice().sort(function(a,b){ return a.date.localeCompare(b.date) || a.id.localeCompare(b.id); });
-        recs.forEach(function(r, i){
-          var prev = i > 0 ? recs[i-1] : null;
-          out.push({
-            recId:r.id, roomId:room.id, category:room.name, key:key,
-            meter:fieldDisplayName(room.id, key), date:r.date, time:logTimeOf(r.updatedAt),
-            reading:r.reading, prev:prev ? prev.reading : null, prevDate:prev ? prev.date : null,
-            kwh:!!KWH_SECTIONS[room.id], unit:logUnitFor(room.id, key)
-          });
-        });
+
+      var latest = recs.slice().sort(function(a,b){
+        return (a.updatedAt || '').localeCompare(b.updatedAt || '');
+      }).pop();
+
+      out.push({
+        recId: latest.id,
+        roomId: room.id,
+        category: room.name,
+        key: first.equipment,
+        meter: fieldDisplayName(room.id, first.equipment),
+        date: first.date,
+        time: logTimeOf(latest.updatedAt),
+        shiftA: shiftA ? shiftA.reading : null,
+        shiftB: shiftB ? shiftB.reading : null,
+        shiftC: shiftC ? shiftC.reading : null,
+        legacy: legacy ? legacy.reading : null,
+        reading: latest.reading,
+        prev: null,
+        prevDate: null,
+        kwh: !!KWH_SECTIONS[room.id],
+        unit: logUnitFor(room.id, first.equipment)
       });
     });
-    return out;
+  });
+
+  return out;
+}
+
+
+function logRecordRow(rec){
+  var row = {
+    mode: 'record',
+    recId: rec.recId,
+    roomId: rec.roomId,
+    date: rec.date,
+    time: rec.time,
+    category: rec.category,
+    meter: rec.meter,
+    shiftA: rec.shiftA,
+    shiftB: rec.shiftB,
+    shiftC: rec.shiftC,
+    legacy: rec.legacy,
+    remarks: [],
+    unit: rec.unit
+  };
+
+  if(rec.legacy !== null){
+    row.remarks.push({
+      t: 'info',
+      text: 'Previous reading (not assigned to a shift)'
+    });
   }
 
-  function logRecordRow(rec){
-    var row = {
-      mode:'record', recId:rec.recId, roomId:rec.roomId, date:rec.date, time:rec.time, category:rec.category,
-      meter:rec.meter, initial:rec.prev !== null ? rec.prev : rec.reading, current:rec.reading,
-      consumption:null, remarks:[], unit:rec.unit
+  return row;
+}
+
+ function logSummaryRows(records){
+  var groups = {};
+
+  records.forEach(function(r){
+    var key = r.roomId + '|' + r.key;
+    (groups[key] = groups[key] || []).push(r);
+  });
+
+  return Object.keys(groups).map(function(g){
+    var recs = groups[g].slice().sort(function(a,b){
+      return a.date.localeCompare(b.date) ||
+             a.time.localeCompare(b.time);
+    });
+
+    var last = recs[recs.length - 1];
+
+    return {
+      mode: 'summary',
+      recId: last.recId,
+      roomId: last.roomId,
+      key: last.key,
+      date: last.date,
+      time: last.time,
+      category: last.category,
+      meter: last.meter,
+      shiftA: last.shiftA,
+      shiftB: last.shiftB,
+      shiftC: last.shiftC,
+      legacy: last.legacy,
+      remarks: [],
+      unit: last.unit
     };
-    if(rec.prev === null){ row.remarks.push({ t:'info', text:'First reading (baseline)' }); }
-    if(rec.kwh && rec.prev !== null){
-      var diff = round2(rec.reading - rec.prev);
-      if(diff < 0){
-        row.remarks.push({ t:'bad', text:'Reading dropped — check for meter reset or entry error' });
-      } else {
-        row.consumption = diff;
-        row.remarks.push(diff === 0 ? { t:'warn', text:'No consumption' } : { t:'ok', text:'OK' });
-      }
-      var gap = isoDayDiff(rec.prevDate, rec.date);
-      if(gap > 1){ row.remarks.push({ t:'warn', text:(gap - 1) + ' day' + (gap - 1 === 1 ? '' : 's') + ' without a reading' }); }
-    }
-    if(!rec.kwh){ row.remarks.push({ t:'', text:'Measured in ' + rec.unit + ' — not added to kWh' }); }
-    return row;
-  }
-
-  function logSummaryRows(records){
-    var groups = {};
-    records.forEach(function(r){ (groups[r.roomId + '|' + r.key] = groups[r.roomId + '|' + r.key] || []).push(r); });
-    return Object.keys(groups).map(function(g){
-      var recs = groups[g].slice().sort(function(a,b){ return a.date.localeCompare(b.date) || a.time.localeCompare(b.time); });
-      var first = recs[0], last = recs[recs.length - 1];
-      var row = {
-        mode:'summary', date:last.date, time:last.time, category:last.category, meter:last.meter,
-        initial:first.reading, current:last.reading, consumption:null, remarks:[], unit:last.unit
-      };
-      if(last.kwh){
-        if(recs.length < 2){
-          row.remarks.push({ t:'info', text:'Needs two readings to calculate consumption' });
-        } else {
-          var sum = 0, drops = 0;
-          for(var i = 1; i < recs.length; i++){
-            var d = round2(recs[i].reading - recs[i-1].reading);
-            if(d < 0){ drops++; } else { sum += d; }
-          }
-          row.consumption = round2(sum);
-          row.remarks.push({ t:'ok', text:recs.length + ' readings' });
-          if(drops){ row.remarks.push({ t:'bad', text:drops + ' drop' + (drops === 1 ? '' : 's') + ' ignored — possible meter reset' }); }
-        }
-      } else {
-        row.remarks.push({ t:'', text:'Measured in ' + last.unit + ' — not added to kWh' });
-      }
-      return row;
-    });
-  }
-
+  });
+}
   function logFilteredRecords(all){
     var q = logState.search.toLowerCase();
     return all.filter(function(r){
@@ -4888,9 +4933,8 @@ if (ovReportsEl) {
     document.getElementById('logKpiRecords').textContent = String(recs.length);
     document.getElementById('logKpiRecordsSub').textContent = filtered ? 'matching the filters (' + all.length + ' in total)' : 'all saved readings';
     document.getElementById('logKpiEnergy').textContent = anyKwh ? fmtNum(energy) : '—';
-    document.getElementById('logKpiEnergySub').textContent = anyKwh
-      ? 'sum of kWh meters only' + (filtered ? ' · filtered' : '')
-      : 'needs two readings on a kWh meter';
+    document.getElementById('logKpiEnergySub').textContent =
+    'Shift-wise readings · consumption not calculated';
 
     renderTotalLogHeader();
     var total = rows.length;
@@ -4903,7 +4947,7 @@ if (ovReportsEl) {
 
     var body = document.getElementById('logBody');
     if(!total){
-      body.innerHTML = '<tr><td colspan="10" class="ov-empty" style="white-space:normal;">' + (all.length
+      body.innerHTML = '<tr><td colspan="9" class="ov-empty" style="white-space:normal;">' + (all.length
         ? 'No readings match these filters. Use "Clear filter" to see everything.'
         : 'No readings have been saved yet. Enter readings from the READINGS menu and they will appear here.') + '</td></tr>';
     } else {
@@ -4918,10 +4962,9 @@ if (ovReportsEl) {
           + '<td class="mono">' + (r.time ? escapeHtml(r.time) : '<span style="color:var(--text-faint);">—</span>') + '</td>'
           + '<td>' + escapeHtml(r.category) + '</td>'
           + '<td class="mono">' + escapeHtml(r.meter) + '</td>'
-          + '<td class="num mono">' + escapeHtml(fmtNum(r.initial)) + '</td>'
-          + '<td class="num mono">' + escapeHtml(fmtNum(r.current)) + '</td>'
-          + '<td class="num mono">' + (r.consumption !== null ? escapeHtml(fmtNum(r.consumption)) : '<span style="color:var(--text-faint);">—</span>') + '</td>'
-          + '<td class="remarks">' + r.remarks.map(logChip).join('') + '</td>'
+          + '<td class="num mono">' + (r.shiftA !== null ? escapeHtml(fmtNum(r.shiftA)) : '—') + '</td>'
+          + '<td class="num mono">' + (r.shiftB !== null ? escapeHtml(fmtNum(r.shiftB)) : '—') + '</td>'
+          + '<td class="num mono">' + (r.shiftC !== null ? escapeHtml(fmtNum(r.shiftC)) : '—') + '</td>'
           + '<td class="log-actions-col">' + actions + '</td>'
           + '</tr>';
       }).join('');
@@ -4943,8 +4986,17 @@ if (ovReportsEl) {
   function logExportMatrix(){
     var head = LOG_COLS.filter(function(c){ return !c.actions; }).map(function(c){ return c.label; });
     var rows = logRowsCache.map(function(r){
-      return [r.sno, r.date, r.time, r.category, r.meter, r.initial, r.current, r.consumption === null ? '' : r.consumption, logRemarksText(r)];
-    });
+  return [
+    r.sno,
+    r.date,
+    r.time,
+    r.category,
+    r.meter,
+    r.shiftA === null ? '' : r.shiftA,
+    r.shiftB === null ? '' : r.shiftB,
+    r.shiftC === null ? '' : r.shiftC
+  ];
+});
     return { head:head, rows:rows };
   }
   function downloadBlob(blob, name){
@@ -4999,7 +5051,7 @@ if (ovReportsEl) {
   function colLetter(i){ var s = ''; i++; while(i > 0){ var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
   function exportTotalLogXlsx(){
     var m = logExportMatrix();
-    var widths = [7, 12, 10, 24, 38, 16, 16, 18, 60];
+    var widths = [7, 12, 10, 24, 38, 16, 16, 16];
     var sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
       + '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
       + '<cols>' + widths.map(function(w, i){ return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join('') + '</cols><sheetData>';
