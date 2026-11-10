@@ -4863,7 +4863,9 @@ function logRecordRow(rec){
 }
   function logFilteredRecords(all){
     var q = logState.search.toLowerCase();
+    var today = istDateStr();
     return all.filter(function(r){
+      if(r.date !== today) return false;
       if(logState.cat && r.roomId !== logState.cat) return false;
       if(logState.from && r.date < logState.from) return false;
       if(logState.to && r.date > logState.to) return false;
