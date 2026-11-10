@@ -1189,6 +1189,20 @@ console.log('Supabase Auth:', supabaseClient.auth);
 </div>
 
     <div class="results-panel">
+      
+<!-- Shared Shift Selector -->
+<div class="quick-entry-panel" id="sharedShiftPanel">
+  <div class="quick-entry-title">SELECT WORKING SHIFT</div>
+  <div class="shift-toggle" id="shiftToggle">
+    <button type="button" class="shift-btn active" data-shift="A">Shift A</button>
+    <button type="button" class="shift-btn" data-shift="B">Shift B</button>
+    <button type="button" class="shift-btn" data-shift="C">Shift C</button>
+  </div>
+  <div class="quick-entry-sub" id="selectedShiftLabel">
+    Currently selected: Shift A
+  </div>
+</div>
+
       <div class="quick-entry-panel" id="p3QuickEntryPanel">
         <div class="quick-entry-title" id="p3QuickTitle">P3 SUB LT READING</div><div class="admin-preview-id" id="p3QuickPanelIdBadge"></div>
         <div class="quick-entry-sub">Select the date, enter each panel's reading, then save all at once.</div>
@@ -2652,6 +2666,24 @@ function runDashboard(){
   function rebuildAllSheets(){
     Object.keys(sheetBuilders).forEach(function(k){ sheetBuilders[k](); });
   }
+  
+// Shared Shift Selector
+var currentShift = 'A';
+
+document.getElementById('shiftToggle').addEventListener('click', function(ev) {
+  var btn = ev.target.closest('.shift-btn');
+  if (!btn) return;
+
+  currentShift = btn.getAttribute('data-shift');
+
+  document.querySelectorAll('#shiftToggle .shift-btn').forEach(function(b) {
+    b.classList.toggle('active', b === btn);
+  });
+
+  document.getElementById('selectedShiftLabel').textContent =
+    'Currently selected: Shift ' + currentShift;
+});
+
 
   function setupQuickEntrySection(roomId, idPrefix, gridElId, saveBtnElId, msgElId, dateElId){
     var grid = document.getElementById(gridElId);
@@ -2685,22 +2717,30 @@ function runDashboard(){
 
         // Upsert: one record per (date, equipment) — never create a
         // duplicate row for the same date + meter, always update it.
-        var existing = list.filter(function(r){ return r.date === chosenDate && r.equipment === label; })[0];
-        if(existing){
-          existing.reading = parseFloat(val);
-          existing.updatedAt = stamp;
-          updatedCount++;
-        } else {
-          list.push({
-            id: uid(),
-            equipment: label,
-            date: chosenDate,
-            reading: parseFloat(val),
-            note: '',
-            updatedAt: stamp
-          });
-          createdCount++;
-        }
+        
+var existing = list.filter(function(r) {
+  return r.date === chosenDate &&
+         r.equipment === label &&
+         r.shift === currentShift;
+})[0];
+
+if (existing) {
+  existing.reading = parseFloat(val);
+  existing.updatedAt = stamp;
+  updatedCount++;
+} else {
+  list.push({
+    id: uid(),
+    equipment: label,
+    date: chosenDate,
+    reading: parseFloat(val),
+    shift: currentShift,
+    note: '',
+    updatedAt: stamp
+  });
+  createdCount++;
+}
+
         savedCount++;
         inp.value = '';
       });
@@ -2791,27 +2831,32 @@ function runDashboard(){
       var savedCount = 0, updatedCount = 0, createdCount = 0;
       var stamp = istDateTimeStr();
 
-      function upsert(label, val){
-        var existing = list.filter(function(r){ return r.date === chosenDate && r.equipment === label; })[0];
-        if(existing){
-          existing.reading = val;
-          existing.updatedAt = stamp;
-          updatedCount++;
-        } else {
-          list.push({ id: uid(), equipment: label, date: chosenDate, reading: val, note: '', updatedAt: stamp });
-          createdCount++;
-        }
-        savedCount++;
-      }
+function upsert(label, val){
+  var existing = list.filter(function(r){
+    return r.date === chosenDate &&
+           r.equipment === label &&
+           r.shift === currentShift;
+  })[0];
 
-      var anyTankFilled = false;
-      tankInputs.forEach(function(inp){
-        var val = inp.value.trim();
-        if(val === '' || isNaN(parseFloat(val))) return;
-        anyTankFilled = true;
-        upsert(inp.getAttribute('data-label'), parseFloat(val));
-        inp.value = '';
-      });
+  if(existing){
+    existing.reading = val;
+    existing.updatedAt = stamp;
+    updatedCount++;
+  } else {
+    list.push({
+      id: uid(),
+      equipment: label,
+      date: chosenDate,
+      reading: val,
+      shift: currentShift,
+      note: '',
+      updatedAt: stamp
+    });
+    createdCount++;
+  }
+  savedCount++;
+}
+
 
       // The day's total is the sum of every tank value STORED for that date,
       // not just the boxes typed this time — so updating a single tank later
