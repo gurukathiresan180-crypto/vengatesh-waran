@@ -1250,7 +1250,9 @@ console.log('Supabase Auth:', supabaseClient.auth);
           <input type="date" class="qe-date-input" id="dieselQuickDate">
         </div>
         <div class="quick-entry-grid" id="dieselQuickEntryGrid"></div>
-        <button type="button" class="btn-primary" id="dieselQuickSaveBtn" style="margin-top:20px; max-width:260px;">Save all readings</button>
+        <button type="button" class="btn-primary" id="dieselWhatsAppBtn" style="margin-top:20px; max-width:260px; background:#25D366;">
+          Share on WhatsApp
+         </button>
         <div class="quick-entry-msg" id="dieselQuickMsg" style="display:none;"></div>
       </div>
 
@@ -2876,8 +2878,52 @@ function upsert(label, val){
         msg.style.display = 'block';
         if(currentView === roomId){ render(); }
       }
-      recomputeTotal();
+            recomputeTotal();
     });
+
+    // WhatsApp Share Button
+    document.getElementById('dieselWhatsAppBtn').addEventListener('click', function(){
+
+      var chosenDate = dateEl.value || istDateStr();
+      var list = dataByRoom[roomId] || [];
+      var fields = visibleFields(roomId);
+      var report = [];
+
+      var latestTime = '';
+      list.forEach(function(r){
+        if(r.date === chosenDate && r.updatedAt > latestTime){
+          latestTime = r.updatedAt;
+        }
+      });
+
+      report.push('DIESEL STATUS REPORT');
+      report.push('');
+      report.push('DATE : ' + fmtDate(chosenDate));
+      report.push('TIME : ' + (latestTime ? logTimeOf(latestTime) : '—'));
+
+      var totalRecord = list.filter(function(r){
+        return r.date === chosenDate && r.equipment === TOTAL_LABEL;
+      })[0];
+
+      fields.forEach(function(f){
+        var record = list.filter(function(r){
+          return r.date === chosenDate && r.equipment === f.key;
+        })[0];
+
+        report.push(f.name.toUpperCase() + ' : ' +
+          (record ? fmtNum(record.reading) : '0'));
+      });
+
+      report.push('------------------------');
+      report.push('TOTAL DIESEL AVAILABLE : ' +
+        (totalRecord ? fmtNum(totalRecord.reading) : '0'));
+
+      window.open(
+        'https://wa.me/?text=' + encodeURIComponent(report.join('\n')),
+        '_blank'
+      );
+    });
+
   })();
 
   /* DG Reading: three 1100 kVA DG units, each with Running Hours and
