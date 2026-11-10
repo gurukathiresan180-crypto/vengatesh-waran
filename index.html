@@ -3838,26 +3838,31 @@ var delBtn = ev.target.closest('.um-delete-btn');
 var meterCloudReadingsPromise = null;
 
 function fetchMeterReadingsFromCloud() {
-  var token = localStorage.getItem('emd_api_token');
-
-  if (!token) {
-    return Promise.reject(
-      new Error('Login token is missing. Please login again.')
-    );
-  }
-
   if (!meterCloudReadingsPromise) {
-    meterCloudReadingsPromise = fetch(
-      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer ' + token
-        },
-        cache: 'no-store'
+    meterCloudReadingsPromise = (async function() {
+      const { data, error } =
+        await supabaseClient.auth.getSession();
+
+      if (error || !data || !data.session ||
+          !data.session.access_token) {
+        throw new Error(
+          'Supabase session is missing. Please login again.'
+        );
       }
-    )
-    .then(async function(response) {
+
+      var token = data.session.access_token;
+
+      var response = await fetch(
+        'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          },
+          cache: 'no-store'
+        }
+      );
+
       var result = await response.json();
 
       if (!response.ok || !result.success ||
@@ -3868,8 +3873,7 @@ function fetchMeterReadingsFromCloud() {
       }
 
       return result.readings;
-    })
-    .catch(function(error) {
+    })().catch(function(error) {
       meterCloudReadingsPromise = null;
       throw error;
     });
@@ -3877,7 +3881,7 @@ function fetchMeterReadingsFromCloud() {
 
   return meterCloudReadingsPromise;
 }
-
+  
 function loadRoom(roomId) {
   var room = ROOMS.filter(function(r) {
     return r.id === roomId;
@@ -3979,56 +3983,63 @@ function ovMeterItems(){
 
   return out;
 }
- 
-function saveRoom(roomId){
-  var room = ROOMS.filter(function(rm){
+async function saveRoom(roomId) {
+  var room = ROOMS.filter(function(rm) {
     return rm.id === roomId;
   })[0];
 
-  if(!room) return Promise.resolve(false);
+  if (!room) return false;
 
   var roomReadings = dataByRoom[roomId] || [];
 
   // Keep local backup
-  try{
+  try {
     localStorage.setItem(
       room.key,
       JSON.stringify(roomReadings)
     );
-  }catch(e){
+  } catch (e) {
     console.error('Local backup error:', e);
   }
 
-  var token = localStorage.getItem('emd_api_token');
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getSession();
 
-  if(!token){
-    console.error('Cloud save failed: Login token missing');
-    return Promise.resolve(false);
-  }
-
-  // Save readings to Cloudflare Worker / Supabase
-  return fetch(
-    'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        roomId: roomId,
-        readings: roomReadings
-      })
+    if (error || !data || !data.session ||
+        !data.session.access_token) {
+      throw new Error(
+        'Supabase session is missing. Please login again.'
+      );
     }
-  )
-  .then(async function(response){
+
+    var token = data.session.access_token;
+
+    var response = await fetch(
+      'https://energydashmeterdashapi.gurukathiresan180.workers.dev/api/meter-readings',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          roomId: roomId,
+          readings: roomReadings
+        })
+      }
+    );
+
     var result = await response.json();
 
-    if(!response.ok || !result.success){
+    if (!response.ok || !result.success) {
       throw new Error(
         result.error || 'Cloud save failed'
       );
     }
+
+    // Clear cached readings so the next load gets fresh data
+    meterCloudReadingsPromise = null;
 
     console.log(
       'Cloud save successful:',
@@ -4037,11 +4048,11 @@ function saveRoom(roomId){
     );
 
     return true;
-  })
-  .catch(function(error){
+
+  } catch (error) {
     console.error('Cloud save error:', roomId, error);
     return false;
-  });
+  }
 }
 
   var NAV_ICON = '<svg class="rt-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
