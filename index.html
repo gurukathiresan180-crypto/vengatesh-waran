@@ -1189,19 +1189,22 @@ console.log('Supabase Auth:', supabaseClient.auth);
 </div>
 
     <div class="results-panel">
-      
+
 <!-- Shared Shift Selector -->
 <div class="quick-entry-panel" id="sharedShiftPanel">
   <div class="quick-entry-title">SELECT WORKING SHIFT</div>
-  <div class="shift-toggle" id="shiftToggle">
-    <button type="button" class="shift-btn active" data-shift="A">Shift A</button>
-    <button type="button" class="shift-btn" data-shift="B">Shift B</button>
-    <button type="button" class="shift-btn" data-shift="C">Shift C</button>
-  </div>
+
+  <select id="shiftSelect" class="shift-select">
+    <option value="A">Shift A</option>
+    <option value="B">Shift B</option>
+    <option value="C">Shift C</option>
+  </select>
+
   <div class="quick-entry-sub" id="selectedShiftLabel">
     Currently selected: Shift A
   </div>
 </div>
+
 
       <div class="quick-entry-panel" id="p3QuickEntryPanel">
         <div class="quick-entry-title" id="p3QuickTitle">P3 SUB LT READING</div><div class="admin-preview-id" id="p3QuickPanelIdBadge"></div>
@@ -2670,20 +2673,12 @@ function runDashboard(){
 // Shared Shift Selector
 var currentShift = 'A';
 
-document.getElementById('shiftToggle').addEventListener('click', function(ev) {
-  var btn = ev.target.closest('.shift-btn');
-  if (!btn) return;
-
-  currentShift = btn.getAttribute('data-shift');
-
-  document.querySelectorAll('#shiftToggle .shift-btn').forEach(function(b) {
-    b.classList.toggle('active', b === btn);
-  });
+document.getElementById('shiftSelect').addEventListener('change', function() {
+  currentShift = this.value;
 
   document.getElementById('selectedShiftLabel').textContent =
     'Currently selected: Shift ' + currentShift;
 });
-
 
   function setupQuickEntrySection(roomId, idPrefix, gridElId, saveBtnElId, msgElId, dateElId){
     var grid = document.getElementById(gridElId);
@@ -2834,8 +2829,7 @@ if (existing) {
 function upsert(label, val){
   var existing = list.filter(function(r){
     return r.date === chosenDate &&
-           r.equipment === label &&
-           r.shift === currentShift;
+           r.equipment === label;
   })[0];
 
   if(existing){
@@ -2848,7 +2842,6 @@ function upsert(label, val){
       equipment: label,
       date: chosenDate,
       reading: val,
-      shift: currentShift,
       note: '',
       updatedAt: stamp
     });
@@ -2856,6 +2849,7 @@ function upsert(label, val){
   }
   savedCount++;
 }
+
 
 
       // The day's total is the sum of every tank value STORED for that date,
@@ -5172,6 +5166,19 @@ if(currentView === 'admin-settings' &&
    (!hasAdminSettingsAccess || !adminGateUnlocked())){
   currentView = 'create-add';
 }
+    
+    var shiftPanel = document.getElementById('sharedShiftPanel');
+
+    if (shiftPanel) {
+      var shiftRooms = ['main-lt', 'p3-sub-lt', 'ups-reading'];
+
+      if (shiftRooms.indexOf(currentView) !== -1) {
+        shiftPanel.style.display = 'block';
+      } else {
+        shiftPanel.style.display = 'none';
+      }
+    }
+
     renderTabs();
     renderOverview();
     renderTotalLog();
