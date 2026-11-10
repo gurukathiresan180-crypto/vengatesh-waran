@@ -1245,16 +1245,26 @@ console.log('Supabase Auth:', supabaseClient.auth);
       <div class="quick-entry-panel" id="dieselQuickEntryPanel">
         <div class="quick-entry-title" id="dieselQuickTitle">DIESEL QUANTITY</div><div class="admin-preview-id" id="dieselQuickPanelIdBadge"></div>
         <div class="quick-entry-sub">Select the date, enter each tank's quantity in litres — the total updates automatically as you type.</div>
-        <div class="qe-date-row">
-          <label for="dieselQuickDate">Date</label>
-          <input type="date" class="qe-date-input" id="dieselQuickDate">
-        </div>
-        <div class="quick-entry-grid" id="dieselQuickEntryGrid"></div>
-        <button type="button" class="btn-primary" id="dieselWhatsAppBtn" style="margin-top:20px; max-width:260px; background:#25D366;">
-          Share on WhatsApp
-         </button>
-        <div class="quick-entry-msg" id="dieselQuickMsg" style="display:none;"></div>
-      </div>
+       
+<div class="qe-date-row">
+  <label for="dieselQuickDate">Date</label>
+  <input type="date" class="qe-date-input" id="dieselQuickDate">
+</div>
+
+<div class="quick-entry-grid" id="dieselQuickEntryGrid"></div>
+
+<button type="button" class="btn-primary" id="dieselQuickSaveBtn" style="margin-top:20px; max-width:260px;">
+  Save all readings
+</button>
+
+<button type="button" class="btn-primary" id="dieselWhatsAppBtn" style="margin-top:20px; max-width:260px; background:#25D366;">
+  Share on WhatsApp
+</button>
+
+</div>
+
+
+<div class="quick-entry-msg" id="dieselQuickMsg" style="display:none;"></div>
 
       <div class="quick-entry-panel" id="dgQuickEntryPanel">
         <div class="quick-entry-title" id="dgQuickTitle">DG READING</div><div class="admin-preview-id" id="dgQuickPanelIdBadge"></div>
