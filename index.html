@@ -4689,17 +4689,19 @@ if (ovReportsEl) {
   var logState = { sort:{ key:'date', dir:'desc' }, page:1, size:25, mode:'records', search:'', from:'', to:'', cat:'', printAll:false };
   var logRowsCache = [];
 
+
 var LOG_COLS = [
   { key:'sno', label:'S.No', sortable:false },
   { key:'date', label:'Date', sortable:true },
   { key:'time', label:'Time', sortable:true },
-  { key:'category', label:'Meter Category', sortable:true },
+  { key:'loginId', label:'Login ID', sortable:true },
   { key:'meter', label:'Meter Name', sortable:true },
   { key:'shiftA', label:'Shift A', sortable:true, num:true },
   { key:'shiftB', label:'Shift B', sortable:true, num:true },
   { key:'shiftC', label:'Shift C', sortable:true, num:true },
   { key:'actions', label:'Actions', sortable:false, actions:true }
 ];
+
 
   var LOG_ICON = {
     ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
@@ -4763,9 +4765,15 @@ function buildLogRecords(){
       }).pop();
 
       out.push({
-        recId: latest.id,
-        roomId: room.id,
-        category: room.name,
+    recId: latest.id,
+    roomId: room.id,
+    loginId: recs
+      .map(function(r){ return r.createdBy || ''; })
+      .filter(function(id, index, arr){
+        return id && arr.indexOf(id) === index;
+      })
+      .join(', ') || '—',
+    category: room.name,
         key: first.equipment,
         meter: fieldDisplayName(room.id, first.equipment),
         date: first.date,
@@ -4794,7 +4802,7 @@ function logRecordRow(rec){
     roomId: rec.roomId,
     date: rec.date,
     time: rec.time,
-    category: rec.category,
+    loginId: rec.loginId,
     meter: rec.meter,
     shiftA: rec.shiftA,
     shiftB: rec.shiftB,
@@ -4837,7 +4845,12 @@ function logRecordRow(rec){
       key: last.key,
       date: last.date,
       time: last.time,
-      category: last.category,
+      loginId: recs
+  .map(function(r){ return r.loginId || ''; })
+  .filter(function(id, index, arr){
+    return id && arr.indexOf(id) === index;
+  })
+  .join(', ') || '—',
       meter: last.meter,
       shiftA: last.shiftA,
       shiftB: last.shiftB,
@@ -4854,7 +4867,7 @@ function logRecordRow(rec){
       if(logState.cat && r.roomId !== logState.cat) return false;
       if(logState.from && r.date < logState.from) return false;
       if(logState.to && r.date > logState.to) return false;
-      if(q && (r.meter + ' ' + r.category + ' ' + r.date).toLowerCase().indexOf(q) === -1) return false;
+      if(q && (r.meter + ' ' + r.loginId + ' ' + r.date).toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
   }
@@ -4863,7 +4876,7 @@ function logRecordRow(rec){
     var key = logState.sort.key, dir = logState.sort.dir === 'asc' ? 1 : -1, c = 0;
     if(key === 'date'){ c = (a.date + ' ' + a.time).localeCompare(b.date + ' ' + b.time); }
     else if(key === 'time'){ c = a.time.localeCompare(b.time); }
-    else if(key === 'category' || key === 'meter'){ c = String(a[key]).localeCompare(String(b[key])); }
+    else if(key === 'loginId' || key === 'meter'){ c = String(a[key]).localeCompare(String(b[key])); }
     else {
       var av = a[key], bv = b[key];
       if(av === null && bv === null) return 0;
@@ -4954,7 +4967,7 @@ function logRecordRow(rec){
           + '<td class="mono">' + r.sno + '</td>'
           + '<td class="mono">' + escapeHtml(fmtDate(r.date)) + '</td>'
           + '<td class="mono">' + (r.time ? escapeHtml(r.time) : '<span style="color:var(--text-faint);">—</span>') + '</td>'
-          + '<td>' + escapeHtml(r.category) + '</td>'
+          + '<td class="mono">' + escapeHtml(r.loginId || '—') + '</td>'
           + '<td class="mono">' + escapeHtml(r.meter) + '</td>'
           + '<td class="num mono">' + (r.shiftA !== null ? escapeHtml(fmtNum(r.shiftA)) : '—') + '</td>'
           + '<td class="num mono">' + (r.shiftB !== null ? escapeHtml(fmtNum(r.shiftB)) : '—') + '</td>'
