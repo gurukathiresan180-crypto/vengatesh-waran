@@ -2862,8 +2862,10 @@ function upsert(label, val){
   savedCount++;
 }
 
-
-
+  
+var anyTankFilled = tankInputs.some(function(inp){
+  return inp.value.trim() !== '';
+});
       // The day's total is the sum of every tank value STORED for that date,
       // not just the boxes typed this time — so updating a single tank later
       // keeps the total correct instead of replacing it with that one value.
