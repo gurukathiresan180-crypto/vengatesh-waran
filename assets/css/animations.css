@@ -189,4 +189,14 @@ html.is-authed #dashboardPage .top {
     transform: none !important;
   }
 }
+/* METER READING CARD ANIMATIONS */
 
+#dashboardPage .meter-card {
+  animation: emSlideUp 0.7s ease both;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#dashboardPage .meter-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 22px rgba(0, 200, 255, 0.18);
+}
