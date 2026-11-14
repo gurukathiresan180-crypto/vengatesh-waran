@@ -1181,13 +1181,39 @@ console.log('Supabase Auth:', supabaseClient.auth);
     </select>
   </div>
 
-  <div id="ovPanelConsumptionChart"></div>
+  <div class="scada-chart-shell">
+    <div class="scada-chart-top">
+      <div>
+        <span class="scada-live-dot"></span>
+        <span>ENERGY MONITORING</span>
+      </div>
+      <span class="scada-chart-unit">LIVE DATA VIEW</span>
+    </div>
+
+    <div class="scada-chart-info">
+      <div>
+        <small>SELECTED PANEL</small>
+        <strong id="scadaPanelStatus">PANEL MONITORING</strong>
+      </div>
+      <div>
+        <small>UNIT</small>
+        <strong>kWh</strong>
+      </div>
+    </div>
+
+    <div id="ovPanelConsumptionChart"></div>
+
+    <div class="scada-chart-footer">
+      <span>SCADA ENERGY SYSTEM</span>
+      <span>DATA MONITORING ACTIVE</span>
+    </div>
+  </div>
+
   <div id="ovSections" style="display:none;"></div>
-<span id="ovSectionRange" style="display:none;"></span>
 </div>
-
 </div>
-
+</div>
+  
     <div class="results-panel">
 
 <!-- Shared Shift Selector -->
