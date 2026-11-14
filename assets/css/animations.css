@@ -933,3 +933,16 @@ html.is-authed #dashboardPage .top {
     font-size: 18px;
   }
 }
+
+/* STEP 23F - SCADA METER ENTRY HEADINGS */
+
+#dashboardPage .quick-entry-title {
+  color: #E0932E;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #35414B;
+  margin-bottom: 8px;
+}
