@@ -645,3 +645,32 @@ html.is-authed #dashboardPage .top {
 #dashboardPage .ov-kpi .value {
   color: #E9E7DF;
 }
+/* INDUSTRIAL SCADA - CONTROL PANEL BORDERS */
+
+#dashboardPage .ov-card,
+#dashboardPage .panel,
+#dashboardPage .quick-entry-panel {
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid #40515E;
+}
+
+#dashboardPage .ov-card::before,
+#dashboardPage .panel::before,
+#dashboardPage .quick-entry-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  background: #E0932E;
+  box-shadow: 0 0 8px rgba(224,147,46,0.4);
+  pointer-events: none;
+}
+
+#dashboardPage .ov-card:hover,
+#dashboardPage .panel:hover,
+#dashboardPage .quick-entry-panel:hover {
+  border-color: #E0932E;
+}
