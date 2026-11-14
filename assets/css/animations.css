@@ -200,3 +200,27 @@ html.is-authed #dashboardPage .top {
   transform: translateY(-4px) scale(1.01);
   box-shadow: 0 8px 22px rgba(0, 200, 255, 0.18);
 }
+/* SIDEBAR ANIMATION */
+
+#dashboardPage .sidebar {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+#dashboardPage .sidebar a,
+#dashboardPage .sidebar button {
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+#dashboardPage .sidebar a:hover,
+#dashboardPage .sidebar button:hover {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .sidebar,
+  #dashboardPage .sidebar a,
+  #dashboardPage .sidebar button {
+    transition: none !important;
+    transform: none !important;
+  }
+}
