@@ -709,3 +709,28 @@ html.is-authed #dashboardPage .top {
   background-size: 32px 32px;
   background-position: center top;
 }
+/* INDUSTRIAL SCADA - CUSTOM SCROLLBAR */
+
+#dashboardPage * {
+  scrollbar-width: thin;
+  scrollbar-color: #40515E #101820;
+}
+
+#dashboardPage *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+#dashboardPage *::-webkit-scrollbar-track {
+  background: #101820;
+}
+
+#dashboardPage *::-webkit-scrollbar-thumb {
+  background: #40515E;
+  border: 1px solid #101820;
+  border-radius: 2px;
+}
+
+#dashboardPage *::-webkit-scrollbar-thumb:hover {
+  background: #E0932E;
+}
