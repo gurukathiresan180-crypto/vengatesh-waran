@@ -475,3 +475,32 @@ html.is-authed #dashboardPage .top {
     transition: none !important;
   }
 }
+/* INDUSTRIAL SCADA - DIGITAL METER DISPLAY */
+
+#dashboardPage input[type="number"],
+#dashboardPage input[type="text"],
+#dashboardPage select {
+  background: #101820;
+  color: #E9E7DF;
+  border-color: #40515E;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#dashboardPage input:focus,
+#dashboardPage select:focus {
+  border-color: #E0932E;
+  box-shadow: 0 0 0 3px rgba(224,147,46,0.12);
+  outline: none;
+}
+
+#dashboardPage .mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage input,
+  #dashboardPage select {
+    transition: none !important;
+  }
+}
