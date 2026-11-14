@@ -138,3 +138,55 @@ html.is-authed #dashboardPage .top {
   }
 }
 
+/* =====================================
+   ENERGY DASHBOARD - PREMIUM CARD EFFECTS
+===================================== */
+
+/* Overview Cards */
+#dashboardPage .ov-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+#dashboardPage .ov-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  border-color: rgba(224, 147, 46, 0.45);
+}
+
+/* Quick Entry Panels */
+#dashboardPage .quick-entry-panel {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+#dashboardPage .quick-entry-panel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+/* Admin Panels */
+#dashboardPage .admin-grid > .panel {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+#dashboardPage .admin-grid > .panel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .ov-card,
+  #dashboardPage .quick-entry-panel,
+  #dashboardPage .admin-grid > .panel {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
