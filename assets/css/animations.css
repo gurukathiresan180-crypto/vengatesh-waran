@@ -577,3 +577,28 @@ html.is-authed #dashboardPage .top {
     animation: none !important;
   }
 }
+/* INDUSTRIAL SCADA - TYPOGRAPHY */
+
+#dashboardPage .top h1 {
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+#dashboardPage .panel h2,
+#dashboardPage .panel h3 {
+  color: #E9E7DF;
+  letter-spacing: 0.8px;
+  font-weight: 650;
+}
+
+#dashboardPage .ov-card h2,
+#dashboardPage .ov-card h3 {
+  color: #E0932E;
+  letter-spacing: 0.7px;
+}
+
+#dashboardPage .side-nav-label {
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
