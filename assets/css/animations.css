@@ -602,3 +602,27 @@ html.is-authed #dashboardPage .top {
   letter-spacing: 1.2px;
   text-transform: uppercase;
 }
+/* INDUSTRIAL SCADA - STATUS LIGHT ANIMATION */
+
+@keyframes emStatusBlink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 5px currentColor;
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 14px currentColor;
+  }
+}
+
+#dashboardPage .status-dot,
+#dashboardPage .status-indicator {
+  animation: emStatusBlink 2.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .status-dot,
+  #dashboardPage .status-indicator {
+    animation: none !important;
+  }
+}
