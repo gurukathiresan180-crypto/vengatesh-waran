@@ -1127,3 +1127,31 @@ html.is-authed #dashboardPage .top {
     opacity: 1;
   }
 }
+
+/* SCADA BAR HOVER NEON EFFECT */
+
+.scada-bar-column {
+  transition: transform 0.25s ease;
+}
+
+.scada-bar-column:hover {
+  transform: translateY(-5px);
+}
+
+.scada-bar-column:hover .scada-bar-fill {
+  filter: brightness(1.4);
+  box-shadow:
+    0 0 12px rgba(0, 230, 255, 0.9),
+    0 0 24px rgba(0, 200, 255, 0.5);
+}
+
+.scada-bar-column:hover .scada-bar-value {
+  color: #ffffff;
+  text-shadow:
+    0 0 8px #00eaff,
+    0 0 16px #00cfff;
+}
+
+.scada-bar-column:hover .scada-bar-track {
+  border-color: rgba(0, 230, 255, 0.6);
+}
