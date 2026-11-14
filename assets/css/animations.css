@@ -1,1 +1,58 @@
 
+/* ENERGY METER DASHBOARD - ANIMATIONS */
+/* Separate animation file - Existing styles untouched */
+
+/* Smooth Fade In */
+@keyframes emFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smooth Slide Up */
+@keyframes emSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Soft Glow */
+@keyframes emSoftGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 200, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(0, 200, 255, 0.3);
+  }
+}
+
+/* Reusable Animation Classes */
+.em-animate-fade-in {
+  animation: emFadeIn 0.8s ease both;
+}
+
+.em-animate-slide-up {
+  animation: emSlideUp 0.7s ease both;
+}
+
+.em-animate-glow {
+  animation: emSoftGlow 3s ease-in-out infinite;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .em-animate-fade-in,
+  .em-animate-slide-up,
+  .em-animate-glow {
+    animation: none !important;
+  }
+}
+
