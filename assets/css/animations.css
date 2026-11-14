@@ -734,3 +734,36 @@ html.is-authed #dashboardPage .top {
 #dashboardPage *::-webkit-scrollbar-thumb:hover {
   background: #E0932E;
 }
+/* STEP 23A - PROFESSIONAL SCADA MAIN LAYOUT */
+
+#dashboardPage .main-content {
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+#dashboardPage .app-shell {
+  min-height: 100vh;
+  background: #101820;
+}
+
+#dashboardPage .layout {
+  gap: 20px;
+  align-items: start;
+}
+
+#dashboardPage .top {
+  padding: 18px 22px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 760px) {
+  #dashboardPage .main-content {
+    padding: 16px;
+    padding-top: 68px;
+  }
+
+  #dashboardPage .top {
+    padding: 14px;
+  }
+}
