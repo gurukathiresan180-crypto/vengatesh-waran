@@ -443,3 +443,35 @@ html.is-authed #dashboardPage .top {
 #dashboardPage .dial {
   box-shadow: 0 0 14px rgba(224,147,46,0.2);
 }
+/* INDUSTRIAL SCADA - STATUS INDICATORS */
+
+#dashboardPage .ov-kpi {
+  position: relative;
+  overflow: hidden;
+}
+
+#dashboardPage .ov-kpi::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: #E0932E;
+  box-shadow: 0 0 12px rgba(224,147,46,0.45);
+}
+
+#dashboardPage .ov-kpi {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#dashboardPage .ov-kpi:hover {
+  border-color: #E0932E;
+  box-shadow: 0 0 16px rgba(224,147,46,0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .ov-kpi {
+    transition: none !important;
+  }
+}
