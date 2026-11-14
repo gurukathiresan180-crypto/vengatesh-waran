@@ -267,3 +267,56 @@ html.is-authed #dashboardPage .top {
     animation: none !important;
   }
 }
+/* PREMIUM DASHBOARD LOADING ANIMATION */
+
+@keyframes emLoadingFade {
+  0%, 70% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes emLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#dashboardPage::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(6, 16, 29, 0.94);
+  pointer-events: none;
+  animation: emLoadingFade 1.4s ease forwards;
+}
+
+#dashboardPage::after {
+  content: "";
+  position: fixed;
+  width: 42px;
+  height: 42px;
+  top: calc(50% - 21px);
+  left: calc(50% - 21px);
+  z-index: 10000;
+  border: 3px solid rgba(105, 222, 244, 0.2);
+  border-top-color: #69def4;
+  border-radius: 50%;
+  pointer-events: none;
+  animation:
+    emLoadingSpin 0.8s linear infinite,
+    emLoadingFade 1.4s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage::before,
+  #dashboardPage::after {
+    animation: none !important;
+    display: none;
+  }
+}
