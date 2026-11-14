@@ -536,3 +536,44 @@ html.is-authed #dashboardPage .top {
     transform: none !important;
   }
 }
+/* INDUSTRIAL SCADA - ELECTRICAL SIGNAL */
+
+@keyframes emSignalPulse {
+  0%, 100% {
+    opacity: 0.12;
+    transform: scaleX(0.35);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scaleX(1);
+  }
+}
+
+#dashboardPage .main-content {
+  position: relative;
+}
+
+#dashboardPage .main-content::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  width: 84%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #E0932E,
+    #69DEF4,
+    transparent
+  );
+  transform-origin: center;
+  animation: emSignalPulse 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .main-content::after {
+    animation: none !important;
+  }
+}
