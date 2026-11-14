@@ -626,3 +626,22 @@ html.is-authed #dashboardPage .top {
     animation: none !important;
   }
 }
+/* INDUSTRIAL SCADA - DIGITAL READOUT */
+
+#dashboardPage .mono,
+#dashboardPage .ov-kpi strong,
+#dashboardPage .ov-kpi .value {
+  font-family: "Consolas", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(105, 222, 244, 0.18);
+}
+
+#dashboardPage .mono {
+  color: #69DEF4;
+}
+
+#dashboardPage .ov-kpi strong,
+#dashboardPage .ov-kpi .value {
+  color: #E9E7DF;
+}
