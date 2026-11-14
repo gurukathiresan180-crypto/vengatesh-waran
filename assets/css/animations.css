@@ -674,3 +674,29 @@ html.is-authed #dashboardPage .top {
 #dashboardPage .quick-entry-panel:hover {
   border-color: #E0932E;
 }
+/* INDUSTRIAL SCADA - ALARM WARNING EFFECT */
+
+@keyframes emAlarmPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(224, 147, 46, 0.12);
+    border-color: rgba(224, 147, 46, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(224, 147, 46, 0.28);
+    border-color: #E0932E;
+  }
+}
+
+#dashboardPage .alert,
+#dashboardPage .warning,
+#dashboardPage .login-alert {
+  animation: emAlarmPulse 2.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .alert,
+  #dashboardPage .warning,
+  #dashboardPage .login-alert {
+    animation: none !important;
+  }
+}
