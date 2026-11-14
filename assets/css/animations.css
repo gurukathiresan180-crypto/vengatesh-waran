@@ -841,3 +841,16 @@ html.is-authed #dashboardPage .top {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* RESTORE FULL-WIDTH METER ENTRY FIELDS */
+
+#dashboardPage .results-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#dashboardPage .results-panel .quick-entry-panel {
+  width: 100%;
+  box-sizing: border-box;
+}
