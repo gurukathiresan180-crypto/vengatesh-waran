@@ -224,3 +224,25 @@ html.is-authed #dashboardPage .top {
     transform: none !important;
   }
 }
+/* DASHBOARD HEADER ANIMATION */
+
+#dashboardPage .top {
+  animation: emFadeIn 1s ease both;
+  transition: box-shadow 0.3s ease;
+}
+
+#dashboardPage .top h1 {
+  animation: emSlideUp 0.8s ease both;
+}
+
+#dashboardPage .top:hover {
+  box-shadow: 0 6px 20px rgba(0, 200, 255, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .top,
+  #dashboardPage .top h1 {
+    animation: none !important;
+    transition: none !important;
+  }
+}
