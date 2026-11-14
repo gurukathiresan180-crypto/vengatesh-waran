@@ -767,3 +767,41 @@ html.is-authed #dashboardPage .top {
     padding: 14px;
   }
 }
+/* STEP 23B - SCADA CARD LAYOUT */
+
+#dashboardPage .ov-card,
+#dashboardPage .panel,
+#dashboardPage .quick-entry-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#dashboardPage .ov-card {
+  padding: 20px;
+  min-height: 120px;
+}
+
+#dashboardPage .panel {
+  padding: 22px;
+}
+
+#dashboardPage .quick-entry-panel {
+  padding: 18px;
+}
+
+#dashboardPage .ov-card h2,
+#dashboardPage .ov-card h3,
+#dashboardPage .panel h2,
+#dashboardPage .panel h3 {
+  line-height: 1.4;
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  #dashboardPage .ov-card,
+  #dashboardPage .panel,
+  #dashboardPage .quick-entry-panel {
+    padding: 16px;
+  }
+}
