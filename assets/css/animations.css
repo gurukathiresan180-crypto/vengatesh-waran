@@ -113,3 +113,28 @@
   }
 }
 
+/* =====================================
+   ENERGY METER DASHBOARD ENTRANCE
+===================================== */
+
+html.is-authed #dashboardPage {
+  animation: emFadeIn 0.9s ease both;
+}
+
+html.is-authed #dashboardPage .shell {
+  animation: emSlideUp 0.8s ease both;
+}
+
+html.is-authed #dashboardPage .top {
+  animation: emFadeIn 1s ease both;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html.is-authed #dashboardPage,
+  html.is-authed #dashboardPage .shell,
+  html.is-authed #dashboardPage .top {
+    animation: none !important;
+  }
+}
+
