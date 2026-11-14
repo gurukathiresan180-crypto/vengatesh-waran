@@ -4647,6 +4647,13 @@ function drawPanelGraph(){
     dates.forEach(function(d){ dateSet[d] = true; });
 
     var panelName = fieldDisplayName(roomId, panelKey);
+  
+    var panelStatus = document.getElementById('scadaPanelStatus');
+
+    if(panelStatus){
+    panelStatus.textContent = panelName.toUpperCase();
+   }
+
 
     var records = ovMeterItems().filter(function(item){
       return item.sectionId === roomId &&
