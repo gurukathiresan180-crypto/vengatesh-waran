@@ -1201,6 +1201,20 @@ console.log('Supabase Auth:', supabaseClient.auth);
       </div>
     </div>
 
+<div class="scada-metrics">
+
+  <div class="scada-metric-card">
+    <small>HIGHEST CONSUMPTION</small>
+    <strong id="scadaHighestDay">--</strong>
+  </div>
+
+  <div class="scada-metric-card">
+    <small>AVERAGE DAILY CONSUMPTION</small>
+    <strong id="scadaAverageDaily">--</strong>
+  </div>
+
+</div>
+
     <div id="ovPanelConsumptionChart"></div>
 
     <div class="scada-chart-footer">
@@ -4672,6 +4686,32 @@ function drawPanelGraph(){
     records.forEach(function(item){
       daily[item.date] = (daily[item.date] || 0) + item.cons;
     });
+
+// Calculate highest consumption day
+var highestDay = values.reduce(function(highest, current){
+  return current.value > highest.value ? current : highest;
+}, values[0]);
+
+// Calculate average daily consumption
+var totalConsumption = values.reduce(function(total, item){
+  return total + item.value;
+}, 0);
+
+var averageDaily = totalConsumption / values.length;
+
+// Update SCADA metric displays
+var highestDisplay = document.getElementById('scadaHighestDay');
+var averageDisplay = document.getElementById('scadaAverageDaily');
+
+if(highestDisplay){
+  highestDisplay.textContent =
+    fmtNum(highestDay.value) + ' kWh / ' + highestDay.date;
+}
+
+if(averageDisplay){
+  averageDisplay.textContent =
+    fmtNum(averageDaily) + ' kWh';
+}
 
     var values = Object.keys(daily).sort().map(function(date){
       return { date: date, value: round2(daily[date]) };
