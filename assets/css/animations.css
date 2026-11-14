@@ -1197,3 +1197,43 @@ html.is-authed #dashboardPage .top {
     grid-template-columns: 1fr;
   }
 }
+
+/* SCADA MONTHLY GRAPH - FIXED DAILY BAR WIDTH */
+
+.scada-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 190px;
+  padding: 12px 8px 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scada-bar-column {
+  flex: 0 0 42px;
+  width: 42px;
+  min-width: 42px;
+  text-align: center;
+}
+
+.scada-bar-track {
+  width: 100%;
+}
+
+.scada-bars::-webkit-scrollbar {
+  height: 7px;
+}
+
+.scada-bars::-webkit-scrollbar-thumb {
+  background: #1689a8;
+  border-radius: 10px;
+}
+
+.scada-bars::-webkit-scrollbar-track {
+  background: #102432;
+  border-radius: 10px;
+}
