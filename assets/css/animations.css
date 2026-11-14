@@ -700,3 +700,12 @@ html.is-authed #dashboardPage .top {
     animation: none !important;
   }
 }
+/* INDUSTRIAL SCADA - ENGINEERING GRID BACKGROUND */
+
+#dashboardPage .main-content {
+  background-image:
+    linear-gradient(rgba(105, 222, 244, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 222, 244, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+}
