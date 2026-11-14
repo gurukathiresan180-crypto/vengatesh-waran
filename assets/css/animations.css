@@ -1155,3 +1155,45 @@ html.is-authed #dashboardPage .top {
 .scada-bar-column:hover .scada-bar-track {
   border-color: rgba(0, 230, 255, 0.6);
 }
+
+/* SCADA ENERGY METRICS DISPLAY */
+
+.scada-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.scada-metric-card {
+  min-width: 0;
+  padding: 15px;
+  background: linear-gradient(145deg, #102637, #091722);
+  border: 1px solid rgba(65, 190, 220, 0.25);
+  border-radius: 9px;
+  box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.04);
+}
+
+.scada-metric-card small {
+  display: block;
+  color: #7fa9bb;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.scada-metric-card strong {
+  display: block;
+  color: #8cecff;
+  font-size: 16px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0 8px rgba(0, 220, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+  .scada-metrics {
+    grid-template-columns: 1fr;
+  }
+}
