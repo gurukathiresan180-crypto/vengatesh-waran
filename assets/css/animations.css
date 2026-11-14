@@ -362,3 +362,51 @@ html.is-authed #dashboardPage .top {
     animation: none !important;
   }
 }
+/* INDUSTRIAL SCADA - DARK SIDEBAR */
+
+#dashboardPage .side-nav {
+  background: #101820;
+  color: #E9E7DF;
+  border: 1px solid #293743;
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.25);
+}
+
+#dashboardPage .side-nav-brand span {
+  color: #E9E7DF;
+}
+
+#dashboardPage .profile-card {
+  background: #18232D;
+  border-color: #34434F;
+}
+
+#dashboardPage .profile-name {
+  color: #FFFFFF;
+}
+
+#dashboardPage .side-nav-label {
+  color: #E0932E;
+}
+
+#dashboardPage .side-nav-bottom {
+  border-top-color: #34434F;
+}
+
+#dashboardPage .sidenav-close-btn {
+  color: #AAB8C2;
+}
+
+#dashboardPage .sidenav-close-btn:hover {
+  background: #263744;
+  color: #FFFFFF;
+}
+
+#dashboardPage .sidebar-logout-btn:hover {
+  background: rgba(193, 85, 60, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .side-nav {
+    transition: none !important;
+  }
+}
