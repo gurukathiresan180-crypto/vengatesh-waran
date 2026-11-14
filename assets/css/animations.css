@@ -854,3 +854,82 @@ html.is-authed #dashboardPage .top {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* STEP 23E - PROFESSIONAL SCADA HEADER */
+
+#dashboardPage .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1B252E, #141C24);
+  border: 1px solid #35414B;
+  border-left: 3px solid #E0932E;
+  border-radius: 4px;
+  margin-bottom: 22px;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
+}
+
+#dashboardPage .brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+#dashboardPage .brand-mark h1 {
+  color: #E9E7DF;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+#dashboardPage .brand-mark .sub {
+  color: #8B9198;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+#dashboardPage .header-right {
+  flex-shrink: 0;
+}
+
+#dashboardPage .clock {
+  text-align: right;
+  padding-left: 20px;
+  border-left: 1px solid #35414B;
+}
+
+#dashboardPage .clock .t {
+  color: #E0932E;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#dashboardPage .clock .d {
+  color: #8B9198;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+@media (max-width: 600px) {
+  #dashboardPage .top {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  #dashboardPage .brand-mark h1 {
+    font-size: 17px;
+  }
+
+  #dashboardPage .brand-mark .sub {
+    font-size: 10px;
+  }
+
+  #dashboardPage .clock .t {
+    font-size: 18px;
+  }
+}
