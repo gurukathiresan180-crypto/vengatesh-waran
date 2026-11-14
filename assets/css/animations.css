@@ -504,3 +504,35 @@ html.is-authed #dashboardPage .top {
     transition: none !important;
   }
 }
+/* INDUSTRIAL SCADA - NAVIGATION MENU */
+
+#dashboardPage .side-nav a,
+#dashboardPage .side-nav button:not(.sidenav-close-btn) {
+  border-radius: 4px;
+  transition: background 0.25s ease,
+              color 0.25s ease,
+              border-color 0.25s ease,
+              transform 0.25s ease;
+}
+
+#dashboardPage .side-nav a:hover,
+#dashboardPage .side-nav button:not(.sidenav-close-btn):hover {
+  background: rgba(224, 147, 46, 0.12);
+  color: #E0932E;
+  transform: translateX(3px);
+}
+
+#dashboardPage .side-nav a.active,
+#dashboardPage .side-nav button.active {
+  background: rgba(224, 147, 46, 0.16);
+  color: #E0932E;
+  border-left: 3px solid #E0932E;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage .side-nav a,
+  #dashboardPage .side-nav button {
+    transition: none !important;
+    transform: none !important;
+  }
+}
