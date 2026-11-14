@@ -805,3 +805,39 @@ html.is-authed #dashboardPage .top {
     padding: 16px;
   }
 }
+/* STEP 23C - SCADA SECTION LAYOUT */
+
+#dashboardPage .layout {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+#dashboardPage .log-panel,
+#dashboardPage .overview-panel,
+#dashboardPage .results-panel {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#dashboardPage .log-panel,
+#dashboardPage .overview-panel {
+  margin-bottom: 4px;
+}
+
+#dashboardPage .results-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+#dashboardPage #sharedShiftPanel {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 760px) {
+  #dashboardPage .results-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
