@@ -1179,6 +1179,13 @@ console.log('Supabase Auth:', supabaseClient.auth);
 
     <select id="ovPanelSelect" style="flex:1; min-width:140px; padding:9px;">
     </select>
+    
+<input
+  type="month"
+  id="ovMonthSelect"
+  style="flex:1; min-width:150px; padding:9px;"
+/>
+
   </div>
 
   <div class="scada-chart-shell">
@@ -4631,6 +4638,16 @@ function setupOverviewPanelGraph(){
   var roomSelect = document.getElementById('ovRoomSelect');
   var panelSelect = document.getElementById('ovPanelSelect');
   var chartBox = document.getElementById('ovPanelConsumptionChart');
+  
+var monthSelect = document.getElementById('ovMonthSelect');
+
+if(monthSelect && !monthSelect.value){
+  var now = new Date();
+  monthSelect.value =
+    now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0');
+}
+
 
   if(!roomSelect || !panelSelect || !chartBox) return;
 
@@ -4656,7 +4673,31 @@ function drawPanelGraph(){
       return;
     }
 
-    var dates = ovRangeDates();
+   
+var selectedMonth = monthSelect ? monthSelect.value : '';
+
+var dates = [];
+
+if(selectedMonth){
+  var monthParts = selectedMonth.split('-');
+  var selectedYear = Number(monthParts[0]);
+  var selectedMonthNumber = Number(monthParts[1]);
+
+  var daysInMonth = new Date(
+    selectedYear,
+    selectedMonthNumber,
+    0
+  ).getDate();
+
+  for(var day = 1; day <= daysInMonth; day++){
+    dates.push(
+      selectedYear + '-' +
+      String(selectedMonthNumber).padStart(2, '0') + '-' +
+      String(day).padStart(2, '0')
+    );
+  }
+}
+
     var dateSet = {};
     dates.forEach(function(d){ dateSet[d] = true; });
 
@@ -4676,16 +4717,19 @@ function drawPanelGraph(){
         dateSet[item.date];
     });
 
-    if(!records.length){
-      chartBox.innerHTML =
-        '<div class="ov-empty">No consumption data for this panel in the selected period.</div>';
-      return;
-    }
-
+  
     var daily = {};
     records.forEach(function(item){
       daily[item.date] = (daily[item.date] || 0) + item.cons;
     });
+
+
+var values = dates.map(function(date){
+  return {
+    date: date,
+    value: round2(daily[date] || 0)
+  };
+});
 
 // Calculate highest consumption day
 var highestDay = values.reduce(function(highest, current){
@@ -4712,11 +4756,6 @@ if(averageDisplay){
   averageDisplay.textContent =
     fmtNum(averageDaily) + ' kWh';
 }
-
-    var values = Object.keys(daily).sort().map(function(date){
-      return { date: date, value: round2(daily[date]) };
-    });
-
     var max = Math.max.apply(null, values.map(function(v){
       return v.value;
     }));
@@ -4759,6 +4798,11 @@ chartBox.innerHTML =
 
   roomSelect.addEventListener('change', loadPanels);
   panelSelect.addEventListener('change', drawPanelGraph);
+  
+if(monthSelect){
+  monthSelect.addEventListener('change', drawPanelGraph);
+}
+
 
   loadPanels();
 }
