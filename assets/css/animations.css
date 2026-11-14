@@ -246,3 +246,24 @@ html.is-authed #dashboardPage .top {
     transition: none !important;
   }
 }
+/* PAGE TRANSITION ANIMATION */
+
+#dashboardPage {
+  animation: emFadeIn 0.8s ease both;
+}
+
+#loginPage {
+  animation: emFadeIn 0.8s ease both;
+}
+
+#dashboardPage .layout {
+  animation: emSlideUp 0.9s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboardPage,
+  #loginPage,
+  #dashboardPage .layout {
+    animation: none !important;
+  }
+}
