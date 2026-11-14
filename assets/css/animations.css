@@ -56,3 +56,60 @@
   }
 }
 
+/* =================================
+   ENERGY METER LOGIN ANIMATION
+================================= */
+
+/* Login panel entrance */
+#loginForm {
+  animation: emSlideUp 0.8s ease both;
+}
+
+/* Login input smooth focus */
+#loginForm input {
+  transition: border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              transform 0.3s ease;
+}
+
+#loginForm input:focus {
+  transform: translateY(-2px);
+}
+
+/* Login button hover */
+#loginBtn {
+  transition: transform 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+#loginBtn:hover {
+  transform: translateY(-2px);
+  animation: emSoftGlow 2s ease-in-out infinite;
+}
+
+/* Login button press */
+#loginBtn:active {
+  transform: scale(0.97);
+}
+
+/* Login form entrance */
+#loginForm label,
+#loginForm .pwd-wrap,
+#loginForm .row-between,
+#loginForm .login-alert {
+  animation: emFadeIn 0.8s ease both;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  #loginForm,
+  #loginForm label,
+  #loginForm .pwd-wrap,
+  #loginForm .row-between,
+  #loginForm .login-alert,
+  #loginBtn {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
