@@ -1433,3 +1433,17 @@ html.is-authed #dashboardPage .top {
     opacity: 0;
   }
 }
+/* ANIMATED DIGITAL ENERGY GRID */
+
+.login-brand::before {
+  animation: energyGridMove 18s linear infinite;
+}
+
+@keyframes energyGridMove {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 40px 40px, 40px 40px;
+  }
+}
