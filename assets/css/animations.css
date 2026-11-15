@@ -1237,3 +1237,35 @@ html.is-authed #dashboardPage .top {
   background: #102432;
   border-radius: 10px;
 }
+/* LOGIN FORM - PROFESSIONAL ANIMATION */
+
+.login-card {
+  animation: loginCardReveal 1.1s ease-out both;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  border-color: rgba(0, 210, 255, 0.35);
+  box-shadow: 0 0 28px rgba(0, 210, 255, 0.08);
+}
+
+.login-card input {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card input:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.18);
+  outline: none;
+}
+
+@keyframes loginCardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
