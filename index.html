@@ -607,6 +607,89 @@
     background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
     padding: 32px 28px; width:100%; max-width:380px;
   }
+  
+/* FUTURISTIC ENERGY LOGIN ANIMATION */
+
+.login-brand::after {
+  content: "";
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  right: -140px;
+  top: 12%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 210, 255, 0.15),
+    rgba(0, 150, 220, 0.05) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: loginEnergyGlow 5s ease-in-out infinite alternate;
+}
+
+.login-brand-inner {
+  animation: loginBrandReveal 1.2s ease-out both;
+}
+
+.login-brand .dial {
+  animation: loginDialPulse 2.5s ease-in-out infinite;
+}
+
+.login-brand h1 {
+  animation: loginTextReveal 1.2s ease-out both;
+}
+
+.login-brand .sub {
+  animation: loginTextReveal 1.5s ease-out both;
+}
+
+.login-brand-stats {
+  animation: loginTextReveal 1.8s ease-out both;
+}
+
+@keyframes loginEnergyGlow {
+  from {
+    transform: scale(0.85);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes loginBrandReveal {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loginDialPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(0, 210, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(0, 210, 255, 0.9));
+  }
+}
+
+@keyframes loginTextReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
   .login-head{ margin-bottom:24px; }
   .login-head h1{ font-size:19px; }
   .login-head .sub{ margin-top:6px; }
