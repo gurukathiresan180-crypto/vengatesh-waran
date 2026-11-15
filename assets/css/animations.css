@@ -1395,3 +1395,41 @@ html.is-authed #dashboardPage .top {
     transform: translateX(50%);
   }
 }
+/* LOGIN SCANNING LIGHT EFFECT */
+
+.login-scan-light {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 45%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(0, 210, 255, 0.04),
+    rgba(0, 210, 255, 0.16),
+    transparent
+  );
+  border-bottom: 1px solid rgba(0, 210, 255, 0.45);
+  box-shadow: 0 8px 25px rgba(0, 210, 255, 0.12);
+  pointer-events: none;
+  z-index: 1;
+  animation: loginScanMove 7s ease-in-out infinite;
+}
+
+@keyframes loginScanMove {
+  0% {
+    top: -45%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
