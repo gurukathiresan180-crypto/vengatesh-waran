@@ -1291,3 +1291,57 @@ html.is-authed #dashboardPage .top {
   outline: 2px solid #00d2ff;
   outline-offset: 4px;
 }
+/* LOGIN ENERGY PARTICLES ANIMATION */
+
+.login-brand {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-energy-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-energy-particles span {
+  position: absolute;
+  bottom: -15px;
+  width: 5px;
+  height: 5px;
+  background: #00d2ff;
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff;
+  animation: energyParticleFloat 8s linear infinite;
+}
+
+.login-energy-particles span:nth-child(1) { left: 8%; animation-delay: 0s; }
+.login-energy-particles span:nth-child(2) { left: 18%; animation-delay: 2s; }
+.login-energy-particles span:nth-child(3) { left: 29%; animation-delay: 4s; }
+.login-energy-particles span:nth-child(4) { left: 40%; animation-delay: 1s; }
+.login-energy-particles span:nth-child(5) { left: 52%; animation-delay: 3s; }
+.login-energy-particles span:nth-child(6) { left: 63%; animation-delay: 5s; }
+.login-energy-particles span:nth-child(7) { left: 72%; animation-delay: 2.5s; }
+.login-energy-particles span:nth-child(8) { left: 81%; animation-delay: 4.5s; }
+.login-energy-particles span:nth-child(9) { left: 90%; animation-delay: 1.5s; }
+.login-energy-particles span:nth-child(10) { left: 96%; animation-delay: 6s; }
+
+@keyframes energyParticleFloat {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-650px) scale(1.5);
+    opacity: 0;
+  }
+}
