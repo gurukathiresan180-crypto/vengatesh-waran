@@ -1345,3 +1345,53 @@ html.is-authed #dashboardPage .top {
     opacity: 0;
   }
 }
+/* LOGIN ENERGY WAVE ANIMATION */
+
+.login-energy-wave {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 12%;
+  height: 120px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+
+.energy-wave-line {
+  position: absolute;
+  left: -100%;
+  width: 200%;
+  height: 70px;
+  border-top: 2px solid rgba(0, 210, 255, 0.65);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 7px rgba(0, 210, 255, 0.8));
+  animation: energyWaveMove 7s linear infinite;
+}
+
+.wave-one {
+  top: 15px;
+}
+
+.wave-two {
+  top: 35px;
+  opacity: 0.65;
+  animation-duration: 10s;
+  animation-direction: reverse;
+}
+
+.wave-three {
+  top: 55px;
+  opacity: 0.4;
+  animation-duration: 13s;
+}
+
+@keyframes energyWaveMove {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
