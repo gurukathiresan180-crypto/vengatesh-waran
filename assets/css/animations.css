@@ -1577,3 +1577,38 @@ html.is-authed #dashboardPage .top {
     opacity: 1;
   }
 }
+
+/* PREMIUM LOGIN BUTTON SHINE EFFECT */
+
+.login-card button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.login-card button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: loginButtonShine 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes loginButtonShine {
+  0%, 65% {
+    left: -120%;
+  }
+  100% {
+    left: 150%;
+  }
+}
