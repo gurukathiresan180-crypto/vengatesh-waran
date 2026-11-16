@@ -1660,3 +1660,76 @@ html.is-authed #dashboardPage .top {
     transform: none;
   }
 }
+
+/* MOBILE RESPONSIVE LOGIN DESIGN */
+
+@media (max-width: 768px) {
+  .login-wrap {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .login-brand {
+    flex: none;
+    min-height: 260px;
+    padding: 35px 25px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .login-brand-inner {
+    max-width: 100%;
+  }
+
+  .login-brand .dial {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 16px;
+  }
+
+  .login-brand h1 {
+    font-size: 22px;
+  }
+
+  .login-brand .sub {
+    font-size: 13px;
+  }
+
+  .login-brand-stats {
+    margin-top: 22px;
+    gap: 24px;
+  }
+
+  .login-energy-status {
+    margin-top: 18px;
+  }
+
+  .login-form-side {
+    flex: 1;
+    padding: 30px 20px;
+  }
+
+  .login-card {
+    max-width: 440px;
+    padding: 28px 22px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-brand {
+    min-height: 230px;
+    padding: 28px 20px;
+  }
+
+  .login-brand h1 {
+    font-size: 20px;
+  }
+
+  .login-brand .sub {
+    font-size: 12px;
+  }
+
+  .login-card {
+    padding: 24px 18px;
+  }
+}
