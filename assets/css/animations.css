@@ -1632,3 +1632,31 @@ html.is-authed #dashboardPage .top {
   transform: translateY(-1px);
   outline: none;
 }
+
+/* ACCESSIBILITY - REDUCE LOGIN ANIMATIONS */
+
+@media (prefers-reduced-motion: reduce) {
+  .login-brand::after,
+  .login-brand-inner,
+  .login-brand .dial,
+  .login-brand h1,
+  .login-brand .sub,
+  .login-brand-stats,
+  .login-energy-particles span,
+  .energy-wave-line,
+  .login-scan-light,
+  .energy-status-dot,
+  .energy-status-line,
+  .login-card,
+  .login-form-side::before,
+  .login-card button::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .login-card:hover,
+  .login-card input:focus,
+  .login-card button:hover {
+    transform: none;
+  }
+}
