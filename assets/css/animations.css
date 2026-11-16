@@ -1447,3 +1447,57 @@ html.is-authed #dashboardPage .top {
     background-position: 40px 40px, 40px 40px;
   }
 }
+/* LIVE ENERGY PULSE INDICATOR */
+
+.login-energy-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  color: #00d2ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+.energy-status-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #00ff9d;
+  box-shadow: 0 0 8px #00ff9d, 0 0 18px #00ff9d;
+  animation: energyStatusPulse 1.5s ease-in-out infinite;
+}
+
+.energy-status-line {
+  width: 35px;
+  height: 2px;
+  background: #00d2ff;
+  box-shadow: 0 0 8px #00d2ff;
+  animation: energyStatusLine 2s ease-in-out infinite alternate;
+}
+
+@keyframes energyStatusPulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes energyStatusLine {
+  from {
+    width: 15px;
+    opacity: 0.4;
+  }
+  to {
+    width: 45px;
+    opacity: 1;
+  }
+}
