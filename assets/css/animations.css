@@ -1612,3 +1612,23 @@ html.is-authed #dashboardPage .top {
     left: 150%;
   }
 }
+
+/* PREMIUM LOGIN INPUT FOCUS EFFECT */
+
+.login-card input {
+  transition: all 0.3s ease;
+  background: rgba(5, 15, 27, 0.65);
+}
+
+.login-card input:hover {
+  border-color: rgba(0, 210, 255, 0.4);
+}
+
+.login-card input:focus {
+  border-color: #00d2ff;
+  box-shadow:
+    0 0 0 3px rgba(0, 210, 255, 0.08),
+    0 0 18px rgba(0, 210, 255, 0.18);
+  transform: translateY(-1px);
+  outline: none;
+}
