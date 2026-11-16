@@ -1501,3 +1501,33 @@ html.is-authed #dashboardPage .top {
     opacity: 1;
   }
 }
+
+/* PROFESSIONAL GLASS LOGIN CARD */
+
+.login-card {
+  background: rgba(18, 29, 43, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(0, 210, 255, 0.22);
+  border-radius: 18px;
+
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.login-card:hover {
+  border-color: rgba(0, 210, 255, 0.55);
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.4),
+    0 0 25px rgba(0, 210, 255, 0.10);
+
+  transform: translateY(-3px);
+}
