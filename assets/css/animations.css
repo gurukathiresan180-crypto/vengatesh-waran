@@ -1531,3 +1531,49 @@ html.is-authed #dashboardPage .top {
 
   transform: translateY(-3px);
 }
+
+/* LOGIN FORM SIDE - CYAN ENERGY BACKGROUND */
+
+.login-form-side {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 75% 25%,
+      rgba(0, 210, 255, 0.10),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 20% 85%,
+      rgba(0, 150, 220, 0.08),
+      transparent 45%
+    ),
+    var(--bg);
+}
+
+.login-form-side::before {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: -100px;
+  right: -100px;
+  border-radius: 50%;
+  background: rgba(0, 210, 255, 0.10);
+  filter: blur(65px);
+  animation: loginFormGlow 7s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes loginFormGlow {
+  from {
+    transform: translate(-20px, 10px) scale(0.85);
+    opacity: 0.4;
+  }
+  to {
+    transform: translate(10px, 35px) scale(1.2);
+    opacity: 1;
+  }
+}
