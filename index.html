@@ -5890,5 +5890,177 @@ console.log('DASHBOARD CLASS AFTER RENDER:', document.getElementById('dashboardP
   render();
 }
 </script>
+  <!-- ===== ENERGY MONITOR: CONFIG + SIMULATED DATA (Step 3) START ===== -->
+<script>
+/* ==========================================================================
+   1. CONFIGURATION  (edit values here, no need to touch the code below)
+   ========================================================================== */
+var PW_CONFIG = {
+
+  // How often the Power Sources chart refreshes (milliseconds)
+  refreshMs: 5000,
+
+  // Power Sources chart limits
+  chart: {
+    yMin: -2,                // kW
+    yMax: 3,                 // kW
+    startHour: 0,            // 12 AM
+    endHour: 24,             // 12 AM (next day)
+    tickEveryHours: 4,       // labels at 12AM, 4AM, 8AM ...
+    historyStepMinutes: 5    // spacing of points in the chart
+  },
+
+  // Line names and colours
+  sources: {
+    solar:       { label: 'Solar',       color: '#E0932E' },   // amber
+    grid:        { label: 'Grid',        color: '#5B9BD5' },   // steel blue
+    battery:     { label: 'Battery',     color: '#2BB3A3' },   // teal
+    consumption: { label: 'Consumption', color: '#FFFFFF' }    // white (dashed)
+  },
+
+  // Energy Flow (Sankey) names and colours
+  sankey: {
+    sources: ['Grid', 'Solar'],
+    destinations: ['Home', 'Battery'],
+    // Room -> loads under it (change which load sits under which room here)
+    rooms: {
+      'Office':  ['Work PC', 'Server Room', 'Fridge'],
+      'Bedroom': ['HVAC Compressor', 'Livingroom', 'Garage']
+    },
+    colors: {
+      'Grid':    '#5B9BD5',
+      'Solar':   '#E0932E',
+      'Battery': '#2BB3A3',
+      'Home':    '#8B9198',
+      'Office':  '#9B7FD1',
+      'Bedroom': '#6FA97A'
+    },
+    defaultLoadColor: '#C9CED6'
+  },
+
+  // Simulated values (used only until real meter data is connected)
+  simulation: {
+    solarPeakKw: 2.4,
+    sunriseHour: 6,
+    sunsetHour: 18,
+    baseLoadKw: 0.7,
+    daytimeExtraKw: 0.9,
+    eveningExtraKw: 0.6,
+    batteryMaxChargeKw: 1.5,
+    batteryMaxDischargeKw: 1.5,
+    noiseKw: 0.12,
+    // share of total consumption for each load (should add up to 1.0)
+    loadWeights: {
+      'Work PC': 0.10,
+      'HVAC Compressor': 0.30,
+      'Garage': 0.08,
+      'Livingroom': 0.14,
+      'Server Room': 0.22,
+      'Fridge': 0.16
+    }
+  }
+};
+
+/* ==========================================================================
+   2. SMALL HELPERS (simulation only)
+   ========================================================================== */
+function pwNoise(seed){            // repeatable pseudo-random number, -1 to +1
+  var x = Math.sin(seed * 12.9898) * 43758.5453;
+  return (x - Math.floor(x)) * 2 - 1;
+}
+function pwBell(hour, centre, width){
+  var d = (hour - centre) / width;
+  return Math.exp(-d * d);
+}
+function pwRound(v){ return Math.round(v * 100) / 100; }
+
+/* ==========================================================================
+   3. DATA SOURCE
+   --------------------------------------------------------------------------
+   getMeterData() is the ONLY place that produces energy values. Later, replace
+   the body of this function with MQTT / Modbus / REST API / CSV / real meter
+   data. As long as it returns the same shape, the charts need no changes.
+
+   Returns:
+   {
+     time:  Date,
+     power: { solar, grid, battery, consumption }     // kW
+            (battery: + discharging, - charging;  grid: - means exporting)
+     flow:  { solarToHome, solarToBattery, gridToHome, gridToBattery }  // kW
+     loads: { 'Work PC': kW, 'HVAC Compressor': kW, ... }               // kW
+   }
+   Optional argument: a Date (used to draw the chart history).
+   ========================================================================== */
+function getMeterData(when){
+  var s = PW_CONFIG.simulation;
+  var d = (when instanceof Date) ? when : new Date();
+  var hour = d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+  var slot = Math.floor(d.getTime() / 5000);      // changes every 5 seconds
+
+  // --- Solar: smooth daylight curve ---
+  var solar = 0;
+  if(hour > s.sunriseHour && hour < s.sunsetHour){
+    var phase = (hour - s.sunriseHour) / (s.sunsetHour - s.sunriseHour);
+    solar = Math.sin(Math.PI * phase) * s.solarPeakKw * (1 + 0.08 * pwNoise(slot + 1));
+  }
+  solar = Math.max(0, solar);
+
+  // --- Consumption: base + daytime + evening peak + small noise ---
+  var consumption = s.baseLoadKw
+    + s.daytimeExtraKw * pwBell(hour, 13, 3.5)
+    + s.eveningExtraKw * pwBell(hour, 20, 1.8)
+    + s.noiseKw * pwNoise(slot + 2);
+  consumption = Math.max(0.2, consumption);
+
+  // --- Battery: charges from surplus, discharges to cover deficit ---
+  var battery = 0;
+  var surplus = solar - consumption;
+  if(surplus > 0){
+    battery = -Math.min(surplus, s.batteryMaxChargeKw);        // negative = charging
+  } else {
+    battery = Math.min(-surplus, s.batteryMaxDischargeKw);     // positive = discharging
+  }
+
+  // --- Grid: whatever is left (negative = exporting) ---
+  var grid = consumption - solar - battery;
+
+  // --- Flows used by the Sankey diagram ---
+  var solarToHome    = Math.min(solar, consumption);
+  var batteryToHome  = battery > 0 ? battery : 0;
+  var solarToBattery = battery < 0 ? Math.min(-battery, solar - solarToHome) : 0;
+  var gridToBattery  = battery < 0 ? Math.max(0, -battery - solarToBattery) : 0;
+  var gridToHome     = Math.max(0, consumption - solarToHome - batteryToHome);
+
+  // --- Loads: split total consumption by weight, then normalise ---
+  var loads = {};
+  var names = Object.keys(s.loadWeights);
+  var raw = {}, rawSum = 0;
+  names.forEach(function(n, i){
+    raw[n] = s.loadWeights[n] * (1 + 0.15 * pwNoise(slot + 10 + i * 7.7));
+    rawSum += raw[n];
+  });
+  names.forEach(function(n){
+    loads[n] = pwRound(consumption * raw[n] / rawSum);
+  });
+
+  return {
+    time: d,
+    power: {
+      solar: pwRound(solar),
+      grid: pwRound(grid),
+      battery: pwRound(battery),
+      consumption: pwRound(consumption)
+    },
+    flow: {
+      solarToHome: pwRound(solarToHome),
+      solarToBattery: pwRound(solarToBattery),
+      gridToHome: pwRound(gridToHome),
+      gridToBattery: pwRound(gridToBattery)
+    },
+    loads: loads
+  };
+}
+</script>
+<!-- ===== ENERGY MONITOR: CONFIG + SIMULATED DATA (Step 3) END ===== -->
 </body>
 </html>
