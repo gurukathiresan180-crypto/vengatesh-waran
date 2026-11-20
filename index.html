@@ -6062,5 +6062,185 @@ function getMeterData(when){
 }
 </script>
 <!-- ===== ENERGY MONITOR: CONFIG + SIMULATED DATA (Step 3) END ===== -->
+  <!-- ===== ENERGY MONITOR: POWER SOURCES CHART (Step 4) START ===== -->
+<script>
+var pwPowerChart = null;
+
+/* ---------- small helpers ---------- */
+function pwHexToRgba(hex, alpha){
+  var h = hex.replace('#', '');
+  var r = parseInt(h.substring(0, 2), 16);
+  var g = parseInt(h.substring(2, 4), 16);
+  var b = parseInt(h.substring(4, 6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+// axis label: 0 -> "12 AM", 4 -> "4 AM", 12 -> "12 PM", 24 -> "12 AM"
+function pwAxisLabel(h){
+  var h24 = Math.round(h) % 24;
+  var suffix = h24 < 12 ? 'AM' : 'PM';
+  var h12 = h24 % 12 || 12;
+  return h12 + ' ' + suffix;
+}
+
+// tooltip title: 11.5 -> "11:30 AM"
+function pwClockLabel(h){
+  var total = Math.round(h * 60);
+  var h24 = Math.floor(total / 60) % 24;
+  var mm = total % 60;
+  var suffix = h24 < 12 ? 'AM' : 'PM';
+  var h12 = h24 % 12 || 12;
+  return h12 + ':' + (mm < 10 ? '0' : '') + mm + ' ' + suffix;
+}
+
+/* ---------- data for the chart (12 AM up to NOW only) ---------- */
+function pwBuildSeries(){
+  var c = PW_CONFIG.chart;
+  var now = new Date();
+  var midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  var step = c.historyStepMinutes * 60000;
+  var series = { solar: [], grid: [], battery: [], consumption: [] };
+
+  function addPoint(date){
+    var hour = (date.getTime() - midnight.getTime()) / 3600000;
+    var p = getMeterData(date).power;
+    series.solar.push({ x: hour, y: p.solar });
+    series.grid.push({ x: hour, y: p.grid });
+    series.battery.push({ x: hour, y: p.battery });
+    series.consumption.push({ x: hour, y: p.consumption });
+  }
+
+  for(var t = midnight.getTime(); t < now.getTime(); t += step){
+    addPoint(new Date(t));
+  }
+  addPoint(now);   // the live point at the right end
+  return series;
+}
+
+/* ---------- create the chart ---------- */
+function pwDataset(key, extra){
+  var src = PW_CONFIG.sources[key];
+  var ds = {
+    label: src.label,
+    data: [],
+    borderColor: src.color,
+    backgroundColor: src.color,
+    borderWidth: 2,
+    pointRadius: 0,
+    pointHoverRadius: 4,
+    tension: 0.35,
+    fill: false
+  };
+  for(var k in extra){ ds[k] = extra[k]; }
+  return ds;
+}
+
+function pwCreatePowerChart(){
+  var canvas = document.getElementById('pwPowerChart');
+  if(!canvas){ return; }
+  if(typeof Chart === 'undefined' || typeof getMeterData !== 'function'){
+    console.error('Power Sources chart: Chart.js or getMeterData() is missing.');
+    return;
+  }
+  var c = PW_CONFIG.chart;
+
+  Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+  Chart.defaults.color = '#8B9198';
+
+  pwPowerChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      datasets: [
+        pwDataset('solar', { fill: true, backgroundColor: pwHexToRgba(PW_CONFIG.sources.solar.color, 0.18) }),
+        pwDataset('grid'),
+        pwDataset('battery'),
+        pwDataset('consumption', { borderDash: [6, 4], backgroundColor: 'rgba(255,255,255,0)' })
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutCubic' },
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: {
+          type: 'linear',
+          min: c.startHour,
+          max: c.endHour,
+          ticks: {
+            stepSize: c.tickEveryHours,
+            autoSkip: false,
+            maxRotation: 0,
+            callback: function(v){ return pwAxisLabel(v); }
+          },
+          grid: { color: '#23282E' },
+          border: { color: '#2C3238' }
+        },
+        y: {
+          min: c.yMin,
+          max: c.yMax,
+          ticks: {
+            stepSize: 1,
+            callback: function(v){ return v + ' kW'; }
+          },
+          grid: {
+            color: function(ctx){
+              return (ctx.tick && ctx.tick.value === 0) ? '#565D64' : '#2C3238';
+            }
+          },
+          border: { display: false }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#E9E7DF', boxWidth: 22, boxHeight: 8, padding: 14, font: { size: 12 } }
+        },
+        tooltip: {
+          backgroundColor: '#14171B',
+          borderColor: '#2C3238',
+          borderWidth: 1,
+          titleColor: '#E9E7DF',
+          bodyColor: '#E9E7DF',
+          padding: 10,
+          callbacks: {
+            title: function(items){
+              return items.length ? pwClockLabel(items[0].parsed.x) : '';
+            },
+            label: function(ctx){
+              var v = ctx.parsed.y;
+              var text = ctx.dataset.label + ': ' + v.toFixed(2) + ' kW';
+              if(ctx.dataset.label === PW_CONFIG.sources.battery.label){
+                text += v > 0 ? ' (discharging)' : (v < 0 ? ' (charging)' : '');
+              }
+              return text;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  var ph = document.getElementById('pwPowerPlaceholder');
+  if(ph){ ph.style.display = 'none'; }
+
+  pwRefreshPower();
+}
+
+/* ---------- refresh (every PW_CONFIG.refreshMs) ---------- */
+function pwRefreshPower(){
+  if(!pwPowerChart){ return; }
+  var s = pwBuildSeries();
+  pwPowerChart.data.datasets[0].data = s.solar;
+  pwPowerChart.data.datasets[1].data = s.grid;
+  pwPowerChart.data.datasets[2].data = s.battery;
+  pwPowerChart.data.datasets[3].data = s.consumption;
+  pwPowerChart.update();
+}
+
+pwCreatePowerChart();
+setInterval(pwRefreshPower, PW_CONFIG.refreshMs);
+</script>
+<!-- ===== ENERGY MONITOR: POWER SOURCES CHART (Step 4) END ===== -->
 </body>
 </html>
