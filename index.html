@@ -1286,7 +1286,95 @@ console.log('Supabase Auth:', supabaseClient.auth);
      
 
 <div class="ov-card">
-  <div class="ov-card-head">
+  <!-- ===== NEW ENERGY MONITOR CARD (Power Sources + Energy Flow) START ===== -->
+<style>
+.pw-card{background:#1B1F24;border:1px solid #2C3238;border-radius:12px;padding:16px 18px;margin-bottom:16px;min-width:0;}
+.pw-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.pw-title{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.8px;color:#E9E7DF;}
+.pw-title small{color:#8B9198;font-weight:500;letter-spacing:.6px;}
+.pw-live-dot{width:8px;height:8px;border-radius:50%;background:#2BB3A3;box-shadow:0 0 8px #2BB3A3;}
+.pw-tabs{display:inline-flex;background:#14171B;border:1px solid #2C3238;border-radius:8px;padding:3px;gap:2px;}
+.pw-tab{background:transparent;border:none;color:#8B9198;font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.pw-tab:hover{color:#E9E7DF;}
+.pw-tab.active{background:rgba(224,147,46,.15);color:#E0932E;}
+.pw-tools{display:flex;gap:6px;}
+.pw-icon-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #2C3238;border-radius:6px;color:#8B9198;cursor:pointer;padding:0;}
+.pw-icon-btn:hover{color:#E9E7DF;border-color:#565D64;}
+.pw-icon-btn svg{width:15px;height:15px;}
+.pw-panel[hidden]{display:none;}
+.pw-block{background:#20252B;border:1px solid #2C3238;border-radius:8px;padding:14px;margin-bottom:14px;}
+.pw-block:last-child{margin-bottom:0;}
+.pw-block-title{font-size:11px;font-weight:600;letter-spacing:.8px;color:#8B9198;margin-bottom:10px;}
+.pw-chart-wrap{position:relative;height:280px;}
+.pw-sankey{position:relative;width:100%;min-height:360px;}
+.pw-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#565D64;font-size:12.5px;text-align:center;padding:12px;pointer-events:none;}
+.pw-empty{padding:40px 12px;text-align:center;color:#8B9198;font-size:13px;}
+@media (max-width:600px){
+  .pw-tabs{width:100%;}
+  .pw-tab{flex:1;padding:7px 6px;}
+  .pw-chart-wrap{height:240px;}
+  .pw-sankey{min-height:420px;}
+}
+</style>
+
+<div class="pw-card" id="pwCard">
+
+  <div class="pw-head">
+    <div class="pw-title">
+      <span class="pw-live-dot"></span>
+      <span>ENERGY MONITOR <small>SCADA</small></span>
+    </div>
+
+    <div class="pw-tabs" role="tablist" aria-label="Energy views">
+      <button type="button" class="pw-tab" data-pw-tab="summary" role="tab" aria-selected="false">Summary</button>
+      <button type="button" class="pw-tab" data-pw-tab="energy" role="tab" aria-selected="false">Energy</button>
+      <button type="button" class="pw-tab active" data-pw-tab="now" role="tab" aria-selected="true">Now</button>
+    </div>
+
+    <div class="pw-tools">
+      <button type="button" class="pw-icon-btn" id="pwRefreshBtn" title="Refresh" aria-label="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"></path></svg>
+      </button>
+      <button type="button" class="pw-icon-btn" id="pwExpandBtn" title="Full screen" aria-label="Full screen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="pw-body">
+
+    <div class="pw-panel" data-pw-panel="summary" hidden>
+      <div class="pw-empty">Summary view will be added in a later step.</div>
+    </div>
+
+    <div class="pw-panel" data-pw-panel="energy" hidden>
+      <div class="pw-empty">Energy view will be added in a later step.</div>
+    </div>
+
+    <div class="pw-panel" data-pw-panel="now">
+
+      <div class="pw-block">
+        <div class="pw-block-title">POWER SOURCES</div>
+        <div class="pw-chart-wrap" id="pwPowerChartBox">
+          <canvas id="pwPowerChart"></canvas>
+          <div class="pw-placeholder" id="pwPowerPlaceholder">Power Sources chart will appear here</div>
+        </div>
+      </div>
+
+      <div class="pw-block">
+        <div class="pw-block-title">ENERGY FLOW</div>
+        <div class="pw-sankey" id="pwSankey">
+          <div class="pw-placeholder" id="pwSankeyPlaceholder">Energy Flow diagram will appear here</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ===== NEW ENERGY MONITOR CARD END ===== -->
+
+<!-- OLD SECTION-WISE CONSUMPTION card: hidden, kept so renderOverview() keeps working -->
+<div class="ov-card" style="display:none;">
     <span>SECTION-WISE CONSUMPTION</span>
     <span class="ov-range-label" id="ovSectionRange"></span>
   </div>
