@@ -6487,5 +6487,77 @@ if(window.ResizeObserver && pwSankeyBox){
 }
 </script>
 <!-- ===== ENERGY MONITOR: ENERGY FLOW SANKEY (Step 5) END ===== -->
+  <!-- ===== ENERGY MONITOR: TABS + TOOL ICONS (Step 6) START ===== -->
+<style>
+#pwCard.pw-full{position:fixed;inset:0;z-index:80;margin:0;border-radius:0;overflow:auto;padding:20px;}
+#pwCard.pw-full .pw-chart-wrap{height:38vh;}
+body.pw-lock{overflow:hidden;}
+.pw-icon-btn.pw-spin svg{animation:pwSpin .7s linear;}
+@keyframes pwSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+</style>
+<script>
+(function(){
+  var card = document.getElementById('pwCard');
+  if(!card){ return; }
+
+  var tabs = card.querySelectorAll('.pw-tab');
+  var panels = card.querySelectorAll('.pw-panel');
+  var refreshBtn = document.getElementById('pwRefreshBtn');
+  var expandBtn = document.getElementById('pwExpandBtn');
+
+  // redraw both graphs at their current size
+  function redrawGraphs(){
+    if(typeof pwPowerChart !== 'undefined' && pwPowerChart){ pwPowerChart.resize(); }
+    if(typeof pwSafeRenderSankey === 'function'){ pwSafeRenderSankey(); }
+  }
+
+  /* ---------- tabs ---------- */
+  function showTab(name){
+    tabs.forEach(function(t){
+      var on = t.getAttribute('data-pw-tab') === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    panels.forEach(function(p){
+      p.hidden = p.getAttribute('data-pw-panel') !== name;
+    });
+    if(name === 'now'){ setTimeout(redrawGraphs, 50); }
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ showTab(t.getAttribute('data-pw-tab')); });
+  });
+
+  /* ---------- refresh icon ---------- */
+  if(refreshBtn){
+    refreshBtn.addEventListener('click', function(){
+      if(typeof pwRefreshPower === 'function'){ pwRefreshPower(); }
+      if(typeof pwSafeRenderSankey === 'function'){ pwSafeRenderSankey(); }
+      refreshBtn.classList.remove('pw-spin');
+      void refreshBtn.offsetWidth;            // restart the spin animation
+      refreshBtn.classList.add('pw-spin');
+    });
+  }
+
+  /* ---------- full screen icon ---------- */
+  function setFull(on){
+    card.classList.toggle('pw-full', on);
+    document.body.classList.toggle('pw-lock', on);
+    if(expandBtn){
+      expandBtn.title = on ? 'Exit full screen' : 'Full screen';
+      expandBtn.setAttribute('aria-label', on ? 'Exit full screen' : 'Full screen');
+    }
+    setTimeout(redrawGraphs, 100);
+  }
+  if(expandBtn){
+    expandBtn.addEventListener('click', function(){
+      setFull(!card.classList.contains('pw-full'));
+    });
+  }
+  document.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape' && card.classList.contains('pw-full')){ setFull(false); }
+  });
+})();
+</script>
+<!-- ===== ENERGY MONITOR: TABS + TOOL ICONS (Step 6) END ===== -->
 </body>
 </html>
