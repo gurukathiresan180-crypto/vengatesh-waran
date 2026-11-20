@@ -4673,9 +4673,8 @@ async function migrateLocalStorageToD1() {
     var date = recs.reduce(function(m, r){ return r.date > m ? r.date : m; }, '');
     return { date: date, recs: recs.filter(function(r){ return r.date === date; }) };
   }
-
   function renderOverviewKpis(items){
-    
+    var today = istDateStr();
 
     var valid = items.filter(function(i){ return i.cons !== null; });
     if(valid.length){
