@@ -6242,5 +6242,250 @@ pwCreatePowerChart();
 setInterval(pwRefreshPower, PW_CONFIG.refreshMs);
 </script>
 <!-- ===== ENERGY MONITOR: POWER SOURCES CHART (Step 4) END ===== -->
+  <!-- ===== ENERGY MONITOR: ENERGY FLOW SANKEY (Step 5) START ===== -->
+<style>
+.pw-sankey-svg{display:block;max-width:100%;}
+.pw-sankey-svg text{font-family:'Space Grotesk',sans-serif;paint-order:stroke;stroke:#20252B;stroke-width:3px;stroke-linejoin:round;}
+.pw-sankey-svg .vl{opacity:.8;}
+.pw-sankey-svg .pw-link{cursor:pointer;}
+.pw-sankey-tip{position:absolute;pointer-events:none;background:#14171B;border:1px solid #2C3238;color:#fff;font-size:12px;padding:6px 9px;border-radius:6px;display:none;z-index:5;white-space:nowrap;}
+</style>
+<script>
+var pwSankeyBox = document.getElementById('pwSankey');
+var pwSankeyTip = null;
+var pwSankeyLastWidth = 0;
+var pwSankeyResizeTimer = null;
+
+/* ---------- helpers ---------- */
+function pwSlug(s){ return String(s).replace(/[^a-zA-Z0-9]+/g, '-'); }
+function pwNodeColor(name){
+  var c = PW_CONFIG.sankey.colors;
+  return c[name] || PW_CONFIG.sankey.defaultLoadColor;
+}
+function pwLinkKey(d){ return d.source.name + '>' + d.target.name; }
+function pwFmtKw(v){ return v.toFixed(2) + ' kW'; }
+
+/* ---------- build nodes + links from getMeterData() ---------- */
+function pwBuildSankeyGraph(){
+  var data = getMeterData();
+  var sk = PW_CONFIG.sankey;
+  var f = data.flow;
+
+  var GRID = sk.sources[0], SOLAR = sk.sources[1];
+  var HOME = sk.destinations[0], BATT = sk.destinations[1];
+
+  var links = [];
+  function add(s, t, v){
+    if(v > 0.005){ links.push({ source: s, target: t, value: v }); }
+  }
+
+  // sources -> destinations
+  add(GRID,  HOME, f.gridToHome);
+  add(SOLAR, HOME, f.solarToHome);
+  add(GRID,  BATT, f.gridToBattery);
+  add(SOLAR, BATT, f.solarToBattery);
+  // battery discharging: it supplies the home (shown as a source)
+  if(data.power.battery > 0){ add(BATT, HOME, data.power.battery); }
+
+  // home -> rooms -> loads
+  Object.keys(sk.rooms).forEach(function(room){
+    var total = 0;
+    sk.rooms[room].forEach(function(load){
+      var v = data.loads[load] || 0;
+      total += v;
+      add(room, load, v);
+    });
+    add(HOME, room, total);
+  });
+
+  // fixed node order (keeps the diagram tidy); nodes with no flow are left out
+  var order = [].concat(sk.sources, sk.destinations, Object.keys(sk.rooms));
+  Object.keys(sk.rooms).forEach(function(room){ order = order.concat(sk.rooms[room]); });
+  var used = {};
+  links.forEach(function(l){ used[l.source] = true; used[l.target] = true; });
+  var nodes = order.filter(function(n){ return used[n]; }).map(function(n){ return { name: n }; });
+
+  return { nodes: nodes, links: links };
+}
+
+/* ---------- tooltip ---------- */
+function pwShowTip(ev, html){
+  if(!pwSankeyTip){ return; }
+  pwSankeyTip.innerHTML = html;
+  pwSankeyTip.style.display = 'block';
+  var p = d3.pointer(ev, pwSankeyBox);
+  var w = pwSankeyTip.offsetWidth;
+  var left = p[0] + 14;
+  if(left + w > pwSankeyBox.clientWidth){ left = p[0] - w - 14; }
+  pwSankeyTip.style.left = Math.max(0, left) + 'px';
+  pwSankeyTip.style.top = (p[1] + 14) + 'px';
+}
+function pwHideTip(){
+  if(pwSankeyTip){ pwSankeyTip.style.display = 'none'; }
+}
+
+/* ---------- draw ---------- */
+function pwRenderSankey(){
+  if(!pwSankeyBox){ return; }
+
+  var ph = document.getElementById('pwSankeyPlaceholder');
+  if(typeof d3 === 'undefined' || typeof d3.sankey !== 'function' || typeof getMeterData !== 'function'){
+    if(ph){ ph.textContent = 'Energy Flow needs the D3 and d3-sankey libraries (check the script lines in <head>).'; }
+    console.error('Energy Flow: d3, d3.sankey or getMeterData() is missing.');
+    return;
+  }
+
+  var width = pwSankeyBox.clientWidth;
+  if(!width){ return; }
+  pwSankeyLastWidth = width;
+
+  var mobile = width < 560;
+  var height = mobile ? 460 : 380;
+  var margin = mobile
+    ? { top: 8, right: 92, bottom: 8, left: 56 }
+    : { top: 10, right: 120, bottom: 10, left: 70 };
+  var fontSize = mobile ? 10 : 11;
+
+  var g = pwBuildSankeyGraph();
+  if(!g.links.length){ return; }
+
+  var sankey = d3.sankey()
+    .nodeId(function(d){ return d.name; })
+    .nodeAlign(d3.sankeyLeft)
+    .nodeWidth(mobile ? 10 : 14)
+    .nodePadding(mobile ? 10 : 14)
+    .nodeSort(null)
+    .linkSort(null)
+    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]]);
+
+  var graph = sankey({ nodes: g.nodes, links: g.links });
+  var maxDepth = d3.max(graph.nodes, function(d){ return d.depth; });
+
+  if(ph){ ph.style.display = 'none'; }
+
+  var root = d3.select(pwSankeyBox);
+  var svg = root.select('svg.pw-sankey-svg');
+  if(svg.empty()){
+    svg = root.append('svg').attr('class', 'pw-sankey-svg');
+    svg.append('defs');
+    svg.append('g').attr('class', 'pw-links');
+    svg.append('g').attr('class', 'pw-nodes');
+    svg.append('g').attr('class', 'pw-labels');
+    pwSankeyTip = root.append('div').attr('class', 'pw-sankey-tip').node();
+  }
+  svg.attr('width', width).attr('height', height).attr('viewBox', '0 0 ' + width + ' ' + height);
+
+  var ease = d3.easeCubicOut;
+  var linkPath = d3.sankeyLinkHorizontal();
+
+  /* --- gradients (one per link: source colour -> target colour) --- */
+  var grads = svg.select('defs').selectAll('linearGradient').data(graph.links, pwLinkKey);
+  grads.exit().remove();
+  var gradsEnter = grads.enter().append('linearGradient').attr('gradientUnits', 'userSpaceOnUse');
+  gradsEnter.append('stop').attr('class', 's0').attr('offset', '0%');
+  gradsEnter.append('stop').attr('class', 's1').attr('offset', '100%');
+  var gradsAll = gradsEnter.merge(grads);
+  gradsAll
+    .attr('id', function(d){ return 'pwg-' + pwSlug(pwLinkKey(d)); })
+    .attr('x1', function(d){ return d.source.x1; })
+    .attr('x2', function(d){ return d.target.x0; });
+  gradsAll.select('stop.s0').attr('stop-color', function(d){ return pwNodeColor(d.source.name); });
+  gradsAll.select('stop.s1').attr('stop-color', function(d){ return pwNodeColor(d.target.name); });
+
+  /* --- links --- */
+  var paths = svg.select('.pw-links').selectAll('path').data(graph.links, pwLinkKey);
+  paths.exit().transition().duration(300).style('opacity', 0).remove();
+  var pathsEnter = paths.enter().append('path')
+    .attr('class', 'pw-link')
+    .attr('fill', 'none')
+    .attr('d', linkPath)
+    .attr('stroke-width', function(d){ return Math.max(1, d.width); })
+    .style('opacity', 0);
+  var pAll = pathsEnter.merge(paths);
+  pAll.attr('stroke', function(d){ return 'url(#pwg-' + pwSlug(pwLinkKey(d)) + ')'; });
+  pAll.transition().duration(600).ease(ease)
+    .attr('d', linkPath)
+    .attr('stroke-width', function(d){ return Math.max(1, d.width); })
+    .style('opacity', 0.55);
+
+  /* --- nodes --- */
+  var rects = svg.select('.pw-nodes').selectAll('rect').data(graph.nodes, function(d){ return d.name; });
+  rects.exit().transition().duration(300).style('opacity', 0).remove();
+  var rectsEnter = rects.enter().append('rect')
+    .attr('rx', 2)
+    .attr('x', function(d){ return d.x0; })
+    .attr('y', function(d){ return d.y0; })
+    .attr('width', function(d){ return d.x1 - d.x0; })
+    .attr('height', function(d){ return Math.max(1, d.y1 - d.y0); })
+    .style('opacity', 0);
+  var rAll = rectsEnter.merge(rects);
+  rAll.attr('fill', function(d){ return pwNodeColor(d.name); });
+  rAll.transition().duration(600).ease(ease)
+    .attr('x', function(d){ return d.x0; })
+    .attr('y', function(d){ return d.y0; })
+    .attr('width', function(d){ return d.x1 - d.x0; })
+    .attr('height', function(d){ return Math.max(1, d.y1 - d.y0); })
+    .style('opacity', 1);
+
+  /* --- labels (name + value, white) --- */
+  var labels = svg.select('.pw-labels').selectAll('text').data(graph.nodes, function(d){ return d.name; });
+  labels.exit().remove();
+  var lEnter = labels.enter().append('text')
+    .attr('fill', '#FFFFFF')
+    .attr('pointer-events', 'none');
+  lEnter.append('tspan').attr('class', 'nm');
+  lEnter.append('tspan').attr('class', 'vl');
+  var lAll = lEnter.merge(labels);
+  function labelX(d){ return d.depth === 0 ? d.x0 - 6 : d.x1 + 6; }
+  lAll
+    .style('font-size', fontSize + 'px')
+    .attr('x', labelX)
+    .attr('y', function(d){ return (d.y0 + d.y1) / 2; })
+    .attr('text-anchor', function(d){ return d.depth === 0 ? 'end' : 'start'; });
+  lAll.select('.nm').attr('x', labelX).attr('dy', '-0.1em')
+    .attr('font-weight', 600).text(function(d){ return d.name; });
+  lAll.select('.vl').attr('x', labelX).attr('dy', '1.2em')
+    .style('font-size', (fontSize - 1) + 'px')
+    .text(function(d){ return pwFmtKw(d.value); });
+
+  /* --- hover: highlight a node's links, show tooltip --- */
+  function resetLinks(){ pAll.style('opacity', 0.55); pwHideTip(); }
+
+  pAll.on('mousemove', function(ev, d){
+      pAll.style('opacity', function(l){ return l === d ? 0.9 : 0.15; });
+      pwShowTip(ev, d.source.name + ' \u2192 ' + d.target.name + ': <b>' + pwFmtKw(d.value) + '</b>');
+    })
+    .on('mouseleave', resetLinks);
+
+  rAll.on('mousemove', function(ev, d){
+      pAll.style('opacity', function(l){ return (l.source === d || l.target === d) ? 0.9 : 0.15; });
+      pwShowTip(ev, d.name + ': <b>' + pwFmtKw(d.value) + '</b>');
+    })
+    .on('mouseleave', resetLinks);
+}
+
+function pwSafeRenderSankey(){
+  try { pwRenderSankey(); }
+  catch(e){ console.error('Energy Flow error:', e); }
+}
+
+/* ---------- start, refresh, resize ---------- */
+pwSafeRenderSankey();
+setInterval(pwSafeRenderSankey, PW_CONFIG.refreshMs);
+
+function pwOnSankeyResize(){
+  clearTimeout(pwSankeyResizeTimer);
+  pwSankeyResizeTimer = setTimeout(function(){
+    var w = pwSankeyBox ? pwSankeyBox.clientWidth : 0;
+    if(w && Math.abs(w - pwSankeyLastWidth) > 2){ pwSafeRenderSankey(); }
+  }, 200);
+}
+if(window.ResizeObserver && pwSankeyBox){
+  new ResizeObserver(pwOnSankeyResize).observe(pwSankeyBox);
+} else {
+  window.addEventListener('resize', pwOnSankeyResize);
+}
+</script>
+<!-- ===== ENERGY MONITOR: ENERGY FLOW SANKEY (Step 5) END ===== -->
 </body>
 </html>
