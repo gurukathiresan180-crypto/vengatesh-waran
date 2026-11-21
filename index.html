@@ -7895,5 +7895,144 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 })();
 </script>
 <!-- ===== ENERGY MONITOR SUMMARY + ENERGY TABS END ===== -->
+<!-- ===== LOGIN BUTTON PERCENT PROGRESS START ===== -->
+<style>
+#loginPage .lg-login-progress{
+  display:none;
+  margin-top:10px;
+}
+
+#loginPage .lg-login-progress.is-active{
+  display:block;
+  animation:lgProgressAppear .2s ease-out both;
+}
+
+#loginPage .lg-login-progress-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:5px;
+  color:#737B83;
+  font-size:11px;
+}
+
+#loginPage .lg-login-progress-track{
+  height:7px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#FCE5D9;
+}
+
+#loginPage .lg-login-progress-bar{
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#F45B0B,#FF7A1A);
+  box-shadow:0 0 10px rgba(244,91,11,.35);
+  transition:width .18s ease-out;
+}
+
+@keyframes lgProgressAppear{
+  from{opacity:0;transform:translateY(-3px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #loginPage .lg-login-progress.is-active{
+    animation:none;
+  }
+  #loginPage .lg-login-progress-bar{
+    transition:none;
+  }
+}
+</style>
+
+<script>
+(function(){
+  var form = document.getElementById('loginForm');
+  var button = document.getElementById('loginBtn');
+  var username = document.getElementById('loginUser');
+  var password = document.getElementById('loginPass');
+
+  if(!form || !button || !username || !password){ return; }
+
+  var wrap = document.createElement('div');
+  wrap.className = 'lg-login-progress';
+  wrap.setAttribute('aria-live','polite');
+  wrap.innerHTML =
+    '<div class="lg-login-progress-top">' +
+      '<span id="lgLoginProgressLabel">Signing in…</span>' +
+      '<span id="lgLoginProgressPercent">0%</span>' +
+    '</div>' +
+    '<div class="lg-login-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+      '<div class="lg-login-progress-bar"></div>' +
+    '</div>';
+
+  button.insertAdjacentElement('afterend', wrap);
+
+  var bar = wrap.querySelector('.lg-login-progress-bar');
+  var track = wrap.querySelector('.lg-login-progress-track');
+  var percentText = wrap.querySelector('#lgLoginProgressPercent');
+  var label = wrap.querySelector('#lgLoginProgressLabel');
+  var percent = 0;
+  var progressTimer = null;
+  var hideTimer = null;
+  var waitingForLogin = false;
+
+  function showProgress(){
+    clearInterval(progressTimer);
+    clearTimeout(hideTimer);
+    percent = 0;
+    waitingForLogin = false;
+    bar.style.width = '0%';
+    percentText.textContent = '0%';
+    label.textContent = 'Signing in…';
+    track.setAttribute('aria-valuenow','0');
+    wrap.classList.add('is-active');
+
+    progressTimer = setInterval(function(){
+      if(percent < 90){
+        percent = Math.min(90, percent + 2);
+        bar.style.width = percent + '%';
+        percentText.textContent = percent + '%';
+        track.setAttribute('aria-valuenow', String(percent));
+      }
+    },150);
+  }
+
+  function finishProgress(){
+    if(!waitingForLogin){ return; }
+    waitingForLogin = false;
+    clearInterval(progressTimer);
+    percent = 100;
+    bar.style.width = '100%';
+    percentText.textContent = '100%';
+    label.textContent = 'Complete';
+    track.setAttribute('aria-valuenow','100');
+
+    hideTimer = setTimeout(function(){
+      wrap.classList.remove('is-active');
+      bar.style.width = '0%';
+    },700);
+  }
+
+  form.addEventListener('submit',function(){
+    if(username.value.trim() && password.value){
+      showProgress();
+    }
+  },true);
+
+  var observer = new MutationObserver(function(){
+    if(button.disabled){
+      waitingForLogin = true;
+    } else if(waitingForLogin){
+      finishProgress();
+    }
+  });
+
+  observer.observe(button,{attributes:true,attributeFilter:['disabled']});
+})();
+</script>
+<!-- ===== LOGIN BUTTON PERCENT PROGRESS END ===== -->
 </body>
 </html>
