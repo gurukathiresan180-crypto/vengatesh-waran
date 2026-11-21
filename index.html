@@ -6745,5 +6745,94 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 #dashboardPage *::-webkit-scrollbar-thumb:hover{background:#F45B0B;}
 </style>
 <!-- ===== DASHBOARD WHITE + ORANGE THEME (Color Step 1) END ===== -->  
+<!-- ===== ENERGY MONITOR: WHITE THEME GRAPH COLORS (Color Step 2) START ===== -->
+<style>
+/* Chart.js legend and axis labels */
+#dashboardPage #pwPowerChart{
+  color:#1A1A1A;
+}
+
+/* Sankey labels: dark text with a white outline for readability */
+#dashboardPage .pw-sankey-svg text{
+  fill:#1A1A1A !important;
+  stroke:#FFFFFF !important;
+  stroke-width:3px !important;
+  paint-order:stroke;
+}
+
+/* Sankey tooltip */
+#dashboardPage .pw-sankey-tip{
+  background:#FFFFFF !important;
+  border-color:#D5D8DC !important;
+  color:#1A1A1A !important;
+  box-shadow:0 3px 12px rgba(0,0,0,.12);
+}
+#dashboardPage .pw-sankey-tip b{
+  color:#1A1A1A !important;
+}
+</style>
+
+<script>
+(function(){
+  if(typeof PW_CONFIG === 'undefined'){ return; }
+
+  /* Clear, readable source colours on white */
+  PW_CONFIG.sources.solar.color = '#B85A00';
+  PW_CONFIG.sources.grid.color = '#3274A8';
+  PW_CONFIG.sources.battery.color = '#168276';
+  PW_CONFIG.sources.consumption.color = '#1A1A1A';
+
+  /* Sankey node colours */
+  PW_CONFIG.sankey.colors = {
+    'Grid': '#3274A8',
+    'Solar': '#B85A00',
+    'Battery': '#168276',
+    'Home': '#68717A',
+    'Office': '#7552A3',
+    'Bedroom': '#39734A'
+  };
+  PW_CONFIG.sankey.defaultLoadColor = '#59636D';
+
+  /* Update the already-created Power Sources chart */
+  if(typeof pwPowerChart !== 'undefined' && pwPowerChart){
+    var datasets = pwPowerChart.data.datasets;
+    var colors = [
+      PW_CONFIG.sources.solar.color,
+      PW_CONFIG.sources.grid.color,
+      PW_CONFIG.sources.battery.color,
+      PW_CONFIG.sources.consumption.color
+    ];
+
+    datasets.forEach(function(ds, i){
+      ds.borderColor = colors[i];
+      ds.backgroundColor = i === 0
+        ? 'rgba(184,90,0,0.16)'
+        : colors[i];
+    });
+
+    var opts = pwPowerChart.options;
+    opts.scales.x.ticks.color = '#5B6168';
+    opts.scales.x.grid.color = '#EEF0F2';
+    opts.scales.x.border.color = '#D5D8DC';
+    opts.scales.y.ticks.color = '#5B6168';
+    opts.scales.y.grid.color = function(ctx){
+      return ctx.tick && ctx.tick.value === 0 ? '#AEB4BB' : '#EEF0F2';
+    };
+    opts.plugins.legend.labels.color = '#1A1A1A';
+    opts.plugins.tooltip.backgroundColor = '#FFFFFF';
+    opts.plugins.tooltip.borderColor = '#D5D8DC';
+    opts.plugins.tooltip.titleColor = '#1A1A1A';
+    opts.plugins.tooltip.bodyColor = '#1A1A1A';
+
+    pwPowerChart.update('none');
+  }
+
+  /* Redraw Energy Flow using its updated node colours */
+  if(typeof pwSafeRenderSankey === 'function'){
+    pwSafeRenderSankey();
+  }
+})();
+</script>
+<!-- ===== ENERGY MONITOR: WHITE THEME GRAPH COLORS (Color Step 2) END ===== -->  
 </body>
 </html>
