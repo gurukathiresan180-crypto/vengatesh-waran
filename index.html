@@ -3169,7 +3169,7 @@ var anyTankFilled = tankInputs.some(function(inp){
       if(anyTankFilled){
         var tankNames = visibleFields(roomId).map(function(f){ return f.key; });
         list.forEach(function(r){
-          if(r.date === chosenDate && tankNames.indexOf(r.equipment) !== -1){ storedTotal += r.reading; }
+                   if(r.date === chosenDate && r.shift === currentShift && tankNames.indexOf(r.equipment) !== -1){ storedTotal += r.reading; }
         });
         storedTotal = Math.round(storedTotal * 100) / 100;
         upsert(TOTAL_LABEL, storedTotal);
@@ -3378,17 +3378,30 @@ window.open(
       var stamp = istDateTimeStr();
 
       function upsert(label, val){
-        var existing = list.filter(function(r){ return r.date === chosenDate && r.equipment === label; })[0];
-        if(existing){
-          existing.reading = val;
-          existing.updatedAt = stamp;
-          updatedCount++;
-        } else {
-          list.push({ id: uid(), equipment: label, date: chosenDate, reading: val, note: '', updatedAt: stamp });
-          createdCount++;
-        }
-        savedCount++;
-      }
+  var existing = list.filter(function(r){
+    return r.date === chosenDate &&
+           r.equipment === label &&
+           r.shift === currentShift;
+  })[0];
+
+  if(existing){
+    existing.reading = val;
+    existing.updatedAt = stamp;
+    updatedCount++;
+  } else {
+    list.push({
+      id: uid(),
+      equipment: label,
+      date: chosenDate,
+      reading: val,
+      shift: currentShift,
+      note: '',
+      updatedAt: stamp
+    });
+    createdCount++;
+  }
+  savedCount++;
+}
 
       DG_UNITS.forEach(function(unit){
         var vals = recomputeUnit(unit);
