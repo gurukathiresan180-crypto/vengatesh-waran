@@ -1312,12 +1312,59 @@ console.log('Supabase Auth:', supabaseClient.auth);
   <div class="pw-body">
 
     <div class="pw-panel" data-pw-panel="summary" hidden>
-      <div class="pw-empty">Summary view will be added in a later step.</div>
+  <div class="pw-summary-heading">
+    <div>
+      <div class="pw-block-title">LIVE POWER SNAPSHOT</div>
+      <div class="pw-summary-note">Current simulated power values</div>
     </div>
+    <span class="pw-data-badge">SIMULATED</span>
+  </div>
 
-    <div class="pw-panel" data-pw-panel="energy" hidden>
-      <div class="pw-empty">Energy view will be added in a later step.</div>
+  <div class="pw-summary-grid">
+    <div class="pw-summary-card pw-solar">
+      <span class="pw-summary-label">SOLAR</span>
+      <strong id="pwSumSolar">— kW</strong>
+      <small id="pwSumSolarNote">Generating</small>
     </div>
+    <div class="pw-summary-card pw-grid">
+      <span class="pw-summary-label">GRID</span>
+      <strong id="pwSumGrid">— kW</strong>
+      <small id="pwSumGridNote">Import / export</small>
+    </div>
+    <div class="pw-summary-card pw-battery">
+      <span class="pw-summary-label">BATTERY</span>
+      <strong id="pwSumBattery">— kW</strong>
+      <small id="pwSumBatteryNote">Charge / discharge</small>
+    </div>
+    <div class="pw-summary-card pw-consumption">
+      <span class="pw-summary-label">CONSUMPTION</span>
+      <strong id="pwSumConsumption">— kW</strong>
+      <small>Current load</small>
+    </div>
+  </div>
+
+  <div class="pw-summary-updated" id="pwSummaryUpdated">Updating…</div>
+</div>
+
+   <div class="pw-panel" data-pw-panel="energy" hidden>
+  <div class="pw-energy-heading">
+    <div>
+      <div class="pw-block-title">TODAY'S ENERGY BY HOUR</div>
+      <div class="pw-summary-note">Estimated energy generated or used in each hour</div>
+    </div>
+    <span class="pw-data-badge">SIMULATION ESTIMATE · kWh</span>
+  </div>
+
+  <div class="pw-energy-chart-wrap">
+    <canvas id="pwEnergyChart"></canvas>
+    <div class="pw-placeholder" id="pwEnergyPlaceholder">
+      Energy estimate chart will appear when you open this tab
+    </div>
+  </div>
+  <div class="pw-energy-footnote">
+    Estimate calculated from simulated power values. It is not actual meter history.
+  </div>
+</div>
 
     <div class="pw-panel" data-pw-panel="now">
 
@@ -7559,5 +7606,294 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== LOGIN LOGO: MOVE LEFT + ANIMATION (Logo Step) END ===== -->
+<!-- ===== ENERGY MONITOR SUMMARY + ENERGY TABS START ===== -->
+<style>
+#dashboardPage .pw-summary-heading,
+#dashboardPage .pw-energy-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+#dashboardPage .pw-summary-note{
+  color:#737B83;
+  font-size:12px;
+  margin-top:4px;
+}
+
+#dashboardPage .pw-data-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 9px;
+  border:1px solid rgba(244,91,11,.35);
+  border-radius:999px;
+  color:#C64B08;
+  background:rgba(244,91,11,.07);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+#dashboardPage .pw-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+
+#dashboardPage .pw-summary-card{
+  min-width:0;
+  padding:18px;
+  border:1px solid rgba(255,122,26,.4);
+  border-radius:10px;
+  background:rgba(255,255,255,.8);
+  box-shadow:0 5px 18px rgba(31,36,48,.06);
+}
+
+#dashboardPage .pw-summary-label{
+  display:block;
+  margin-bottom:12px;
+  color:#5B6168;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+#dashboardPage .pw-summary-card strong{
+  display:block;
+  color:#1A1A1A;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:clamp(20px,2.4vw,29px);
+}
+
+#dashboardPage .pw-summary-card small{
+  display:block;
+  margin-top:7px;
+  color:#737B83;
+  font-size:12px;
+}
+
+#dashboardPage .pw-summary-card.pw-solar{border-top:3px solid #B85A00;}
+#dashboardPage .pw-summary-card.pw-grid{border-top:3px solid #3274A8;}
+#dashboardPage .pw-summary-card.pw-battery{border-top:3px solid #168276;}
+#dashboardPage .pw-summary-card.pw-consumption{border-top:3px solid #1A1A1A;}
+
+#dashboardPage .pw-summary-updated,
+#dashboardPage .pw-energy-footnote{
+  margin-top:12px;
+  color:#737B83;
+  font-size:11px;
+}
+
+#dashboardPage .pw-energy-chart-wrap{
+  position:relative;
+  height:300px;
+}
+
+@media(max-width:760px){
+  #dashboardPage .pw-summary-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #dashboardPage .pw-energy-chart-wrap{
+    height:260px;
+  }
+}
+
+@media(max-width:420px){
+  #dashboardPage .pw-summary-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
+<script>
+(function(){
+  var card = document.getElementById('pwCard');
+  if(!card || typeof getMeterData !== 'function'){ return; }
+
+  var energyChart = null;
+
+  function setText(id, value){
+    var el = document.getElementById(id);
+    if(el){ el.textContent = value; }
+  }
+
+  function formatKw(value){
+    return Number(value || 0).toFixed(2) + ' kW';
+  }
+
+  function updateSummary(){
+    var data = getMeterData();
+    if(!data || !data.power){ return; }
+
+    var p = data.power;
+    setText('pwSumSolar', formatKw(p.solar));
+    setText('pwSumGrid', formatKw(Math.abs(p.grid)));
+    setText('pwSumBattery', formatKw(Math.abs(p.battery)));
+    setText('pwSumConsumption', formatKw(p.consumption));
+
+    setText('pwSumGridNote',
+      p.grid < 0 ? 'Exporting to grid' : (p.grid > 0 ? 'Importing from grid' : 'No grid flow'));
+    setText('pwSumBatteryNote',
+      p.battery > 0 ? 'Discharging' : (p.battery < 0 ? 'Charging' : 'Idle'));
+    setText('pwSummaryUpdated',
+      'Updated ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+  }
+
+  function buildTodayEnergy(){
+    var now = new Date();
+    var midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var buckets = [];
+
+    for(var h = 0; h < 24; h++){
+      buckets.push({solar:0, grid:0, battery:0, consumption:0});
+    }
+
+    var cursor = midnight.getTime();
+    var nowMs = now.getTime();
+    var intervalMs = 5 * 60 * 1000;
+
+    while(cursor < nowMs){
+      var next = Math.min(cursor + intervalMs, nowMs);
+      var durationHours = (next - cursor) / 3600000;
+      var midpoint = new Date(cursor + (next - cursor) / 2);
+      var power = getMeterData(midpoint).power;
+      var hour = Math.floor((cursor - midnight.getTime()) / 3600000);
+
+      buckets[hour].solar += Math.max(0, power.solar) * durationHours;
+      buckets[hour].grid += Math.max(0, power.grid) * durationHours;
+      buckets[hour].battery += Math.max(0, power.battery) * durationHours;
+      buckets[hour].consumption += Math.max(0, power.consumption) * durationHours;
+
+      cursor = next;
+    }
+
+    var labels = [];
+    var solar = [];
+    var grid = [];
+    var battery = [];
+    var consumption = [];
+
+    for(var i = 0; i < 24; i++){
+      var hourStart = midnight.getTime() + i * 3600000;
+      var labelHour = i % 12 || 12;
+      labels.push(labelHour + (i < 12 ? ' AM' : ' PM'));
+
+      if(hourStart > nowMs){
+        solar.push(null);
+        grid.push(null);
+        battery.push(null);
+        consumption.push(null);
+      } else {
+        solar.push(Number(buckets[i].solar.toFixed(3)));
+        grid.push(Number(buckets[i].grid.toFixed(3)));
+        battery.push(Number(buckets[i].battery.toFixed(3)));
+        consumption.push(Number(buckets[i].consumption.toFixed(3)));
+      }
+    }
+
+    return {labels:labels, solar:solar, grid:grid, battery:battery, consumption:consumption};
+  }
+
+  function renderEnergyChart(){
+    var canvas = document.getElementById('pwEnergyChart');
+    var placeholder = document.getElementById('pwEnergyPlaceholder');
+    if(!canvas || typeof Chart === 'undefined'){ return; }
+
+    var d = buildTodayEnergy();
+    var datasets = [
+      {label:'Solar generated', data:d.solar, backgroundColor:'#B85A00'},
+      {label:'Grid import', data:d.grid, backgroundColor:'#3274A8'},
+      {label:'Battery discharge', data:d.battery, backgroundColor:'#168276'},
+      {label:'Consumption', data:d.consumption, backgroundColor:'#1A1A1A'}
+    ];
+
+    if(!energyChart){
+      energyChart = new Chart(canvas, {
+        type:'bar',
+        data:{labels:d.labels, datasets:datasets},
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          animation:{duration:350},
+          interaction:{mode:'index', intersect:false},
+          scales:{
+            x:{
+              grid:{color:'#EEF0F2'},
+              ticks:{color:'#5B6168', maxRotation:0, autoSkip:true, maxTicksLimit:12},
+              border:{color:'#D5D8DC'}
+            },
+            y:{
+              beginAtZero:true,
+              title:{display:true, text:'Estimated kWh', color:'#5B6168'},
+              grid:{color:'#EEF0F2'},
+              ticks:{color:'#5B6168'},
+              border:{display:false}
+            }
+          },
+          plugins:{
+            legend:{
+              position:'top',
+              labels:{color:'#1A1A1A', boxWidth:12, padding:12}
+            },
+            tooltip:{
+              backgroundColor:'#FFFFFF',
+              borderColor:'#D5D8DC',
+              borderWidth:1,
+              titleColor:'#1A1A1A',
+              bodyColor:'#1A1A1A',
+              callbacks:{
+                label:function(ctx){
+                  return ctx.dataset.label + ': ' + Number(ctx.parsed.y || 0).toFixed(3) + ' kWh';
+                }
+              }
+            }
+          }
+        }
+      });
+    } else {
+      energyChart.data.labels = d.labels;
+      energyChart.data.datasets.forEach(function(ds, i){
+        ds.data = datasets[i].data;
+      });
+      energyChart.update('none');
+    }
+
+    if(placeholder){ placeholder.style.display = 'none'; }
+  }
+
+  function currentTab(){
+    var active = card.querySelector('.pw-tab.active');
+    return active ? active.getAttribute('data-pw-tab') : 'now';
+  }
+
+  card.querySelectorAll('.pw-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      setTimeout(function(){
+        var name = tab.getAttribute('data-pw-tab');
+        if(name === 'summary'){ updateSummary(); }
+        if(name === 'energy'){ renderEnergyChart(); }
+      }, 60);
+    });
+  });
+
+  var refreshButton = document.getElementById('pwRefreshBtn');
+  if(refreshButton){
+    refreshButton.addEventListener('click', function(){
+      updateSummary();
+      if(currentTab() === 'energy'){ renderEnergyChart(); }
+    });
+  }
+
+  updateSummary();
+  setInterval(updateSummary, 5000);
+  setInterval(function(){
+    if(currentTab() === 'energy'){ renderEnergyChart(); }
+  }, 60000);
+})();
+</script>
+<!-- ===== ENERGY MONITOR SUMMARY + ENERGY TABS END ===== -->
 </body>
 </html>
