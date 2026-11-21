@@ -8303,12 +8303,12 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 <!-- ===== ADMIN SETTINGS FIT DISPLAY START ===== -->
 <style>
 #dashboardPage.view-admin-settings #adminSettingsPanel{
-  position:relative !important;
-  left:72px !important;
-  width:calc(100% - 72px) !important;
+  position:static !important;
+  left:auto !important;
+  width:auto !important;
   max-width:none !important;
-  margin:12px 0 0 !important;
-  padding:8px 12px 20px !important;
+  margin:12px 18px 0 274px !important;
+  padding:8px 0 20px !important;
   box-sizing:border-box !important;
 }
 
@@ -8334,7 +8334,11 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
   min-width:0 !important;
 }
 
-@media(max-width:900px){
+#dashboardPage.view-admin-settings .admin-preview-box{
+  overflow-x:auto !important;
+}
+
+@media(max-width:1200px){
   #dashboardPage.view-admin-settings .admin-grid{
     grid-template-columns:1fr !important;
   }
@@ -8342,9 +8346,7 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 
 @media(max-width:760px){
   #dashboardPage.view-admin-settings #adminSettingsPanel{
-    left:0 !important;
-    width:100% !important;
-    margin:12px 0 0 !important;
+    margin:12px 12px 0 12px !important;
   }
 }
 </style>
