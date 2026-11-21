@@ -8466,5 +8466,23 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== SHOW SHIFT SELECTOR ON DG AND DIESEL END ===== -->
+<!-- LOGIN TO HOME FADE START -->
+<style>
+@keyframes emdDashboardHomeFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+html.is-authed #dashboardPage {
+  animation: emdDashboardHomeFade 0.7s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-authed #dashboardPage {
+    animation: none !important;
+  }
+}
+</style>
+<!-- LOGIN TO HOME FADE END -->
 </body>
 </html>
