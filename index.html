@@ -3208,32 +3208,100 @@ var anyTankFilled = tankInputs.some(function(inp){
         }
       });
 
-      report.push('DIESEL STATUS REPORT');
-      report.push('');
-      report.push('DATE : ' + fmtDate(chosenDate));
-      report.push('TIME : ' + (latestTime ? logTimeOf(latestTime) : '—'));
+report.push('DIESEL STATUS REPORT');
+report.push('');
 
-      var totalRecord = list.filter(function(r){
-        return r.date === chosenDate && r.equipment === TOTAL_LABEL;
-      })[0];
+var rows = [];
+var dateParts = chosenDate.split('-');
+var displayDate = dateParts.length === 3
+  ? dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0]
+  : chosenDate;
 
-      fields.forEach(function(f){
-        var record = list.filter(function(r){
-          return r.date === chosenDate && r.equipment === f.key;
-        })[0];
+function reportNumber(value){
+  var n = Number(value || 0);
+  return isFinite(n) ? n.toFixed(2).replace(/\.?0+$/, '') : '0';
+}
 
-        report.push(f.name.toUpperCase() + ' : ' +
-          (record ? fmtNum(record.reading) : '0'));
-      });
+rows.push({label:'DATE', value:displayDate});
+rows.push({label:'TIME', value:latestTime ? logTimeOf(latestTime) : '—'});
 
-      report.push('------------------------');
-      report.push('TOTAL DIESEL AVAILABLE : ' +
-        (totalRecord ? fmtNum(totalRecord.reading) : '0'));
+fields.forEach(function(f){
+  var record = list.filter(function(r){
+    return r.date === chosenDate && r.equipment === f.key;
+  })[0];
 
-      window.open(
-        'https://wa.me/?text=' + encodeURIComponent(report.join('\n')),
-        '_blank'
-      );
+  rows.push({
+    label:f.name.toUpperCase(),
+    value:record ? reportNumber(record.reading) : '0'
+  });
+});
+
+var totalRecord = list.filter(function(r){
+  return r.date === chosenDate && r.equipment === TOTAL_LABEL;
+})[0];
+
+rows.push({
+  label:'TOTAL DIESEL AVAILABLE',
+  value:totalRecord ? reportNumber(totalRecord.reading) : '0'
+});
+
+var labelWidth = 21;
+var valueWidth = 8;
+
+rows.forEach(function(row){
+  labelWidth = Math.max(labelWidth, row.label.length);
+  valueWidth = Math.max(valueWidth, row.value.length);
+});
+
+function repeatLine(character, count){
+  var result = '';
+  for(var i = 0; i < count; i++){ result += character; }
+  return result;
+}
+
+function padRight(value, width){
+  value = String(value);
+  while(value.length < width){ value += ' '; }
+  return value;
+}
+
+function padLeft(value, width){
+  value = String(value);
+  while(value.length < width){ value = ' ' + value; }
+  return value;
+}
+
+function border(left, middle, right){
+  return left
+    + repeatLine('─', labelWidth + 2)
+    + middle
+    + repeatLine('─', valueWidth + 2)
+    + right;
+}
+
+function tableRow(row){
+  return '│ '
+    + padRight(row.label, labelWidth)
+    + ' │ '
+    + padLeft(row.value, valueWidth)
+    + ' │';
+}
+
+report.push(border('┌', '┬', '┐'));
+
+rows.forEach(function(row, index){
+  report.push(tableRow(row));
+  report.push(index === rows.length - 1
+    ? border('└', '┴', '┘')
+    : border('├', '┼', '┤'));
+});
+
+var shareText = '```' + '\n' + report.join('\n') + '\n' + '```';
+
+window.open(
+  'https://wa.me/?text=' + encodeURIComponent(shareText),
+  '_blank'
+);
     });
 
   })();
