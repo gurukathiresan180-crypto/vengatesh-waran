@@ -1059,7 +1059,13 @@ console.log('Supabase Auth:', supabaseClient.auth);
   <nav class="side-nav" id="sideNav">
     <div class="side-nav-header">
       <div class="side-nav-brand">
-        <div class="mini-dial"></div>
+       <svg class="emd-logo-mark emd-logo-large" viewBox="0 0 64 64" role="img" aria-label="Energy meter logo">
+  <circle cx="32" cy="32" r="28" fill="#FFFFFF" stroke="#F45B0B" stroke-width="4"/>
+  <path d="M13 34a19 19 0 0 1 36-10" fill="none" stroke="#FF7A1A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 32L46 20" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="4" fill="#FF7A1A"/>
+  <path d="M29 51l7-13h-7l6-12-15 17h8z" fill="#F45B0B"/>
+</svg>
         <span>Energy Meter</span>
       </div>
       <button class="sidenav-close-btn" id="sidenavCloseBtn" aria-label="Close navigation">&times;</button>
@@ -7025,5 +7031,19 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== SUNSET ORANGE CONTENT AND FIELD BORDERS END ===== -->
+<style>
+.emd-logo-mark{
+  display:block;
+  flex-shrink:0;
+}
+.emd-logo-small{
+  width:26px;
+  height:26px;
+}
+.emd-logo-large{
+  width:44px;
+  height:44px;
+}
+</style>
 </body>
 </html>
