@@ -1011,94 +1011,42 @@ console.log('Supabase Auth:', supabaseClient.auth);
 <body>
 
 
-<!-- ================= LOGIN PAGE (split-screen) ================= -->
-<div id="loginPage" class="login-wrap">
+<!-- ================= LOGIN PAGE (centered card) ================= -->
+<div id="loginPage" class="lg-page">
+  <div class="lg-card">
 
-  <div class="login-brand">
-    <div class="login-scan-light"></div>
-    <div class="login-energy-particles">
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
-    <div class="login-energy-wave">
-  <div class="energy-wave-line wave-one"></div>
-  <div class="energy-wave-line wave-two"></div>
-  <div class="energy-wave-line wave-three"></div>
-</div>
+    <div class="dial small"></div>
+    <h1 class="lg-title">Energy meter dashboard</h1>
+    <div class="lg-sub">Sign in to continue</div>
 
-  <div class="login-brand-inner">
-  <div class="dial"></div>
+    <form id="loginForm" novalidate>
+      <label for="loginUser">Username</label>
+      <input id="loginUser" class="mono" type="text" placeholder="admin" autocomplete="username">
+      <div class="err" id="userErr">Please enter your username</div>
 
-  <h1>Energy Meter Dashboard</h1>
+      <label for="loginPass">Password</label>
+      <div class="pwd-wrap">
+        <input id="loginPass" class="mono" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" class="pwd-toggle" id="pwdToggle">Show</button>
+      </div>
+      <div class="err" id="passErr">Please enter your password</div>
 
-  <div class="sub">
-    Log kWh readings across MAIN LT, P3 SUB LT, UPS and HT sections, and track consumption between checks in one place.
-  </div>
-
-  <div class="login-brand-stats">
-    <div>
-      <div class="n">4</div>
-      <div class="l">SECTIONS TRACKED</div>
-    </div>
-
-    <div>
-      <div class="n">24/7</div>
-      <div class="l">LOGGING</div>
-    </div>
-  </div>
-
-  <div class="login-energy-status">
-    <span class="energy-status-dot"></span>
-    <span>SYSTEM ENERGY ACTIVE</span>
-    <span class="energy-status-line"></span>
-  </div>
-</div>
-
-    </div>
-
-  <div class="login-form-side">
-    <div class="login-card">
-      <div class="login-head">
-        <h1>Sign in</h1>
-        <div class="sub">Login to continue</div>
+      <div class="row-between">
+        <span class="session-note">Sign-in ends when you close this tab.</span>
+        <button type="button" class="link-btn" id="forgotPasswordLink">Forgot password?</button>
       </div>
 
-      <form id="loginForm" novalidate>
-        <label for="loginUser">Username</label>
-        <input id="loginUser" class="mono" type="text" placeholder="admin" autocomplete="username">
-        <div class="err" id="userErr">Please enter your username</div>
+      <div class="login-alert" id="loginAlert" style="display:none;"></div>
 
-        <label for="loginPass">Password</label>
-        <div class="pwd-wrap">
-          <input id="loginPass" class="mono" type="password" placeholder="••••••••" autocomplete="current-password">
-          <button type="button" class="pwd-toggle" id="pwdToggle">Show</button>
-        </div>
-        <div class="err" id="passErr">Please enter your password</div>
+      <button type="submit" class="btn-primary" id="loginBtn">Login</button>
+    </form>
 
-        <div class="row-between">
-          <span class="session-note">Sign-in ends when you close this tab.</span>
-          <button type="button" class="link-btn" id="forgotPasswordLink">Forgot password?</button>
-        </div>
+    <div class="signup-line">New here? <button type="button" class="link-btn" id="openRegisterLink">Create an account</button></div>
 
-        <div class="login-alert" id="loginAlert" style="display:none;"></div>
+    <div class="lg-status"><span class="lg-dot"></span><span>System online</span></div>
 
-        <button type="submit" class="btn-primary" id="loginBtn">Login</button>
-      </form>
-
-      <div class="signup-line">New here? <button type="button" class="link-btn" id="openRegisterLink">Create an account</button></div>
-    </div>
   </div>
-
 </div>
-
 <!-- ================= DASHBOARD ================= -->
 <div id="dashboardPage">
 <div class="app-shell">
