@@ -6568,5 +6568,79 @@ body.pw-lock #dashboardPage .layout{
   transform:none !important;
 }
 body.pw-lock #dashboardPage .main-content{isolation:auto !important;}
+<!-- ===== LOGIN PAGE REDESIGN: CSS (Login Step 1) START ===== -->
+<style>
+#loginPage.lg-page{
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background-color:#14171B;
+  background-image:
+    linear-gradient(rgba(224,147,46,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224,147,46,.045) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.lg-card{
+  width:100%;
+  max-width:400px;
+  padding:32px 28px 26px;
+  background:#1B1F24;
+  border:1px solid #2C3238;
+  border-radius:12px;
+  box-shadow:0 14px 40px rgba(0,0,0,.4);
+  animation:lgRise .7s ease-out both;
+}
+.lg-title{
+  margin:0;
+  text-align:center;
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:.3px;
+  color:#E9E7DF;
+}
+.lg-sub{
+  margin:6px 0 24px;
+  text-align:center;
+  font-size:13px;
+  color:#8B9198;
+}
+.lg-status{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px solid #2C3238;
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#6FA97A;
+}
+.lg-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#6FA97A;
+  box-shadow:0 0 8px #6FA97A;
+  animation:lgPulse 2s ease-in-out infinite;
+}
+@keyframes lgRise{
+  from{opacity:0;transform:translateY(22px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes lgPulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.4;}
+}
+@media (max-width:480px){
+  .lg-card{padding:26px 20px 22px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .lg-card,.lg-dot{animation:none !important;}
+}
+</style>
+<!-- ===== LOGIN PAGE REDESIGN: CSS (Login Step 1) END ===== -->
 </body>
 </html>
