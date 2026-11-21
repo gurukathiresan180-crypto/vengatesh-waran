@@ -7122,5 +7122,82 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
   }
 }
 </style>
+<!-- ===== ENERGY METER DASHBOARD PAGE ANIMATION START ===== -->
+<style>
+/* Main page gently appears */
+#dashboardPage .main-content{
+  animation:emdPageFade .7s ease-out both;
+}
+
+/* Dashboard sections appear in sequence */
+#dashboardPage .top{
+  animation:emdSectionFade .65s ease-out .08s both;
+}
+#dashboardPage .ov-kpis > *:nth-child(1){animation:emdSectionFade .55s ease-out .15s both;}
+#dashboardPage .ov-kpis > *:nth-child(2){animation:emdSectionFade .55s ease-out .23s both;}
+#dashboardPage .ov-kpis > *:nth-child(3){animation:emdSectionFade .55s ease-out .31s both;}
+#dashboardPage .ov-kpis > *:nth-child(4){animation:emdSectionFade .55s ease-out .39s both;}
+#dashboardPage .pw-card{
+  animation:emdSectionFade .65s ease-out .32s both;
+}
+#dashboardPage .panel,
+#dashboardPage .quick-entry-panel,
+#dashboardPage .log-panel{
+  animation:emdSectionFade .55s ease-out .2s both;
+}
+
+/* Subtle orange pulse for the live indicator */
+#dashboardPage .pw-live-dot{
+  animation:emdLivePulse 1.8s ease-in-out infinite;
+}
+
+/* Smooth hover feedback */
+#dashboardPage button,
+#dashboardPage .ov-card,
+#dashboardPage .panel,
+#dashboardPage .quick-entry-panel{
+  transition:
+    color .2s ease,
+    background-color .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+@keyframes emdPageFade{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+@keyframes emdSectionFade{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+@keyframes emdLivePulse{
+  0%,100%{box-shadow:0 0 4px rgba(43,179,163,.35);opacity:.75;}
+  50%{box-shadow:0 0 13px rgba(43,179,163,.8);opacity:1;}
+}
+
+/* Respect devices set to reduce motion */
+@media (prefers-reduced-motion:reduce){
+  #dashboardPage .main-content,
+  #dashboardPage .top,
+  #dashboardPage .ov-kpis > *,
+  #dashboardPage .pw-card,
+  #dashboardPage .panel,
+  #dashboardPage .quick-entry-panel,
+  #dashboardPage .log-panel,
+  #dashboardPage .pw-live-dot{
+    animation:none !important;
+  }
+  #dashboardPage button,
+  #dashboardPage .ov-card,
+  #dashboardPage .panel,
+  #dashboardPage .quick-entry-panel{
+    transition:none !important;
+  }
+}
+</style>
+<!-- ===== ENERGY METER DASHBOARD PAGE ANIMATION END ===== -->
 </body>
 </html>
