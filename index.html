@@ -8200,5 +8200,39 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== SCADA WHITE BACKGROUND + RACING ORANGE GRAPH END ===== -->
+<!-- ===== BOXED LOGO ON ALL READING SECTIONS START ===== -->
+<style>
+#dashboardPage #mainLtQuickEntryPanel .quick-entry-title,
+#dashboardPage #p3QuickEntryPanel .quick-entry-title,
+#dashboardPage #upsQuickEntryPanel .quick-entry-title,
+#dashboardPage #dgQuickEntryPanel .quick-entry-title,
+#dashboardPage #dieselQuickEntryPanel .quick-entry-title{
+  display:flex !important;
+  align-items:center;
+  gap:10px;
+  min-height:42px;
+}
+
+#dashboardPage #mainLtQuickEntryPanel .quick-entry-title::before,
+#dashboardPage #p3QuickEntryPanel .quick-entry-title::before,
+#dashboardPage #upsQuickEntryPanel .quick-entry-title::before,
+#dashboardPage #dgQuickEntryPanel .quick-entry-title::before,
+#dashboardPage #dieselQuickEntryPanel .quick-entry-title::before{
+  content:"";
+  display:block;
+  flex:0 0 36px;
+  width:36px;
+  height:36px;
+  border:1px solid #FF7A1A;
+  border-radius:9px;
+  background-color:#FFFFFF;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='%23FFFFFF' stroke='%23F45B0B' stroke-width='4'/%3E%3Cpath d='M14 34a19 19 0 0 1 36-10' fill='none' stroke='%23FF7A1A' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M32 32 46 20' fill='none' stroke='%231A1A1A' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23FF7A1A'/%3E%3Cpath d='m29 51 7-13h-7l6-12-15 17h8z' fill='%23F45B0B'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:29px 29px;
+  box-shadow:0 3px 9px rgba(244,91,11,.12);
+}
+</style>
+<!-- ===== BOXED LOGO ON ALL READING SECTIONS END ===== -->
 </body>
 </html>
