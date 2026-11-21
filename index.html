@@ -8424,5 +8424,24 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== SHIFT SELECTOR IN READING BOX CORNER END ===== -->
+<!-- ===== ADMIN TABS: REMOVE SCROLL ARROWS START ===== -->
+<style>
+#dashboardPage .admin-tabs,
+#dashboardPage .pm-tabs{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  padding-bottom:1px !important;
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+
+#dashboardPage .admin-tabs::-webkit-scrollbar,
+#dashboardPage .pm-tabs::-webkit-scrollbar{
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+}
+</style>
+<!-- ===== ADMIN TABS: REMOVE SCROLL ARROWS END ===== -->
 </body>
 </html>
