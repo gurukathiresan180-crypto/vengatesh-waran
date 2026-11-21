@@ -7429,5 +7429,30 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
   }
 }
 </style>
+  <style>
+/* Desktop: place watermark to the left of the login card */
+@media (min-width:900px){
+  #loginPage.lg-page::before{
+    left:calc(50% - 210px - clamp(180px,24vw,320px)) !important;
+    right:auto !important;
+    top:50% !important;
+    width:clamp(180px,24vw,320px) !important;
+    height:220px !important;
+    transform:translateY(-50%) !important;
+  }
+}
+
+/* Smaller screens: show it at the upper-left */
+@media (max-width:899px){
+  #loginPage.lg-page::before{
+    left:3% !important;
+    right:auto !important;
+    top:10% !important;
+    width:180px !important;
+    height:110px !important;
+    transform:none !important;
+  }
+}
+</style>
 </body>
 </html>
