@@ -3151,7 +3151,18 @@ function upsert(label, val){
   savedCount++;
 }
 
-  
+/* Save each tank value that was entered */
+tankInputs.forEach(function(inp){
+  var label = inp.getAttribute('data-label');
+  var valueText = inp.value.trim();
+
+  if(valueText === ''){ return; }
+
+  var value = parseFloat(valueText);
+  if(!isNaN(value) && isFinite(value)){
+    upsert(label, value);
+  }
+});  
 var anyTankFilled = tankInputs.some(function(inp){
   return inp.value.trim() !== '';
 });
