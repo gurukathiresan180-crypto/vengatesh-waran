@@ -1519,51 +1519,85 @@ console.log('Supabase Auth:', supabaseClient.auth);
     <!-- ---------- Panel Management ---------- -->
     <div class="admin-tab-panel active" id="adminTabPanel-panel">
       <div class="admin-grid">
-        <div class="panel admin-form-panel">
-          <div class="panel-title"><span>Panel &amp; sheet settings</span></div>
+<div class="panel admin-form-panel pm-organized">
+  <div class="panel-title">
+    <span>Panel &amp; sheet settings</span>
+  </div>
 
-          <label for="pmSheetTitle">Reading Sheet title</label>
-          <input id="pmSheetTitle" placeholder="Energy Meter Reading">
+  <div class="pm-group">
+    <div class="pm-group-heading">
+      <span class="pm-group-number">01</span>
+      <span>Reading sheet</span>
+    </div>
+    <div class="pm-group-grid">
+      <div>
+        <label for="pmSheetTitle">Reading Sheet title</label>
+        <input id="pmSheetTitle" placeholder="Energy Meter Reading">
+      </div>
+      <div>
+        <label for="pmTitleAlign">Panel title alignment</label>
+        <select id="pmTitleAlign">
+          <option value="left">Left</option>
+          <option value="center">Center</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-          <label for="pmTitleAlign">Panel title alignment</label>
-          <select id="pmTitleAlign">
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
-          </select>
+  <div class="pm-group">
+    <div class="pm-group-heading">
+      <span class="pm-group-number">02</span>
+      <span>Choose and name a panel</span>
+    </div>
+    <div class="pm-group-grid">
+      <div>
+        <label for="pmSectionSelect">Section to edit</label>
+        <select id="pmSectionSelect" class="mono"></select>
+      </div>
+      <div>
+        <label for="pmPanelId">Panel ID <span class="pm-hint">(cosmetic label)</span></label>
+        <input id="pmPanelId" class="mono" placeholder="e.g. P-01">
+      </div>
+      <div class="pm-full-width">
+        <label for="pmPanelName">Panel name</label>
+        <input id="pmPanelName" placeholder="e.g. MAIN LT READING">
+      </div>
+    </div>
+  </div>
 
-          <label for="pmSectionSelect" style="margin-top:22px;">Section to edit</label>
-          <select id="pmSectionSelect" class="mono"></select>
+  <div class="pm-group">
+    <div class="pm-group-heading">
+      <span class="pm-group-number">03</span>
+      <span>Fields in this section</span>
+    </div>
+    <div class="pm-group-description">Move, rename or remove fields. Saved readings are kept.</div>
+    <ul class="admin-field-list" id="pmFieldList"></ul>
+    <div id="pmRemovedWrap" style="display:none;">
+      <label>Removed fields <span class="pm-hint">(saved readings are kept)</span></label>
+      <ul class="admin-field-list" id="pmRemovedList"></ul>
+    </div>
+  </div>
 
-          <label for="pmPanelId">Panel ID (cosmetic label)</label>
-          <input id="pmPanelId" class="mono" placeholder="e.g. P-01">
+  <div class="pm-group">
+    <div class="pm-group-heading">
+      <span class="pm-group-number">04</span>
+      <span>Menu and report order</span>
+    </div>
+    <label>Panel order in the menu</label>
+    <ul class="admin-field-list" id="pmPanelOrderList"></ul>
+    <label>Reports column order <span class="pm-hint">(drag to reorder)</span></label>
+    <ul class="admin-col-list" id="pmColumnList"></ul>
+  </div>
 
-          <label for="pmPanelName">Panel name</label>
-          <input id="pmPanelName" placeholder="e.g. MAIN LT READING">
-
-          <label style="margin-top:22px;">Fields in this section — move, rename or remove</label>
-          <ul class="admin-field-list" id="pmFieldList"></ul>
-          <div id="pmRemovedWrap" style="display:none;">
-            <label style="margin-top:14px;">Removed fields (saved readings are kept)</label>
-            <ul class="admin-field-list" id="pmRemovedList"></ul>
-          </div>
-
-          <label style="margin-top:22px;">Panel order in the menu</label>
-          <ul class="admin-field-list" id="pmPanelOrderList"></ul>
-
-          <label style="margin-top:22px;">Reports column order (drag to reorder)</label>
-          <ul class="admin-col-list" id="pmColumnList"></ul>
-
-          <div class="admin-btn-row">
-            <button type="button" class="btn-primary" id="pmApplyBtn" style="width:auto; margin-top:0;">Apply</button>
-            <button type="button" class="btn-primary" id="pmSaveBtn" style="width:auto; margin-top:0;">Save</button>
-            <button type="button" class="btn-ghost" id="pmCancelBtn">Cancel</button>
-            <button type="button" class="btn-ghost" id="pmResetBtn" style="color:var(--red); border-color:var(--red);">Reset to defaults</button>
-          </div>
-          <div class="quick-entry-msg" id="pmMsg" style="display:none;"></div>
-        </div>
-
-        <div class="panel admin-preview-panel">
+  <div class="admin-btn-row pm-actions">
+    <button type="button" class="btn-primary" id="pmApplyBtn" style="width:auto; margin-top:0;">Apply</button>
+    <button type="button" class="btn-primary" id="pmSaveBtn" style="width:auto; margin-top:0;">Save</button>
+    <button type="button" class="btn-ghost" id="pmCancelBtn">Cancel</button>
+    <button type="button" class="btn-ghost" id="pmResetBtn" style="color:var(--red); border-color:var(--red);">Reset to defaults</button>
+  </div>
+  <div class="quick-entry-msg" id="pmMsg" style="display:none;"></div>
+</div>
           <div class="panel-title"><span>Live preview</span></div>
           <div class="admin-preview-box">
             <div class="admin-preview-title" id="pmPreviewTitle">MAIN LT READING</div>
