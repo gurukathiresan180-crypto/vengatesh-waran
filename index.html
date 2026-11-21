@@ -8261,5 +8261,44 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== REMOVE ADMIN SETTINGS VERTICAL GAP END ===== -->
+<!-- ===== FIT SCADA GRAPH TO DISPLAY START ===== -->
+<style>
+@media(min-width:761px){
+  #dashboardPage .scada-chart-shell #ovPanelConsumptionChart{
+    width:100% !important;
+    max-width:none !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+
+  #dashboardPage .scada-chart-shell .scada-bars{
+    display:flex !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:clamp(2px,.35vw,6px) !important;
+    overflow-x:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  #dashboardPage .scada-chart-shell .scada-bar-column{
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+
+  #dashboardPage .scada-chart-shell .scada-bar-track{
+    width:100% !important;
+  }
+
+  #dashboardPage .scada-chart-shell .scada-bar-value,
+  #dashboardPage .scada-chart-shell .scada-bar-date{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:clamp(6px,.65vw,9px) !important;
+  }
+}
+</style>
+<!-- ===== FIT SCADA GRAPH TO DISPLAY END ===== -->
 </body>
 </html>
