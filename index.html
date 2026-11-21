@@ -7404,5 +7404,30 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== DASHBOARD GLASSMORPHISM EFFECTS END ===== -->
+<style>
+/* Desktop: place the animated watermark to the right of the login card */
+@media (min-width:701px){
+  #loginPage.lg-page::before{
+    left:calc(50% + 210px) !important;
+    right:auto !important;
+    top:50% !important;
+    width:clamp(180px,24vw,320px) !important;
+    height:220px !important;
+    transform:translateY(-50%) !important;
+  }
+}
+
+/* Small screens: place it above the login card */
+@media (max-width:700px){
+  #loginPage.lg-page::before{
+    left:50% !important;
+    right:auto !important;
+    top:8% !important;
+    width:220px !important;
+    height:140px !important;
+    transform:translateX(-50%) !important;
+  }
+}
+</style>
 </body>
 </html>
