@@ -6526,6 +6526,7 @@ body.pw-lock{overflow:hidden;}
 })();
 </script>
 <!-- ===== ENERGY MONITOR: TABS + TOOL ICONS (Step 6) END ===== -->
+<style>
 /* full screen: stop page animations from trapping the fixed card */
 body.pw-lock #dashboardPage,
 body.pw-lock #dashboardPage .shell,
@@ -6533,6 +6534,10 @@ body.pw-lock #dashboardPage .layout{
   animation:none !important;
   transform:none !important;
 }
+body.pw-lock #dashboardPage .main-content{
+  isolation:auto !important;
+}
+</style>
 body.pw-lock #dashboardPage .main-content{isolation:auto !important;}
 <!-- ===== LOGIN PAGE REDESIGN: CSS (Login Step 1) START ===== -->
 <style>
