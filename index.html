@@ -8302,6 +8302,22 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 <!-- ===== FIT SCADA GRAPH TO DISPLAY END ===== -->
 <!-- ===== ADMIN SETTINGS FIT DISPLAY START ===== -->
 <style>
+#dashboardPage.view-admin-settings .main-content{
+  width:calc(100% - 256px) !important;
+  margin-left:256px !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+
+#dashboardPage.view-admin-settings .main-content > .shell{
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding-left:24px !important;
+  padding-right:24px !important;
+  box-sizing:border-box !important;
+}
+
 #dashboardPage.view-admin-settings #adminSettingsPanel{
   width:100% !important;
   max-width:none !important;
@@ -8315,12 +8331,25 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 #dashboardPage.view-admin-settings .admin-grid{
   width:100% !important;
   max-width:none !important;
+  min-width:0 !important;
   box-sizing:border-box !important;
 }
 
 #dashboardPage.view-admin-settings .admin-grid{
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   gap:16px !important;
+}
+
+@media(max-width:760px){
+  #dashboardPage.view-admin-settings .main-content{
+    width:100% !important;
+    margin-left:0 !important;
+  }
+
+  #dashboardPage.view-admin-settings .main-content > .shell{
+    padding-left:16px !important;
+    padding-right:16px !important;
+  }
 }
 
 @media(max-width:900px){
