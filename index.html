@@ -8466,6 +8466,68 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== SHOW SHIFT SELECTOR ON DG AND DIESEL END ===== -->
+  <!-- ===== LOGIN TO HOME TRANSITION START ===== -->
+<style>
+/* 1. Orange welcome screen with logo, fades out */
+html.is-authed::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  background:#F45B0B url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='26' fill='none' stroke='%23FFFFFF' stroke-width='4'/%3E%3Cpath d='M14 34a19 19 0 0 1 36-10' fill='none' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round' opacity='.7'/%3E%3Cpath d='M32 32 46 20' fill='none' stroke='%23FFFFFF' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23FFFFFF'/%3E%3Cpath d='m29 51 7-13h-7l6-12-15 17h8z' fill='%23FFFFFF'/%3E%3C/svg%3E") center / 96px 96px no-repeat;
+  animation:emdLoginWipe .75s ease-in-out both;
+}
+
+/* 2. Sidebar slides in (desktop only) */
+@media (min-width:761px){
+  html.is-authed #dashboardPage .side-nav{
+    animation:emdLoginSlideIn .5s ease-out .3s backwards;
+  }
+}
+
+/* 3. Header drops in */
+html.is-authed #dashboardPage .main-content > .shell > .top{
+  animation:emdLoginDropIn .5s ease-out .4s backwards;
+}
+
+/* 4. KPI cards and Energy Monitor rise in, one after another */
+html.is-authed #dashboardPage .ov-kpis > *:nth-child(1){animation:emdLoginRiseIn .5s ease-out .45s backwards;}
+html.is-authed #dashboardPage .ov-kpis > *:nth-child(2){animation:emdLoginRiseIn .5s ease-out .53s backwards;}
+html.is-authed #dashboardPage .ov-kpis > *:nth-child(3){animation:emdLoginRiseIn .5s ease-out .61s backwards;}
+html.is-authed #dashboardPage .ov-kpis > *:nth-child(4){animation:emdLoginRiseIn .5s ease-out .69s backwards;}
+html.is-authed #dashboardPage .pw-card{
+  animation:emdLoginRiseIn .55s ease-out .75s backwards;
+}
+
+@keyframes emdLoginWipe{
+  0%,45%{opacity:1;visibility:visible;}
+  100%{opacity:0;visibility:hidden;}
+}
+@keyframes emdLoginSlideIn{
+  from{opacity:0;transform:translateX(-36px);}
+  to{opacity:1;transform:translateX(0);}
+}
+@keyframes emdLoginDropIn{
+  from{opacity:0;transform:translateY(-18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes emdLoginRiseIn{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html.is-authed::before{display:none !important;}
+  html.is-authed #dashboardPage .side-nav,
+  html.is-authed #dashboardPage .main-content > .shell > .top,
+  html.is-authed #dashboardPage .ov-kpis > *,
+  html.is-authed #dashboardPage .pw-card{
+    animation:none !important;
+  }
+}
+</style>
+<!-- ===== LOGIN TO HOME TRANSITION END ===== -->
 <!-- LOGIN TO HOME FADE START -->
 <style>
 @keyframes emdDashboardHomeFade {
