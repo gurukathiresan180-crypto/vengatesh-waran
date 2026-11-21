@@ -4899,8 +4899,10 @@ if (!box) return;
 ];
 
   function renderOverviewSections(items, dates){
-    var box = document.getElementById('ovSections');
-    document.getElementById('ovSectionRange').textContent = ovRangeLabel();
+   var box = document.getElementById('ovSections');
+var rangeLabel = document.getElementById('ovSectionRange');
+if(!box || !rangeLabel){ return; }
+rangeLabel.textContent = ovRangeLabel();
     var inRange = {}; dates.forEach(function(d){ inRange[d] = true; });
     var totals = OV_SECTIONS.map(function(sec){
       var sum = items.filter(function(i){ return i.sectionId === sec.id && i.cons !== null && inRange[i.date]; })
