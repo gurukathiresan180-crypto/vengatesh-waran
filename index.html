@@ -3126,7 +3126,8 @@ if (existing) {
 function upsert(label, val){
   var existing = list.filter(function(r){
     return r.date === chosenDate &&
-           r.equipment === label;
+           r.equipment === label &&
+           r.shift === currentShift;
   })[0];
 
   if(existing){
@@ -3139,6 +3140,7 @@ function upsert(label, val){
       equipment: label,
       date: chosenDate,
       reading: val,
+      shift: currentShift,
       note: '',
       updatedAt: stamp
     });
