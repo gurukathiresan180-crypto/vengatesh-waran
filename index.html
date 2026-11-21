@@ -8300,5 +8300,35 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 </style>
 <!-- ===== FIT SCADA GRAPH TO DISPLAY END ===== -->
+<!-- ===== ADMIN SETTINGS FIT DISPLAY START ===== -->
+<style>
+#dashboardPage.view-admin-settings #adminSettingsPanel{
+  width:100% !important;
+  max-width:none !important;
+  margin:12px 0 0 !important;
+  padding:8px 12px 20px !important;
+  box-sizing:border-box !important;
+}
+
+#dashboardPage.view-admin-settings .admin-tabs,
+#dashboardPage.view-admin-settings .admin-tab-panel.active,
+#dashboardPage.view-admin-settings .admin-grid{
+  width:100% !important;
+  max-width:none !important;
+  box-sizing:border-box !important;
+}
+
+#dashboardPage.view-admin-settings .admin-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:16px !important;
+}
+
+@media(max-width:900px){
+  #dashboardPage.view-admin-settings .admin-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+<!-- ===== ADMIN SETTINGS FIT DISPLAY END ===== -->
 </body>
 </html>
