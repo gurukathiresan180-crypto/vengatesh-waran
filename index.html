@@ -6590,5 +6590,160 @@ body.pw-lock #dashboardPage .main-content{isolation:auto !important;}
 }
 </style>
 <!-- ===== LOGIN PAGE REDESIGN: CSS (Login Step 1) END ===== -->
+<!-- ===== DASHBOARD WHITE + ORANGE THEME (Color Step 1) START ===== -->
+<style>
+/* variables: only while signed in, so the login page is untouched */
+html.is-authed{
+  --bg:#FFFFFF;
+  --panel:#FFFFFF;
+  --panel-2:#F5F6F7;
+  --border:#E3E5E8;
+  --border-soft:#EEF0F2;
+  --text:#1A1A1A;
+  --text-dim:#5B6168;
+  --text-faint:#8A9097;
+  --amber:#F45B0B;
+}
+html.is-authed body{background:#FFFFFF;color:#1A1A1A;}
+html.is-authed input[type="date"]::-webkit-calendar-picker-indicator{filter:none;opacity:.6;}
+
+/* main area */
+#dashboardPage .app-shell{background:#FFFFFF;}
+#dashboardPage .main-content{background-image:none;}
+#dashboardPage .main-content::before,
+#dashboardPage .main-content::after{display:none;}
+#dashboardPage::before{background:rgba(255,255,255,.96);}
+#dashboardPage::after{border-color:rgba(244,91,11,.2);border-top-color:#F45B0B;}
+
+/* header */
+#dashboardPage .top{
+  background:#FFFFFF;
+  border:1px solid #E3E5E8;
+  border-left:3px solid #F45B0B;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+#dashboardPage .top h1,
+#dashboardPage .brand-mark h1{color:#1A1A1A;}
+#dashboardPage .sub,
+#dashboardPage .brand-mark .sub{color:#5B6168;}
+#dashboardPage .clock{border-left-color:#E3E5E8;}
+#dashboardPage .clock .t{color:#F45B0B;}
+#dashboardPage .clock .d{color:#5B6168;}
+#dashboardPage .dial{box-shadow:none;}
+
+/* sidebar */
+#dashboardPage .side-nav{
+  background:#FFFFFF;
+  color:#1A1A1A;
+  border:1px solid #E3E5E8;
+  box-shadow:2px 0 16px rgba(0,0,0,.05);
+}
+#dashboardPage .side-nav-brand span{color:#1A1A1A;}
+#dashboardPage .side-nav .mini-dial{border-color:#F45B0B;}
+#dashboardPage .side-nav .mini-dial::after{background:#F45B0B;}
+#dashboardPage .profile-card{background:#FAFAFB;border-color:#E3E5E8;}
+#dashboardPage .profile-name{color:#1A1A1A;}
+#dashboardPage .profile-role{color:#F45B0B;}
+#dashboardPage .profile-avatar{background:#F45B0B;}
+#dashboardPage .side-nav-label{color:#F45B0B;}
+#dashboardPage .side-nav-bottom{border-top-color:#E3E5E8;}
+#dashboardPage .sidenav-close-btn{color:#5B6168;}
+#dashboardPage .sidenav-close-btn:hover{background:#F5F6F7;color:#1A1A1A;}
+#dashboardPage .side-nav .rname{color:#1A1A1A;text-shadow:none;}
+#dashboardPage .side-nav .rmeta{color:#8A9097;}
+#dashboardPage .side-nav a:hover,
+#dashboardPage .side-nav button:not(.sidenav-close-btn):hover{
+  background:rgba(244,91,11,.08);
+  color:#F45B0B;
+}
+#dashboardPage .roomtab.active{background:rgba(244,91,11,.10);}
+#dashboardPage .roomtab.active .rname{color:#F45B0B;}
+#dashboardPage .roomtab.active .rt-icon{color:#F45B0B;}
+#dashboardPage .side-nav button.active,
+#dashboardPage .nav-child-btn.active{
+  background:rgba(244,91,11,.10);
+  color:#F45B0B;
+  border-left:3px solid #F45B0B;
+}
+#dashboardPage .nav-item-wrap.expanded .chevron-btn{color:#F45B0B;}
+#dashboardPage .sidebar-logout-btn:hover{background:#FDEEE8;}
+
+/* cards and panels */
+#dashboardPage .ov-card,
+#dashboardPage .panel,
+#dashboardPage .quick-entry-panel{
+  background:#FFFFFF;
+  border:1px solid #E3E5E8;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+#dashboardPage .ov-card:hover,
+#dashboardPage .panel:hover,
+#dashboardPage .quick-entry-panel:hover{
+  border-color:#F45B0B;
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
+}
+#dashboardPage .ov-card::before,
+#dashboardPage .panel::before,
+#dashboardPage .quick-entry-panel::before{
+  background:#F45B0B;
+  box-shadow:none;
+}
+#dashboardPage .ov-kpi::after{background:#F45B0B;box-shadow:none;}
+#dashboardPage .ov-kpi:hover{border-color:#F45B0B;box-shadow:0 8px 22px rgba(0,0,0,.08);}
+#dashboardPage .ov-orange{--ov-rgb:244,91,11;}
+#dashboardPage .ov-card h2,
+#dashboardPage .ov-card h3{color:#F45B0B;}
+#dashboardPage .panel h2,
+#dashboardPage .panel h3{color:#1A1A1A;}
+#dashboardPage .quick-entry-title{color:#F45B0B;border-bottom-color:#E3E5E8;}
+
+/* numbers and text */
+#dashboardPage .mono{color:#1A1A1A;text-shadow:none;}
+#dashboardPage .ov-kpi strong,
+#dashboardPage .ov-kpi .value{color:#1A1A1A;text-shadow:none;}
+
+/* form fields */
+#dashboardPage input[type="number"],
+#dashboardPage input[type="text"],
+#dashboardPage select{
+  background:#FFFFFF;
+  color:#1A1A1A;
+  border-color:#D5D8DC;
+}
+#dashboardPage input:focus,
+#dashboardPage select:focus{
+  border-color:#F45B0B;
+  box-shadow:0 0 0 3px rgba(244,91,11,.15);
+}
+
+/* orange buttons: white text */
+html.is-authed .btn-primary,
+html.is-authed .ov-action-btn{color:#FFFFFF;}
+html.is-authed .btn-primary:hover,
+html.is-authed .ov-action-btn:hover{background:#D94F06;}
+html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
+
+/* Energy Monitor card */
+#dashboardPage .pw-card{background:#FFFFFF;border-color:#E3E5E8;}
+#dashboardPage .pw-title{color:#1A1A1A;}
+#dashboardPage .pw-title small{color:#8A9097;}
+#dashboardPage .pw-tabs{background:#F5F6F7;border-color:#E3E5E8;}
+#dashboardPage .pw-tab{color:#5B6168;}
+#dashboardPage .pw-tab:hover{color:#1A1A1A;}
+#dashboardPage .pw-tab.active{background:rgba(244,91,11,.12);color:#F45B0B;}
+#dashboardPage .pw-icon-btn{border-color:#E3E5E8;color:#5B6168;}
+#dashboardPage .pw-icon-btn:hover{color:#F45B0B;border-color:#F45B0B;}
+#dashboardPage .pw-block{background:#FAFAFB;border-color:#E3E5E8;}
+#dashboardPage .pw-block-title{color:#5B6168;}
+#dashboardPage .pw-placeholder,
+#dashboardPage .pw-empty{color:#8A9097;}
+
+/* scrollbars */
+#dashboardPage *{scrollbar-color:#C9CDD2 #F1F2F4;}
+#dashboardPage *::-webkit-scrollbar-track{background:#F1F2F4;}
+#dashboardPage *::-webkit-scrollbar-thumb{background:#C9CDD2;border-color:#F1F2F4;}
+#dashboardPage *::-webkit-scrollbar-thumb:hover{background:#F45B0B;}
+</style>
+<!-- ===== DASHBOARD WHITE + ORANGE THEME (Color Step 1) END ===== -->  
 </body>
 </html>
