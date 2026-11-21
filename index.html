@@ -8302,24 +8302,10 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 <!-- ===== FIT SCADA GRAPH TO DISPLAY END ===== -->
 <!-- ===== ADMIN SETTINGS FIT DISPLAY START ===== -->
 <style>
-#dashboardPage.view-admin-settings .main-content{
-  width:auto !important;
-  margin-left:256px !important;
-  min-width:0 !important;
-  box-sizing:border-box !important;
-}
-
-#dashboardPage.view-admin-settings .main-content > .shell{
-  width:auto !important;
-  max-width:none !important;
-  margin:0 !important;
-  box-sizing:border-box !important;
-}
-
 #dashboardPage.view-admin-settings #adminSettingsPanel{
-  width:100% !important;
+  width:calc(100% - 48px) !important;
   max-width:none !important;
-  margin:12px 0 0 !important;
+  margin:12px 24px 0 !important;
   padding:8px 12px 20px !important;
   box-sizing:border-box !important;
 }
@@ -8333,6 +8319,10 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
   box-sizing:border-box !important;
 }
 
+#dashboardPage.view-admin-settings .admin-tab-panel.active{
+  padding:0 !important;
+}
+
 #dashboardPage.view-admin-settings .admin-grid{
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   gap:16px !important;
@@ -8342,6 +8332,11 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
   min-width:0 !important;
 }
 
+#dashboardPage.view-admin-settings .admin-tab-panel table{
+  width:100% !important;
+  max-width:100% !important;
+}
+
 @media(max-width:900px){
   #dashboardPage.view-admin-settings .admin-grid{
     grid-template-columns:1fr !important;
@@ -8349,9 +8344,9 @@ html.is-authed .btn-primary:disabled{background:#F9B895;color:#FFFFFF;}
 }
 
 @media(max-width:760px){
-  #dashboardPage.view-admin-settings .main-content{
-    width:auto !important;
-    margin-left:0 !important;
+  #dashboardPage.view-admin-settings #adminSettingsPanel{
+    width:calc(100% - 32px) !important;
+    margin:12px 16px 0 !important;
   }
 }
 </style>
