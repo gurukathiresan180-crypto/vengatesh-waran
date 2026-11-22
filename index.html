@@ -8634,5 +8634,32 @@ html.is-authed #dashboardPage {
 }
 </style>
 <!-- ===== LOGIN LEFT ANIMATED LOGO (Logo Animation Step) END ===== -->
+<!-- LOGIN CARD LOGO RING ALIGNMENT START -->
+<style>
+#loginPage .lg-logo-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lgCardLogoPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes lgCardLogoPulse {
+  0%, 100% {
+    opacity: .16;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .45;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #loginPage .lg-logo-glow {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+</style>
+<!-- LOGIN CARD LOGO RING ALIGNMENT END -->
 </body>
 </html>
