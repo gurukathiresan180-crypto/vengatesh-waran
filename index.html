@@ -8574,5 +8574,65 @@ html.is-authed #dashboardPage {
 }
 </style>
 <!-- READING SECTION HEADER GAP END -->
+<!-- ===== LOGIN LEFT ANIMATED LOGO (Logo Animation Step) START ===== -->
+<style>
+#loginPage.lg-page{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+
+/* hide the older static watermark so only one logo shows */
+#loginPage.lg-page::before{
+  display:none !important;
+}
+
+/* new animated logo on the left */
+#loginPage.lg-page::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:50%;
+  left:4%;
+  width:360px;
+  height:260px;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 260'%3E%3Ccircle cx='180' cy='110' r='88' fill='none' stroke='%23F45B0B' stroke-width='2' stroke-dasharray='6 10' opacity='.55'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 180 110' to='360 180 110' dur='24s' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='180' cy='110' r='62' fill='none' stroke='%23F45B0B' stroke-width='8'/%3E%3Cpath d='M138 118a44 44 0 0 1 80-26' fill='none' stroke='%23FF7A1A' stroke-width='8' stroke-linecap='round'/%3E%3Cpath d='M180 110L211 84' fill='none' stroke='%23FF7A1A' stroke-width='8' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' values='-25 180 110;25 180 110;-25 180 110' dur='6s' repeatCount='indefinite'/%3E%3C/path%3E%3Ccircle cx='180' cy='110' r='6' fill='%23FF7A1A'/%3E%3Cpath d='M174 144l14-25h-13l11-24-28 32h16z' fill='%23F45B0B'%3E%3Canimate attributeName='opacity' values='1;.35;1' dur='2.5s' repeatCount='indefinite'/%3E%3C/path%3E%3Ctext x='180' y='232' text-anchor='middle' font-family='Arial,sans-serif' font-size='22' font-weight='700' letter-spacing='3' fill='%23F45B0B'%3EENERGY METER%3C/text%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  animation:lgLogoGlow 4s ease-in-out infinite;
+}
+
+@keyframes lgLogoGlow{
+  0%,100%{
+    opacity:.28;
+    transform:translateY(-50%) scale(1);
+    filter:drop-shadow(0 0 0 rgba(244,91,11,0));
+  }
+  50%{
+    opacity:.5;
+    transform:translateY(-50%) scale(1.04);
+    filter:drop-shadow(0 0 18px rgba(244,91,11,.35));
+  }
+}
+
+/* the form card stays above the logo */
+#loginPage .lg-card{
+  position:relative;
+  z-index:1;
+}
+
+/* narrow screens: hide the logo so it never overlaps the card */
+@media (max-width:1100px){
+  #loginPage.lg-page::after{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+  #loginPage.lg-page::after{animation:none !important;}
+}
+</style>
+<!-- ===== LOGIN LEFT ANIMATED LOGO (Logo Animation Step) END ===== -->
 </body>
 </html>
