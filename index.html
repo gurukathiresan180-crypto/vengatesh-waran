@@ -8738,5 +8738,80 @@ html.is-authed #dashboardPage {
 }
 </style>
 <!-- GLASSY SIDEBAR V10 END -->
+<!-- GLASSY SIDEBAR LOGIN EXPAND START -->
+<style>
+@keyframes emdV10SidebarExpand {
+  0%, 18% {
+    width: 92px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  100% {
+    width: 256px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@keyframes emdV10ContentShift {
+  0%, 18% { margin-left: 92px; }
+  100% { margin-left: 256px; }
+}
+
+@keyframes emdV10TextReveal {
+  0%, 35% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes emdV10ProfileExpand {
+  0%, 18% {
+    padding: 8px;
+    gap: 0;
+  }
+  100% {
+    padding: 12px;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 761px) {
+  html.is-authed #dashboardPage .side-nav {
+    overflow-x: hidden;
+    animation: emdV10SidebarExpand 1.25s cubic-bezier(.2, .8, .2, 1) .75s both !important;
+  }
+
+  html.is-authed #dashboardPage .main-content {
+    animation: emdV10ContentShift 1.25s cubic-bezier(.2, .8, .2, 1) .75s both !important;
+  }
+
+  html.is-authed #dashboardPage .side-nav .profile-card {
+    animation: emdV10ProfileExpand 1.25s ease-out .75s both !important;
+  }
+
+  html.is-authed #dashboardPage .side-nav-brand span,
+  html.is-authed #dashboardPage .side-nav .profile-info,
+  html.is-authed #dashboardPage .side-nav-label,
+  html.is-authed #dashboardPage .side-nav .roomtab .rt-text,
+  html.is-authed #dashboardPage .side-nav .nav-child-btn,
+  html.is-authed #dashboardPage .side-nav-bottom span {
+    animation: emdV10TextReveal 1.25s ease-out .75s both !important;
+  }
+}
+
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  html.is-authed #dashboardPage .side-nav,
+  html.is-authed #dashboardPage .main-content,
+  html.is-authed #dashboardPage .side-nav .profile-card,
+  html.is-authed #dashboardPage .side-nav-brand span,
+  html.is-authed #dashboardPage .side-nav .profile-info,
+  html.is-authed #dashboardPage .side-nav-label,
+  html.is-authed #dashboardPage .side-nav .roomtab .rt-text,
+  html.is-authed #dashboardPage .side-nav .nav-child-btn,
+  html.is-authed #dashboardPage .side-nav-bottom span {
+    animation: none !important;
+  }
+}
+</style>
+<!-- GLASSY SIDEBAR LOGIN EXPAND END -->
 </body>
 </html>
