@@ -3225,6 +3225,8 @@ function reportNumber(value){
 rows.push({label:'DATE', value:displayDate});
 rows.push({label:'TIME', value:latestTime ? logTimeOf(latestTime) : '—'});
 
+var reportedTotal = 0;
+
 fields.forEach(function(f){
   var record = list.filter(function(r){
     return r.date === chosenDate &&
@@ -3232,21 +3234,22 @@ fields.forEach(function(f){
            r.equipment === f.key;
   })[0];
 
+  var value = record ? Number(record.reading) : 0;
+  if(isFinite(value)){
+    reportedTotal += value;
+  }
+
   rows.push({
     label:f.name.toUpperCase(),
-    value:record ? reportNumber(record.reading) : '0'
+    value:reportNumber(value)
   });
 });
 
-var totalRecord = list.filter(function(r){
-  return r.date === chosenDate &&
-         r.shift === currentShift &&
-         r.equipment === TOTAL_LABEL;
-})[0];
+reportedTotal = Math.round(reportedTotal * 100) / 100;
 
 rows.push({
   label:'TOTAL DIESEL AVAILABLE',
-  value:totalRecord ? reportNumber(totalRecord.reading) : '0'
+  value:reportNumber(reportedTotal)
 });
 
 var labelWidth = 21;
