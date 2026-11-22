@@ -3199,12 +3199,14 @@ var anyTankFilled = tankInputs.some(function(inp){
       var fields = visibleFields(roomId);
       var report = [];
 
-      var latestTime = '';
-      list.forEach(function(r){
-        if(r.date === chosenDate && r.updatedAt > latestTime){
-          latestTime = r.updatedAt;
-        }
-      });
+ var latestTime = '';
+list.forEach(function(r){
+  if(r.date === chosenDate &&
+     r.shift === currentShift &&
+     r.updatedAt > latestTime){
+    latestTime = r.updatedAt;
+  }
+});
 
 report.push('DIESEL STATUS REPORT');
 report.push('');
@@ -3225,7 +3227,9 @@ rows.push({label:'TIME', value:latestTime ? logTimeOf(latestTime) : '—'});
 
 fields.forEach(function(f){
   var record = list.filter(function(r){
-    return r.date === chosenDate && r.equipment === f.key;
+    return r.date === chosenDate &&
+           r.shift === currentShift &&
+           r.equipment === f.key;
   })[0];
 
   rows.push({
@@ -3235,7 +3239,9 @@ fields.forEach(function(f){
 });
 
 var totalRecord = list.filter(function(r){
-  return r.date === chosenDate && r.equipment === TOTAL_LABEL;
+  return r.date === chosenDate &&
+         r.shift === currentShift &&
+         r.equipment === TOTAL_LABEL;
 })[0];
 
 rows.push({
