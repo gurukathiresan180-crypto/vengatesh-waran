@@ -8843,7 +8843,10 @@ html.is-authed #dashboardPage {
     });
   }
 
+    var savedPowerUpdateInProgress = false;
   function updateSavedPowerChart(){
+    if(!window.pwPowerChart || savedPowerUpdateInProgress) return;
+    savedPowerUpdateInProgress = true;
     if(!window.pwPowerChart) return;
 
     var rows = dailyTotals();
@@ -8895,6 +8898,7 @@ html.is-authed #dashboardPage {
     };
 
     chart.update('none');
+    savedPowerUpdateInProgress = false;
   }
 
   if(window.pwPowerChart){
