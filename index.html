@@ -8817,5 +8817,185 @@ html.is-authed #dashboardPage {
 }
 </style>
 <!-- GLASSY SIDEBAR LOGIN EXPAND END -->
+<!-- SAVED READINGS ENERGY MONITOR START -->
+<script>
+(function(){
+  function getSavedItems(){
+    if(typeof window.__getSavedEnergyMonitorItems !== 'function') return [];
+    try {
+      return window.__getSavedEnergyMonitorItems() || [];
+    } catch(error) {
+      console.error('Saved Energy Monitor data error:', error);
+      return [];
+    }
+  }
+
+  function dailyTotals(){
+    var totals = {};
+    getSavedItems().forEach(function(item){
+      var value = Number(item.cons);
+      if(!item.date || !Number.isFinite(value) || value < 0) return;
+      totals[item.date] = (totals[item.date] || 0) + value;
+    });
+
+    return Object.keys(totals).sort().slice(-30).map(function(date){
+      return { date: date, value: totals[date] };
+    });
+  }
+
+  function updateSavedPowerChart(){
+    if(!window.pwPowerChart) return;
+
+    var rows = dailyTotals();
+    var labels = rows.map(function(row){ return row.date; });
+    var chart = window.pwPowerChart;
+
+    chart.data.datasets = [
+      {
+        label: 'Recorded consumption',
+        data: rows.map(function(row, index){
+          return { x: index, y: row.value };
+        }),
+        borderColor: '#F45B0B',
+        backgroundColor: 'rgba(244, 91, 11, 0.16)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.25,
+        fill: true
+      },
+      { label: '', data: [], hidden: true },
+      { label: '', data: [], hidden: true },
+      { label: '', data: [], hidden: true }
+    ];
+
+    var x = chart.options.scales.x;
+    x.type = 'linear';
+    x.min = 0;
+    x.max = Math.max(1, rows.length - 1);
+    x.ticks.stepSize = Math.max(1, Math.ceil((rows.length - 1) / 6));
+    x.ticks.callback = function(value){
+      return labels[Math.round(Number(value))] || '';
+    };
+
+    var y = chart.options.scales.y;
+    y.min = 0;
+    delete y.max;
+    y.ticks.callback = function(value){
+      return Number(value).toLocaleString() + ' kWh';
+    };
+
+    chart.options.plugins.tooltip.callbacks.title = function(points){
+      return points.length ? (labels[Math.round(points[0].parsed.x)] || '') : '';
+    };
+    chart.options.plugins.tooltip.callbacks.label = function(context){
+      return 'Recorded consumption: ' + Number(context.parsed.y).toLocaleString(
+        undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+      ) + ' kWh';
+    };
+
+    chart.update('none');
+  }
+
+  if(window.pwPowerChart){
+    var originalUpdate = window.pwPowerChart.update.bind(window.pwPowerChart);
+    window.pwPowerChart.update = function(mode){
+      updateSavedPowerChart();
+      return originalUpdate(mode);
+    };
+    updateSavedPowerChart();
+  }
+
+  window.pwFmtKw = function(value){
+    return Number(value).toLocaleString(
+      undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    ) + ' kWh';
+  };
+
+  window.pwBuildSankeyGraph = function(){
+    var items = getSavedItems();
+    if(!items.length) return { nodes: [], links: [] };
+
+    var latestDate = items.reduce(function(latest, item){
+      return item.date && item.date > latest ? item.date : latest;
+    }, '');
+
+    var roomNames = {
+      'main-lt': 'Main LT',
+      'p3-sub-lt': 'P3 Sub LT',
+      'ups-reading': 'UPS'
+    };
+    var totals = {};
+
+    items.forEach(function(item){
+      if(item.date !== latestDate || !roomNames[item.roomId]) return;
+      var value = Number(item.cons);
+      if(!Number.isFinite(value) || value <= 0) return;
+
+      var key = item.roomId + '|' + item.equipment;
+      if(!totals[key]){
+        totals[key] = {
+          roomId: item.roomId,
+          room: roomNames[item.roomId],
+          equipment: item.equipment || 'Panel',
+          value: 0
+        };
+      }
+      totals[key].value += value;
+    });
+
+    var nodes = [{ name: 'Saved readings' }];
+    var links = [];
+    var byRoom = {};
+
+    Object.keys(totals).forEach(function(key){
+      var row = totals[key];
+      (byRoom[row.roomId] = byRoom[row.roomId] || []).push(row);
+    });
+
+    Object.keys(roomNames).forEach(function(roomId){
+      var rows = (byRoom[roomId] || []).sort(function(a,b){
+        return b.value - a.value;
+      });
+      if(!rows.length) return;
+
+      var room = roomNames[roomId];
+      var roomTotal = rows.reduce(function(sum,row){ return sum + row.value; }, 0);
+      nodes.push({ name: room });
+      links.push({ source: 'Saved readings', target: room, value: roomTotal });
+
+      var shown = rows.slice(0, 5);
+      shown.forEach(function(row){
+        var panelName = row.equipment + ' - ' + room;
+        nodes.push({ name: panelName });
+        links.push({ source: room, target: panelName, value: row.value });
+      });
+
+      var otherTotal = rows.slice(5).reduce(function(sum,row){
+        return sum + row.value;
+      }, 0);
+      if(otherTotal > 0){
+        var otherName = 'Other panels - ' + room;
+        nodes.push({ name: otherName });
+        links.push({ source: room, target: otherName, value: otherTotal });
+      }
+    });
+
+    return { nodes: nodes, links: links };
+  };
+
+  if(typeof window.pwSafeRenderSankey === 'function'){
+    window.pwSafeRenderSankey();
+  }
+
+  setInterval(function(){
+    updateSavedPowerChart();
+    if(typeof window.pwSafeRenderSankey === 'function'){
+      window.pwSafeRenderSankey();
+    }
+  }, 5000);
+})();
+</script>
+<!-- SAVED READINGS ENERGY MONITOR END -->
 </body>
 </html>
