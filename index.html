@@ -9003,5 +9003,33 @@ html.is-authed #dashboardPage {
 })();
 </script>
 <!-- SAVED READINGS ENERGY MONITOR END -->
+<!-- SMOOTH LOGIN TRANSITION START -->
+<style>
+@media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+  @keyframes emdSidebarSmooth60 {
+    from { transform: scaleX(.36); opacity: .75; }
+    to   { transform: scaleX(1); opacity: 1; }
+  }
+
+  @keyframes emdContentSmooth60 {
+    from { transform: translateX(-164px); opacity: .85; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+
+  html.is-authed #dashboardPage .side-nav {
+    width: 256px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    transform-origin: left center;
+    animation: emdSidebarSmooth60 .9s cubic-bezier(.22,.61,.36,1) .75s both !important;
+  }
+
+  html.is-authed #dashboardPage .main-content {
+    margin-left: 256px !important;
+    animation: emdContentSmooth60 .9s cubic-bezier(.22,.61,.36,1) .75s both !important;
+  }
+}
+</style>
+<!-- SMOOTH LOGIN TRANSITION END -->
 </body>
 </html>
