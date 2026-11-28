@@ -9280,5 +9280,48 @@ html.is-authed #dashboardPage {
   }
 </style>
 <!-- EQUAL ADMIN SETTINGS SIDE GAPS END -->
+<!-- ALIGN ADMIN SETTINGS WITH EQUAL GAPS START -->
+<style>
+@media (min-width: 761px) {
+  #dashboardPage.view-admin-settings .main-content {
+    position: relative !important;
+    left: auto !important;
+    margin-left: 256px !important;
+    width: calc(100% - 256px) !important;
+    box-sizing: border-box !important;
+  }
+
+  #dashboardPage.view-admin-settings .main-content > .shell {
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  #dashboardPage.view-admin-settings #adminSettingsPanel {
+    position: relative !important;
+    left: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #dashboardPage.view-admin-settings .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  #dashboardPage.view-admin-settings .main-content > .shell {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+</style>
+<!-- ALIGN ADMIN SETTINGS WITH EQUAL GAPS END -->
 </body>
 </html>
