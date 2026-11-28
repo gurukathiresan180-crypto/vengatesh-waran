@@ -9175,19 +9175,20 @@ html.is-authed #dashboardPage {
       placeholder.style.display = points.length ? 'none' : 'block';
     }
 
-    chart.config.type = 'line';
     chart.data.labels = points.map(function(point){ return point.label; });
-    chart.data.datasets = [{
-      label: 'Estimated demand',
-      data: points.map(function(point){ return Number(point.kw.toFixed(2)); }),
-      borderColor: '#F45B0B',
-      backgroundColor: 'rgba(244, 91, 11, 0.14)',
-      borderWidth: 2,
-      pointRadius: 3,
-      pointHoverRadius: 5,
-      tension: 0.3,
-      fill: true
-    }];
+    chart.data.datasets = [
+      {
+        label: 'Estimated demand',
+        data: points.map(function(point){ return Number(point.kw.toFixed(2)); }),
+        backgroundColor: '#F45B0B',
+        borderColor: '#F45B0B',
+        borderWidth: 1,
+        borderRadius: 3
+      },
+      { label: '', data: [], hidden: true },
+      { label: '', data: [], hidden: true },
+      { label: '', data: [], hidden: true }
+    ];
 
     chart.options.animation = {
       duration: 600,
@@ -9208,7 +9209,11 @@ html.is-authed #dashboardPage {
     chart.options.plugins.legend.labels = {
       color: '#1A1A1A',
       boxWidth: 12,
-      padding: 12
+      padding: 12,
+      filter: function(item, data){
+        return !!(data.datasets[item.datasetIndex] &&
+                  data.datasets[item.datasetIndex].label);
+      }
     };
     chart.options.plugins.tooltip.callbacks = {
       label: function(context){
