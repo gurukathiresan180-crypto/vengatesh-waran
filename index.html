@@ -8897,7 +8897,9 @@ html.is-authed #dashboardPage {
       ) + ' kWh';
     };
 
-    chart.update('none');
+        chart.options.animation.duration = 350;
+    chart.options.animation.easing = 'easeOutCubic';
+    chart.update();
     savedPowerUpdateInProgress = false;
   }
 
