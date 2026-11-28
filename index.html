@@ -9039,5 +9039,30 @@ html.is-authed #dashboardPage {
   }
 </style>
 <!-- HIDE LIVE POWER SNAPSHOT END -->
+<!-- HIDE POWER SOURCES AND ENERGY FLOW START -->
+<style>
+  #pwCard .pw-tab[data-pw-tab="now"],
+  #pwCard .pw-panel[data-pw-panel="now"] {
+    display: none !important;
+  }
+</style>
+
+<script>
+(function(){
+  function openEnergyTab(){
+    var energyTab = document.querySelector(
+      '#pwCard .pw-tab[data-pw-tab="energy"]'
+    );
+    if(energyTab) energyTab.click();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', openEnergyTab, { once: true });
+  } else {
+    openEnergyTab();
+  }
+})();
+</script>
+<!-- HIDE POWER SOURCES AND ENERGY FLOW END -->
 </body>
 </html>
