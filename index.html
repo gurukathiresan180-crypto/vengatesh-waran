@@ -9336,5 +9336,34 @@ html.is-authed #dashboardPage {
 }
 </style>
 <!-- ADMIN SETTINGS ALIGNMENT FIX END -->>
+<!-- ROOM COLOURS FOR ENERGY MONITORING BARS START -->
+<style>
+/* P3 Sub LT Room - teal */
+#dashboardPage:has(#ovRoomSelect option[value="p3-sub-lt"]:checked) .scada-bar-fill{
+  background:linear-gradient(180deg,#2DBFAA 0%,#0F9D8A 60%,#0B7F70 100%) !important;
+  box-shadow:0 3px 10px rgba(15,157,138,.22) !important;
+}
+#dashboardPage:has(#ovRoomSelect option[value="p3-sub-lt"]:checked) .scada-bar-track{
+  background:#F0FBF9 !important;
+  border-color:rgba(15,157,138,.25) !important;
+}
+#dashboardPage:has(#ovRoomSelect option[value="p3-sub-lt"]:checked) .scada-bar-column:hover .scada-bar-value{
+  color:#0B7F70 !important;
+}
+
+/* UPS - blue */
+#dashboardPage:has(#ovRoomSelect option[value="ups-reading"]:checked) .scada-bar-fill{
+  background:linear-gradient(180deg,#5B8DEF 0%,#2563EB 60%,#1D4ED8 100%) !important;
+  box-shadow:0 3px 10px rgba(37,99,235,.22) !important;
+}
+#dashboardPage:has(#ovRoomSelect option[value="ups-reading"]:checked) .scada-bar-track{
+  background:#F3F7FF !important;
+  border-color:rgba(37,99,235,.25) !important;
+}
+#dashboardPage:has(#ovRoomSelect option[value="ups-reading"]:checked) .scada-bar-column:hover .scada-bar-value{
+  color:#1D4ED8 !important;
+}
+</style>
+<!-- ROOM COLOURS FOR ENERGY MONITORING BARS END -->
 </body>
 </html>
