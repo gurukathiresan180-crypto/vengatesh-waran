@@ -9077,5 +9077,181 @@ html.is-authed #dashboardPage {
 })();
 </script>
 <!-- HIDE POWER SOURCES AND ENERGY FLOW END -->
+<!-- ESTIMATED TNEB DEMAND GRAPH START -->
+<script>
+(function(){
+  var patchedChart = null;
+
+  function getPoints(){
+    if(typeof window.__getSavedDemandReadings !== 'function') return [];
+
+    var readings = window.__getSavedDemandReadings() || [];
+    var byMeter = {};
+
+    function parseTime(value){
+      var m = String(value || '').match(
+        /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/
+      );
+      if(!m) return null;
+
+      return Date.UTC(
+        Number(m[1]), Number(m[2]) - 1, Number(m[3]),
+        Number(m[4]), Number(m[5]), Number(m[6])
+      ) - 330 * 60000;
+    }
+
+    readings.forEach(function(r){
+      var time = parseTime(r.updatedAt);
+      if(time === null || !r.equipment || !Number.isFinite(Number(r.reading))) return;
+
+      (byMeter[r.equipment] = byMeter[r.equipment] || []).push({
+        time: time,
+        date: r.date || '',
+        shift: r.shift || '',
+        reading: Number(r.reading),
+        updatedAt: r.updatedAt
+      });
+    });
+
+    var byTime = {};
+
+    Object.keys(byMeter).forEach(function(meter){
+      var list = byMeter[meter].sort(function(a,b){ return a.time - b.time; });
+
+      for(var i = 1; i < list.length; i++){
+        var previous = list[i - 1];
+        var current = list[i];
+        var hours = (current.time - previous.time) / 3600000;
+        var difference = current.reading - previous.reading;
+
+        if(hours <= 0 || difference < 0) continue;
+
+        var key = String(current.time);
+        if(!byTime[key]){
+          var timeText = current.updatedAt.match(/\d{2}:\d{2}/);
+          byTime[key] = {
+            time: current.time,
+            label: current.date + ' ' + (timeText ? timeText[0] : '') +
+              (current.shift ? ' · Shift ' + current.shift : ''),
+            kw: 0
+          };
+        }
+
+        byTime[key].kw += difference / hours;
+      }
+    });
+
+    return Object.keys(byTime)
+      .map(function(key){ return byTime[key]; })
+      .sort(function(a,b){ return a.time - b.time; })
+      .slice(-30);
+  }
+
+  function setChartData(chart, points){
+    var title = document.querySelector(
+      '#pwCard .pw-energy-heading .pw-block-title'
+    );
+    var note = document.querySelector(
+      '#pwCard .pw-energy-heading .pw-summary-note'
+    );
+    var badge = document.querySelector(
+      '#pwCard .pw-energy-heading .pw-data-badge'
+    );
+    var footnote = document.querySelector('#pwCard .pw-energy-footnote');
+
+    if(title) title.textContent = 'TNEB DEMAND (ESTIMATED)';
+    if(note) note.textContent = 'Calculated from saved Main LT kWh readings';
+    if(badge) badge.textContent = 'ESTIMATED DEMAND · kW';
+    if(footnote){
+      footnote.textContent =
+        'Average demand between saved readings; this is not a TNEB meter peak-demand value.';
+    }
+
+    var placeholder = document.getElementById('pwEnergyPlaceholder');
+    if(placeholder){
+      placeholder.textContent = points.length
+        ? ''
+        : 'Save at least two timestamped readings for the same Main LT meter to calculate demand.';
+      placeholder.style.display = points.length ? 'none' : 'block';
+    }
+
+    chart.config.type = 'line';
+    chart.data.labels = points.map(function(point){ return point.label; });
+    chart.data.datasets = [{
+      label: 'Estimated demand',
+      data: points.map(function(point){ return Number(point.kw.toFixed(2)); }),
+      borderColor: '#F45B0B',
+      backgroundColor: 'rgba(244, 91, 11, 0.14)',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.3,
+      fill: true
+    }];
+
+    chart.options.animation = {
+      duration: 600,
+      easing: 'easeInOutCubic'
+    };
+    chart.options.scales.x = {
+      grid: { color: '#EEF0F2' },
+      ticks: { color: '#5B6168', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 },
+      border: { color: '#D5D8DC' }
+    };
+    chart.options.scales.y = {
+      beginAtZero: true,
+      title: { display: true, text: 'Estimated demand (kW)', color: '#5B6168' },
+      grid: { color: '#EEF0F2' },
+      ticks: { color: '#5B6168' },
+      border: { display: false }
+    };
+    chart.options.plugins.legend.labels = {
+      color: '#1A1A1A',
+      boxWidth: 12,
+      padding: 12
+    };
+    chart.options.plugins.tooltip.callbacks = {
+      label: function(context){
+        return 'Estimated demand: ' +
+          Number(context.parsed.y || 0).toLocaleString(
+            undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+          ) + ' kW';
+      }
+    };
+  }
+
+  function updateDemandChart(){
+    if(!window.Chart || typeof Chart.getChart !== 'function') return;
+
+    var canvas = document.getElementById('pwEnergyChart');
+    if(!canvas) return;
+
+    var chart = Chart.getChart(canvas);
+    if(!chart) return;
+
+    if(chart !== patchedChart){
+      var originalUpdate = chart.update.bind(chart);
+      chart.update = function(mode){
+        setChartData(chart, getPoints());
+        return originalUpdate(mode);
+      };
+      patchedChart = chart;
+    }
+
+    var points = getPoints();
+    var signature = JSON.stringify(points);
+    setChartData(chart, points);
+
+    if(chart.__tnebDemandSignature !== signature){
+      chart.__tnebDemandSignature = signature;
+      chart.update();
+    }
+  }
+
+  updateDemandChart();
+  setInterval(updateDemandChart, 2000);
+})();
+</script>
+<!-- ESTIMATED TNEB DEMAND GRAPH END -->
 </body>
 </html>
