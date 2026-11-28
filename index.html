@@ -4468,6 +4468,10 @@ function ovMeterItems(){
 
   return out;
 }
+  // Let the Energy Monitor read the already calculated saved kWh records.
+  window.__getSavedEnergyMonitorItems = function(){
+    return ovMeterItems().slice();
+  };
 async function saveRoom(roomId) {
   var room = ROOMS.filter(function(rm) {
     return rm.id === roomId;
