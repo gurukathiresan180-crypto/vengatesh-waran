@@ -8580,12 +8580,22 @@ html.is-authed #dashboardPage {
   margin-bottom: 0 !important;
 }
 
+/* Remove empty space inside the orange header frame */
 #dashboardPage.view-mainlt-quick .layout,
 #dashboardPage.view-p3-quick .layout,
 #dashboardPage.view-ups-quick .layout,
 #dashboardPage.view-dg-quick .layout,
 #dashboardPage.view-diesel-quick .layout {
- padding-top: 40px !important;
+  padding-top: 0 !important;
+}
+
+/* Gap between the header frame and the reading section */
+#dashboardPage.view-mainlt-quick .results-panel,
+#dashboardPage.view-p3-quick .results-panel,
+#dashboardPage.view-ups-quick .results-panel,
+#dashboardPage.view-dg-quick .results-panel,
+#dashboardPage.view-diesel-quick .results-panel {
+  margin-top: 28px !important;
 }
 </style>
 <!-- READING SECTION HEADER GAP END -->
