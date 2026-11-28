@@ -4472,6 +4472,19 @@ function ovMeterItems(){
   window.__getSavedEnergyMonitorItems = function(){
     return ovMeterItems().slice();
   };
+    window.__getSavedDemandReadings = function(){
+    return (dataByRoom['main-lt'] || []).map(function(r){
+      return {
+        equipment: r.equipment || '',
+        date: r.date || '',
+        shift: r.shift || '',
+        reading: Number(r.reading),
+        updatedAt: r.updatedAt || ''
+      };
+    }).filter(function(r){
+      return Number.isFinite(r.reading);
+    });
+  };
 async function saveRoom(roomId) {
   var room = ROOMS.filter(function(rm) {
     return rm.id === roomId;
